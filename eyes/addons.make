@@ -1,0 +1,7 @@
+ofxAutoReloadedShader
+ofxCv
+ofxFaceTracker2
+ofxGui
+ofxOpenCv
+ofxOsc
+ofxPubSubOsc
