@@ -1,6 +1,6 @@
 #include "ofApp.h"
 
-bool testMode = false;
+bool testMode = true;
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -125,38 +125,38 @@ void ofApp::drawMainTexture() {
 	//ofPopMatrix();
 
 	if (qualitySlider > 0.0f && vcb.isEmpty() == false && tracker0.getInstances().size() > 0) {
+		for (int j = 0; j < tracker0.getInstances().size(); j++) {
+			auto vs0 = vcb.getImagePoints();
+			auto vs1 = tracker1.getInstances().at(0).getLandmarks().getImagePoints();
 
-		auto vs0 = vcb.getImagePoints();
-		auto vs1 = tracker1.getInstances().at(0).getLandmarks().getImagePoints();
-
-		ofMesh m;
-		int count = 0;
-		for (auto& v : tracker0.getInstances().at(0).getLandmarks().getImagePoints()) {
-			m.addVertex(glm::vec3(v.x, v.y, 0));
-			if (false && count < 27) { // contour
-				m.addColor(ofFloatColor(1.0f, 1.0f, 1.0f, 0.0f));
+			ofMesh m;
+			int count = 0;
+			for (auto& v : tracker0.getInstances().at(j).getLandmarks().getImagePoints()) {
+				m.addVertex(glm::vec3(v.x, v.y, 0));
+				if (false && count < 27) { // contour
+					m.addColor(ofFloatColor(1.0f, 1.0f, 1.0f, 0.0f));
+				}
+				else {
+					m.addColor(ofFloatColor(1.0f, 1.0f, 1.0f, qualitySlider));
+				}
+				count++;
 			}
-			else {
-				m.addColor(ofFloatColor(1.0f, 1.0f, 1.0f, qualitySlider));
+
+			count = 0;
+			for (auto& vt : points) {
+				m.addTexCoord(glm::vec2(vt[0], vt[1]));
+				count++;
 			}
-			count++;
-		}
+			for (int i = 0; i < sizeof(faces) / sizeof(*faces); i += 3) {
+				m.addIndex(faces[i]);
+				m.addIndex(faces[i + 1]);
+				m.addIndex(faces[i + 2]);
+			}
 
-		count = 0;
-		for (auto& vt : points) {
-			m.addTexCoord(glm::vec2(vt[0], vt[1]));
-			count++;
+			vcb.getFrame().bind();
+			m.draw();
+			vcb.getFrame().unbind();
 		}
-		for (int i = 0; i < sizeof(faces) / sizeof(*faces); i += 3) {
-			m.addIndex(faces[i]);
-			m.addIndex(faces[i + 1]);
-			m.addIndex(faces[i + 2]);
-		}
-
-		vcb.getFrame().bind();
-		m.draw();
-		vcb.getFrame().unbind();
-
 	}
 
 	mainTexture.end();
