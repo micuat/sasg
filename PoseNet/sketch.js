@@ -14,14 +14,32 @@ let poses = [];
 let sh;
 
 function preload() {
-  video = createVideo('assets/clip.mp4');
+  video = createVideo('assets/clip.mp4', () => {
+    console.log("ready")
+    setupPromise();
+  });
   sh = loadShader('vert.glsl', 'frag.glsl');
 }
+
 function setup() {
-  createCanvas(480, 720, WEBGL);
-  console.log(video.elt.playbackRate)
+  noLoop();
+}
+
+function setupPromise() {
+  let aspectRatio = video.width / video.height;
+  if(aspectRatio > 1.0) {
+    createCanvas(720, 720 / aspectRatio, WEBGL);
+  }
+  else {
+    createCanvas(720 * aspectRatio, 720, WEBGL);
+  }
+  pixelDensity(1.0);
+
+  // createCanvas(480, 720, WEBGL);
+  console.log(aspectRatio)
   video.loop();
   video.volume(0);
+  video.speed(0.5);
   video.play();
   video.size(width, height);
 
@@ -37,8 +55,8 @@ function setup() {
 }
 
 function modelReady() {
-  video.speed(0.5);
   // select('#status').html('Model Loaded');
+  loop();
 }
 
 function draw() {
