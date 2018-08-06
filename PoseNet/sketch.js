@@ -14,7 +14,7 @@ let poses = [];
 let sh;
 
 function preload() {
-  video = createVideo('assets/clip.mp4', () => {
+  video = createVideo('assets/clip2.mp4', () => {
     console.log("ready")
     setupPromise();
   });
@@ -63,6 +63,8 @@ function draw() {
   background(0);
   translate(-width / 2, -height / 2);
 
+  colorMode(RGB, 255);
+
   texture(video);
   beginShape();
   vertex(0, 0, 0, 0, 0);
@@ -70,14 +72,16 @@ function draw() {
   vertex(width, height, 0, 1, 1);
   vertex(0, height, 0, 0, 1);
   endShape(CLOSE);
-  // image(video, 0, 0, width, height);
 
+  ambientLight(50, 50, 50);
+  directionalLight(255, 255, 255, 0.25, 0.25, 0);
+
+  colorMode(HSB, 255);
+  // shader(sh);
+  // sh.setUniform('uSampler', video);
   // We can call both functions to draw all keypoints and the skeletons
-  shader(sh);
-  sh.setUniform('uSampler', video);
   drawKeypoints();
 
-  // translate(0, 0, 1);
   // drawSkeleton();
 }
 
@@ -123,19 +127,14 @@ function drawKeypoints()  {
       }
 
       if(j < 5) {
-        //let c = get(keypoint.position.x, keypoint.position.y);
-        //fill(c);
-        // ellipse(keypoint.position.x, keypoint.position.y, 50, 50);
         push();
         let dw = 25;
         let dh = tall * 0.1;
+        if(dh < 10) dh = 10;
+        noStroke();
+        specularMaterial(255 * i / 10.0, 255, 255);
         translate(keypoint.position.x, keypoint.position.y);
-        beginShape();
-        vertex(-dw, -dh, 0, 0, 0);
-        vertex(dw, -dh, 0, 1, 0);
-        vertex(dw, dh, 0, 1, 1);
-        vertex(-dw, dh, 0, 0, 1);
-        endShape(CLOSE);
+        sphere(dh);
         pop();
       }
     }
