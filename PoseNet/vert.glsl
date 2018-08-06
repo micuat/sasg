@@ -1,25 +1,35 @@
-uniform mat4 uModelViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform mat3 uNormalMatrix;
+precision mediump float;
 
 attribute vec3 aPosition;
 attribute vec3 aNormal;
-attribute vec4 aVertexColor;
 attribute vec2 aTexCoord;
 
-varying vec4 vertColor;
-varying vec2 vertTexCoord;
-varying vec3 vertNormal;
-varying vec3 vertPosition;
+uniform vec3 uAmbientColor[8];
 
-void main() {
-  vec4 positionVec4 = vec4(aPosition, 1.0);
-  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4;
-  vec4 vertPosition4 = uProjectionMatrix * uModelViewMatrix * positionVec4;
+uniform mat4 uModelViewMatrix;
+uniform mat4 uProjectionMatrix;
+uniform mat3 uNormalMatrix;
+uniform int uAmbientLightCount;
 
-  vertPosition = vertPosition4.xyz / vertPosition4.w;
+varying vec3 vNormal;
+varying vec2 vTexCoord;
+varying vec3 vViewPosition;
+varying vec3 vAmbientColor;
 
-  vertNormal = vec3(uNormalMatrix * aNormal);
-  vertColor = aVertexColor;
-  vertTexCoord = aTexCoord;
+void main(void){
+
+  vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);
+
+  // Pass varyings to fragment shader
+  vViewPosition = viewModelPosition.xyz;
+  gl_Position = uProjectionMatrix * viewModelPosition;  
+
+  vNormal = normalize(uNormalMatrix * normalize(aNormal));
+  vTexCoord = aTexCoord;
+
+  vAmbientColor = vec3(0.0);
+  for (int i = 0; i < 8; i++) {
+    if (uAmbientLightCount == i) break;
+    vAmbientColor += uAmbientColor[i];
+  }
 }

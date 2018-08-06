@@ -1,34 +1,111 @@
-#ifdef GL_ES
 precision mediump float;
-precision mediump int;
-#endif
 
+//uniform mat4 uModelViewMatrix;
+uniform mat4 uViewMatrix;
+
+uniform vec4 uMaterialColor;
 uniform sampler2D uSampler;
-uniform sampler2D uSecondSampler;
-uniform float uRed;
-uniform float uGreen;
+uniform bool isTexture;
+uniform bool uUseLighting;
 
-varying vec4 vertColor;
-varying vec2 vertTexCoord;
-varying vec3 vertNormal;
-varying vec3 vertPosition;
+uniform vec3 uLightingDirection[8];
+uniform vec3 uDirectionalColor[8];
+uniform vec3 uPointLightLocation[8];
+uniform vec3 uPointLightColor[8];
+uniform bool uSpecular;
 
-const vec4 lumcoeff = vec4(0.299, 0.587, 0.114, 0);
+uniform int uDirectionalLightCount;
+uniform int uPointLightCount;
 
-float saturate(float a) {
-    return clamp(a, 0.0, 1.0);
+varying vec3 vNormal;
+varying vec2 vTexCoord;
+varying vec3 vViewPosition;
+varying vec3 vAmbientColor;
+
+vec3 V;
+vec3 N;
+
+const float shininess = 32.0;
+const float specularFactor = 2.0;
+const float diffuseFactor = 0.73;
+
+uniform float uBrighter;
+
+struct LightResult {
+	float specular;
+	float diffuse;
+};
+
+float phongSpecular(
+  vec3 lightDirection,
+  vec3 viewDirection,
+  vec3 surfaceNormal,
+  float shininess) {
+
+  vec3 R = normalize(reflect(-lightDirection, surfaceNormal));  
+  return pow(max(0.0, dot(R, viewDirection)), shininess);
 }
-void main() {
-    vec2 vp = vec2(vertPosition.x * 0.5 + 0.5, 0.5 - vertPosition.y * 0.5);
-    vec2 ratio = vec2(720, 480) / 480.0 * 0.01;
-    vp = floor(vp / ratio) * ratio;
-    vec4 textureColor = texture2D(uSampler, vp + vec2(0.0));
-//   float a = dot(textureColor, lumcoeff);
-//   vec4 secondTextureColor = texture2D(uSecondSampler, vertTexCoord);
-//   float b = dot(secondTextureColor, lumcoeff);
-    gl_FragColor = vec4(saturate(1.0 - textureColor.r * 2.0),
-    0.0,
-    saturate(textureColor.r * 2.0 - 1.0),
-    1.0);
-    // gl_FragColor = textureColor;
+
+float lambertDiffuse(
+  vec3 lightDirection,
+  vec3 surfaceNormal) {
+  return max(0.0, dot(-lightDirection, surfaceNormal));
+}
+
+LightResult light(vec3 lightVector) {
+
+  vec3 L = normalize(lightVector);
+
+  //compute our diffuse & specular terms
+  LightResult lr;
+  if (uSpecular)
+    lr.specular = phongSpecular(L, V, N, shininess);
+  lr.diffuse = lambertDiffuse(L, N);
+  return lr;
+}
+
+void main(void) {
+
+  V = normalize(vViewPosition);
+  N = vNormal;
+
+  vec3 diffuse = vec3(0.0);
+  float specular = 0.0;
+
+  for (int j = 0; j < 8; j++) {
+    if (uDirectionalLightCount == j) break;
+
+    LightResult result = light(uLightingDirection[j]);
+    diffuse += result.diffuse * uDirectionalColor[j];
+    specular += result.specular;
+  }
+
+  for (int k = 0; k < 8; k++) {
+    if (uPointLightCount == k) break;
+
+    vec3 lightPosition = (uViewMatrix * vec4(uPointLightLocation[k], 1.0)).xyz;
+    vec3 lightVector = vViewPosition - lightPosition;
+	
+    //calculate attenuation
+    float lightDistance = length(lightVector);
+    float falloff = 500.0 / (lightDistance + 500.0);
+
+    LightResult result = light(lightVector);
+    diffuse += result.diffuse * falloff * uPointLightColor[k];
+    specular += result.specular * falloff;
+  }
+
+  if(uBrighter > 0.5) {
+    gl_FragColor = isTexture ? texture2D(uSampler, vTexCoord * vec2(2.0, 1.0) - floor(vTexCoord * vec2(2.0, 1.0))) : uMaterialColor;
+    float r = 1.0 / 8.0;
+    gl_FragColor.r = pow(gl_FragColor.r, r);
+    gl_FragColor.g = pow(gl_FragColor.g, r);
+    gl_FragColor.b = pow(gl_FragColor.b, r);
+    gl_FragColor.rgb *= 0.7;
+  }
+  else {
+      gl_FragColor = isTexture ? texture2D(uSampler, vTexCoord) : uMaterialColor;
+      gl_FragColor *= 1.0;
+  }
+  gl_FragColor.rgb = gl_FragColor.rgb * (diffuse * diffuseFactor + vAmbientColor) + specular * specularFactor;
 }

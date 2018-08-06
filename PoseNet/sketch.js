@@ -9,17 +9,19 @@ PoseNet example using p5.js
 === */
 
 let video;
+let envImage;
 let poseNet;
 let poses = [];
 let sh;
 let avatars = [];
 
 function preload() {
-  video = createVideo('assets/clip3.mp4', () => {
+  video = createVideo('assets/clip2.mp4', () => {
     console.log("ready")
     setupPromise();
   });
   sh = loadShader('vert.glsl', 'frag.glsl');
+  envImage = loadImage('assets/env.jpg');
 }
 
 function setup() {
@@ -35,7 +37,7 @@ function setupPromise() {
   else {
     createCanvas(720 * aspectRatio, 720, WEBGL);
   }
-  pixelDensity(1.0);
+  pixelDensity(2.0);
 
   // createCanvas(480, 720, WEBGL);
   console.log(aspectRatio)
@@ -67,6 +69,8 @@ function draw() {
 
   colorMode(RGB, 255);
 
+  sh.setUniform('uBrighter', 0.0);
+
   texture(video);
   beginShape();
   vertex(0, 0, 0, 0, 0);
@@ -75,12 +79,15 @@ function draw() {
   vertex(0, height, 0, 0, 1);
   endShape(CLOSE);
 
-  ambientLight(50, 50, 50);
-  directionalLight(255, 255, 255, 0.25, 0.25, 0);
+  ambientLight(200, 200, 200);
+  let lc = 150;
+  directionalLight(lc, lc, lc, 0.25, 0.25, -0.5);
+  directionalLight(lc, lc, lc, -0.25, 0.25, -0.5);
 
   colorMode(HSB, 255);
-  // shader(sh);
-  // sh.setUniform('uSampler', video);
+  shader(sh);
+  sh.setUniform('uSampler', video);
+  sh.setUniform('uBrighter', 1.0);
   // We can call both functions to draw all keypoints and the skeletons
   drawKeypoints();
   drawAvatars();
@@ -136,13 +143,13 @@ function drawKeypoints() {
       }
 
       if(j < 5) {
-        push();
+        // push();
         let dw = 25;
         let dh = tall * 0.1;
         if(dh < 10) dh = 10;
-        noStroke();
-        specularMaterial(255 * i / 10.0, 255, 255);
-        translate(keypoint.position.x, keypoint.position.y);
+        // noStroke();
+        // specularMaterial(255 * i / 10.0, 255, 255);
+        // translate(keypoint.position.x, keypoint.position.y);
         // sphere(dh);
         avatar.push({
           x: keypoint.position.x,
@@ -150,7 +157,7 @@ function drawKeypoints() {
           r: dh,
           c: 255 * i / 10.0
         });
-        pop();
+        // pop();
       }
     }
     frame.push(avatar);
@@ -167,8 +174,10 @@ function drawAvatars()  {
         noStroke();
         let sat = map(count, 0, avatars.length / 2, 0, 255);
         sat = constrain(sat, 0, 255);
-        specularMaterial(point.c, sat, 255);
         translate(point.x, point.y);
+        texture(envImage);
+        // specularMaterial(255);
+        rotateY(PI * 0.25);
         sphere(point.r * sat / 255.0);
         pop();
       }
