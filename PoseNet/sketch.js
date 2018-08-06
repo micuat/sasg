@@ -12,9 +12,10 @@ let video;
 let poseNet;
 let poses = [];
 let sh;
+let avatars = [];
 
 function preload() {
-  video = createVideo('assets/clip2.mp4', () => {
+  video = createVideo('assets/clip3.mp4', () => {
     console.log("ready")
     setupPromise();
   });
@@ -23,6 +24,7 @@ function preload() {
 
 function setup() {
   noLoop();
+  for(let i = 0; i < 30; i++) avatars.push([]);
 }
 
 function setupPromise() {
@@ -81,14 +83,21 @@ function draw() {
   // sh.setUniform('uSampler', video);
   // We can call both functions to draw all keypoints and the skeletons
   drawKeypoints();
+  drawAvatars();
+
+  if(avatars.length > 30) {
+    avatars.shift();
+  }
 
   // drawSkeleton();
 }
 
 // A function to draw ellipses over the detected keypoints
-function drawKeypoints()  {
+function drawKeypoints() {
+  let frame = []
   // Loop through all the poses detected
   for (let i = 0; i < poses.length; i++) {
+    let avatar = [];
     // get size
     let tall = 0;
     {
@@ -134,10 +143,37 @@ function drawKeypoints()  {
         noStroke();
         specularMaterial(255 * i / 10.0, 255, 255);
         translate(keypoint.position.x, keypoint.position.y);
-        sphere(dh);
+        // sphere(dh);
+        avatar.push({
+          x: keypoint.position.x,
+          y: keypoint.position.y,
+          r: dh,
+          c: 255 * i / 10.0
+        });
         pop();
       }
     }
+    frame.push(avatar);
+  }
+  avatars.push(frame);
+}
+
+function drawAvatars()  {
+  let count = 0;
+  for (let frame of avatars) {
+    for (let avatar of frame) {
+      for (let point of avatar) {
+        push();
+        noStroke();
+        let sat = map(count, 0, avatars.length / 2, 0, 255);
+        sat = constrain(sat, 0, 255);
+        specularMaterial(point.c, sat, 255);
+        translate(point.x, point.y);
+        sphere(point.r * sat / 255.0);
+        pop();
+      }
+    }
+    count++;
   }
 }
 
