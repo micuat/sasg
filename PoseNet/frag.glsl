@@ -30,6 +30,7 @@ const float specularFactor = 2.0;
 const float diffuseFactor = 0.73;
 
 uniform float uBrighter;
+uniform vec3 uMaterialColorOverride;
 
 struct LightResult {
 	float specular;
@@ -101,7 +102,7 @@ void main(void) {
     gl_FragColor.r = pow(gl_FragColor.r, r);
     gl_FragColor.g = pow(gl_FragColor.g, r);
     gl_FragColor.b = pow(gl_FragColor.b, r);
-    gl_FragColor.rgb *= 0.7;
+    gl_FragColor.rgb *= uMaterialColorOverride;
   }
   else {
       gl_FragColor = isTexture ? texture2D(uSampler, vTexCoord) : uMaterialColor;

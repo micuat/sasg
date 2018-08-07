@@ -32,6 +32,32 @@ if(true) {
   looped = true;
 }
 
+// https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
+function HSVtoRGB(h, s, v) {
+  var r, g, b, i, f, p, q, t;
+  if (arguments.length === 1) {
+      s = h.s, v = h.v, h = h.h;
+  }
+  i = Math.floor(h * 6);
+  f = h * 6 - i;
+  p = v * (1 - s);
+  q = v * (1 - f * s);
+  t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+      case 0: r = v, g = t, b = p; break;
+      case 1: r = q, g = v, b = p; break;
+      case 2: r = p, g = v, b = t; break;
+      case 3: r = p, g = q, b = v; break;
+      case 4: r = t, g = p, b = v; break;
+      case 5: r = v, g = p, b = q; break;
+  }
+  return {
+      r: r,
+      g: g,
+      b: b
+  };
+}
+
 function preload() {
   video = createVideo('assets/clip4.mp4', () => {
     console.log("ready")
@@ -213,13 +239,14 @@ function drawAvatars()  {
     for (let avatar of frame) {
       for (let point of avatar) {
         push();
-        noStroke();
         let sat = map(index, frameNums[i] + 60, frameNums[i] + 20, 0, 255);
         sat = constrain(sat, 0, 255);
         translate(point.x, point.y);
         texture(envImage);
         // specularMaterial(255);
         rotateY(PI * -0.5);
+        let hsv = HSVtoRGB(map(point.c, 0.0, 255.0, 0.0, 1.0), 0.8, 0.8);
+        sh.setUniform('uMaterialColorOverride', [hsv.r, hsv.g, hsv.b]);
         sphere(point.r * sat / 255.0);
         pop();
       }
