@@ -12,6 +12,10 @@ let videoFrameRate = 59.94;
 let curTime = 0;
 let isSetup = false;
 
+let clipName = "clip4.mp4";
+let frameNums = frameNumData[clipName];
+let avatars = avatarData[clipName];
+
 // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
 function HSVtoRGB(h, s, v) {
   var r, g, b, i, f, p, q, t;
@@ -39,7 +43,7 @@ function HSVtoRGB(h, s, v) {
 }
 
 function preload() {
-  video = createVideo('assets/clip4.mp4', () => {
+  video = createVideo('assets/' + clipName, () => {
     console.log("ready")
     setupPromise();
   });
