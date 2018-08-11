@@ -12,7 +12,7 @@ let videoFrameRate = 59.94;
 let curTime = 0;
 let isSetup = false;
 
-let clipName = "clip4.mp4";
+let clipName = "clip180811.mp4";
 let frameNums = frameNumData[clipName];
 let avatars = avatarData[clipName];
 
@@ -137,7 +137,7 @@ function drawAvatars()  {
         texture(envImage);
         // specularMaterial(255);
         rotateY(PI * -0.5);
-        let hsv = HSVtoRGB(map(point.c, 0.0, 255.0, 0.0, 1.0), 0.8, 0.8);
+        let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), 0.8, 0.8);
         sh.setUniform('uMaterialColorOverride', [hsv.r, hsv.g, hsv.b]);
         sphere(point.r * sat / 255.0);
         pop();

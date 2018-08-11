@@ -16,7 +16,7 @@ let lastFrameNum = 0;
 let isSetup = false;
 
 function preload() {
-  video = createVideo('assets/clip4.mp4', () => {
+  video = createVideo('assets/clip180811.mp4', () => {
     console.log("ready")
     setupPromise();
   });
@@ -45,7 +45,7 @@ function setupPromise() {
   pixelDensity(2.0);
 
   video.loop();
-  video.volume(0);
+  video.elt.muted = true;
   video.play();
   video.size(width, height);
 
