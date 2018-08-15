@@ -23,30 +23,37 @@ void setup() {
 
 void draw() {
   if (frameCount % 60 == 0) {
+    // needs to be in other thread
     HashMap<String, String>[] allServers = SyphonClient.listServers();
 
     int nServers = allServers.length;
 
-    canvas = new PGraphics[nServers];
-    clients = new SyphonClient[nServers];
+    if (nServers != nClients) {
+
+      canvas = new PGraphics[nServers];
+      clients = new SyphonClient[nServers];
 
 
-    for (int i = 0; i < allServers.length; i++) {
+      for (int i = 0; i < allServers.length; i++) {
 
-      String appName = allServers[i].get("AppName");
-      String serverName = allServers[i].get("ServerName");
+        String appName = allServers[i].get("AppName");
+        String serverName = allServers[i].get("ServerName");
 
-      clients[i] = new SyphonClient(this, appName, serverName);
+        clients[i] = new SyphonClient(this, appName, serverName);
+      }
+
+      nClients = nServers;
     }
-
-    nClients = nServers;
   }
 
-
+  background(0);
+  blendMode(ADD);
   for (int i = 0; i < nClients; i++) {
     if (clients[i].newFrame()) {
+      //tint(255, 255.0 / nClients);
       canvas[i] = clients[i].getGraphics(canvas[i]);
-      image(canvas[i], 200 * (i % 2), 200 * (i / 2));
+      //image(canvas[i], 200 * (i % 2), 200 * (i / 2));
+      image(canvas[i], 0, 0);
     }
   }
 }
