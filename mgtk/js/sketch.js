@@ -1,6 +1,7 @@
 var s = function (p) {
   let name;
   let transformFunc;
+  let lineFunc;
   let startFrame;
   let targetII;
 
@@ -14,11 +15,6 @@ var s = function (p) {
   function getCount() { return p.frameCount - startFrame };
 
   p.draw = function () {
-    p.background(0);
-    p.stroke(255);
-
-    p.translate(p.width / 2, p.height / 2);
-
     if(getCount() % 60 == 0) {
       // targetII = Math.floor(p.random(-1, 2));
       targetII = Math.floor(p.random(-5, 2));
@@ -48,15 +44,73 @@ var s = function (p) {
         function(tween, l) {
           if(tween < 0.5) {
             return p.map(tween, 0.0, 0.5, 1.0, 0.1) * l;
-            // p.scale(1.0 - tween, 1.0);
           }
           else {
             return p.map(tween, 0.5, 1.0, 0.1, 1.0) * l;
-            // p.scale(tween, 1.0);
           }
         }
       ]);
+
+      lineFunc = p.random([
+        function (tween, l) {
+          p.ellipse(0, 0, 10);
+          p.line(0,0,l,0);
+          p.ellipse(l, 0, 10);    
+        }
+        ,
+        function (tween, l) {
+          p.ellipse(0, 0, 10);
+          if(tween < 0.5) {
+            p.line(0, 0, p.map(tween, 0.0, 0.5, 1.0, 0.1) * l, 0);
+          }
+          else {
+            p.line(0, 0, p.map(tween, 0.5, 1.0, 0.1, 1.0) * l, 0);
+          }
+          p.ellipse(l, 0, 10);    
+        }
+        ,
+        function (tween, l) {
+          p.ellipse(0, 0, 10);
+          p.line(tween * l, 0, (1.0 - tween) * l, 0);
+          p.ellipse(l, 0, 10);    
+        }
+        ,
+        function (tween, l) {
+          p.ellipse(0, 0, 10);
+          p.push();
+          p.rotate(tween * Math.PI * 2.0);
+          p.line(0, 0, l, 0);
+          p.pop();
+          p.ellipse(l, 0, 10);
+        }
+        ,
+        function (tween, l) {
+          p.ellipse(0, 0, 10);
+          let tw;
+          if(tween < 0.5) {
+            tw = tween * 2.0;
+          }
+          else {
+            tw = 2.0 - tween * 2.0;
+          }
+          p.noFill();
+          p.beginShape(p.POINTS);
+          for(let dx = 0.0; dx < l; dx+=1.0) {
+            let y = Math.sin(dx / l * Math.PI) * Math.sin(dx * 0.1 + tw * 10.0) * tw;
+            p.vertex(dx, y * 100);
+          }
+          p.endShape();
+          p.fill(255);
+          p.ellipse(l, 0, 10);
+        }
+      ]);
     }
+
+    p.background(0);
+    p.stroke(255);
+    p.strokeWeight(3);
+
+    p.translate(p.width / 2, p.height / 2);
 
     let t = getCount() / 30.0;
 
@@ -77,11 +131,11 @@ var s = function (p) {
       p.translate(ii * p.width / 3, 0);
       let l = 150;
       l = transformFunc(tween, l);
-      p.ellipse(0, 0, 10);
-      p.line(0,0,l,0);
-      p.ellipse(l, 0, 10);
+      lineFunc(tween, l);
       p.pop();
     }
+
+    p.syphonServer.sendScreen();
   }
 };
 

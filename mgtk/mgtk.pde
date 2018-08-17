@@ -37,6 +37,8 @@ import netP5.*;
 
 import geomerative.*;
 
+import codeanticode.syphon.*;
+
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 
@@ -57,6 +59,8 @@ public int newWidth, newHeight;
 public PApplet that = this;
 
 public String folderName = "js";
+
+public SyphonServer syphonServer;
 
 boolean libInited = false;
 
@@ -88,6 +92,8 @@ void setup() {
   libPaths.add(sketchPath("libs/regression.min.js"));
 
   scriptPaths.add(sketchPath(folderName + "/sketch.js"));
+
+  syphonServer = new SyphonServer(this, "mgtk");
 
   initNashorn();
 }
