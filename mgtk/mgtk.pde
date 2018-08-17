@@ -56,9 +56,7 @@ public int newWidth, newHeight;
 
 public PApplet that = this;
 
-public Icosahedron ico = new Icosahedron(75);
-
-public String folderName = "080_wmp";
+public String folderName = "js";
 
 boolean libInited = false;
 
