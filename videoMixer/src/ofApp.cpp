@@ -164,44 +164,42 @@ void ofApp::draw(){
         if(dir.isValidIndex(i)) {
             auto& c = clients.at(i);
             ofPushMatrix();
+            float alpha = 0.0f;
             try {
                 if(jsonGeometry.find("layers") != jsonGeometry.end()) {
                     auto& jsonLayers = jsonGeometry["layers"];
                     string name = c.getServerName() + ":" + c.getApplicationName();
 
                     if(jsonLayers.find(name) != jsonLayers.end()) {
-                        auto& geom = jsonLayers[name];
+                        auto& layer = jsonLayers[name];
 
-                        ofPoint src[4];
-                        ofPoint dst[4];
-                        float homography[16];
-                        src[0] = ofPoint(0, 0);
-                        src[1] = ofPoint(c.getWidth(), 0);
-                        src[2] = ofPoint(c.getWidth(), c.getHeight());
-                        src[3] = ofPoint(0, c.getHeight());
-                        for(int idx = 0; idx < 4; idx++) {
-                            dst[idx] = ofPoint(geom["corners"][idx]["x"], geom["corners"][idx]["y"]);
+                        if(layer.find("corners") != layer.end()) {
+                            ofPoint src[4];
+                            ofPoint dst[4];
+                            float homography[16];
+                            src[0] = ofPoint(0, 0);
+                            src[1] = ofPoint(c.getWidth(), 0);
+                            src[2] = ofPoint(c.getWidth(), c.getHeight());
+                            src[3] = ofPoint(0, c.getHeight());
+                            for(int idx = 0; idx < 4; idx++) {
+                                dst[idx] = ofPoint(layer["corners"][idx]["x"], layer["corners"][idx]["y"]);
+                            }
+                            findHomography(src, dst, homography);
+                            glMultMatrixf(homography);
                         }
-                        findHomography(src, dst, homography);
-                        glMultMatrixf(homography);
-
-//                        if(geom.find("tx") != geom.end() && geom.find("ty") != geom.end())
-//                            ofTranslate(geom["tx"], geom["ty"]);
-//                        if(geom.find("sx") != geom.end() && geom.find("sy") != geom.end())
-//                            ofScale(geom["sx"], geom["sy"]);
-//                        if(geom.find("r") != geom.end()) {
-//                            ofTranslate(c.getWidth() * 0.5f, c.getHeight() * 0.5f);
-//                            ofRotateZDeg(geom["r"]);
-//                            ofTranslate(-c.getWidth() * 0.5f, -c.getHeight() * 0.5f);
-//                        }
+                        if(layer.find("alpha") != layer.end()) {
+                            alpha = ofClamp(layer["alpha"], 0.0f, 1.0f);
+                        }
                     }
                 }
             }
             catch (exception e) {
             }
             
+            ofSetColor(ofFloatColor(1.0f, alpha));
             c.draw(0, 0);
-            
+            ofSetColor(ofFloatColor(1.0f, 1.0f));
+
             try {
                 if(jsonGeometry.find("debug") != jsonGeometry.end()) {
                     auto& jsonDebug = jsonGeometry["debug"];
