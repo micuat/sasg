@@ -9,6 +9,7 @@ var s = function (p) {
   let transformFunc;
   let lineFunc;
   let sigFunc;
+  let pointFunc;
   let startFrame;
   let targetII;
   let agents = [];
@@ -18,15 +19,15 @@ var s = function (p) {
   p.setup = function () {
     name = p.folderName;
     p.createCanvas(1280/2, 560/2);
-    p.frameRate(30);
+    p.frameRate(60);
     startFrame = p.frameCount;
   }
 
   function getCount() { return p.frameCount - startFrame };
 
   p.draw = function () {
-    let t = getCount() / 30.0;
-    if (getCount() % 30 == 0) {
+    let t = getCount() / 60.0;
+    if (getCount() % 60 == 0) {
       tintR = p.random(255);
       tintG = p.random(255);
       tintB = p.random(255);
@@ -35,7 +36,7 @@ var s = function (p) {
       // theVideo = p.movies[Math.floor(p.random(p.movies.length))];
       // theVideo.loop();
     }
-    if (getCount() % 30 == 0) {
+    if (getCount() % 60 == 0) {
       // targetII = Math.floor(p.random(-1, 2));
       {
         transformFunc = p.random([
@@ -106,41 +107,78 @@ var s = function (p) {
             return p.random(-1, 1);
           }
         ]);
+        pointFunc = p.random([
+          function (x, y, tween) {
+            p.ellipse(x, y, 7);
+          }
+          ,
+          function (x, y, tween) {
+            p.ellipse(x, y, 7);
+            p.push();
+            let r = 1.0;
+            let alpha = 1.0;
+            if (tween < 0.5) {
+              r *= p.map(tween, 0, 0.5, 1.0, 10.0);
+              alpha *= p.map(tween, 0, 0.5, 1.0, 0.0);
+              p.noFill();
+              p.stroke(255, 255 * alpha);
+              p.strokeWeight(1.0);
+              p.ellipse(x, y, 7 * r);
+            }
+            p.pop();
+          }
+          ,
+          function (x, y, tween) {
+            p.ellipse(x, y, 7);
+            p.push();
+            let r = 1.0;
+            let alpha = 1.0;
+            if (tween > 0.5) {
+              r *= p.map(tween, 0.5, 1.0, 10.0, 1.0);
+              alpha *= p.map(tween, 0.5, 1.0, 0.0, 1.0);
+              p.noFill();
+              p.stroke(255, 255 * alpha);
+              p.strokeWeight(1.0);
+              p.ellipse(x, y, 7 * r);
+            }
+            p.pop();
+          }
+        ]);
         lineFunc = p.random([
           function (tween, l) {
-            p.ellipse(0, 0, 5);
+            pointFunc(0, 0, tween);
             p.line(0, 0, l, 0);
-            p.ellipse(l, 0, 5);
+            pointFunc(l, 0, tween);
           }
           ,
           // function (tween, l) {
-          //   p.ellipse(0, 0, 5);
+          //   pointFunc(0, 0, tween);
           //   if (tween < 0.5) {
           //     p.line(0, 0, p.map(tween, 0.0, 0.5, 1.0, 0.1) * l, 0);
           //   }
           //   else {
           //     p.line(0, 0, p.map(tween, 0.5, 1.0, 0.1, 1.0) * l, 0);
           //   }
-          //   p.ellipse(l, 0, 5);
+          //   pointFunc(l, 0, tween);
           // }
           // ,
           // function (tween, l) {
-          //   p.ellipse(0, 0, 5);
+          //   pointFunc(0, 0, tween);
           //   p.line(tween * l, 0, (1.0 - tween) * l, 0);
-          //   p.ellipse(l, 0, 5);
+          //   pointFunc(l, 0, tween);
           // }
           // ,
           // function (tween, l) {
-          //   p.ellipse(0, 0, 5);
+          //   pointFunc(0, 0, tween);
           //   p.push();
           //   p.rotate(tween * Math.PI * 2.0);
           //   p.line(0, 0, l, 0);
           //   p.pop();
-          //   p.ellipse(l, 0, 5);
+          //   pointFunc(l, 0, tween);
           // }
           // ,
           function (tween, l) {
-            p.ellipse(0, 0, 5);
+            pointFunc(0, 0, tween);
             let tw;
             if (tween < 0.5) {
               tw = tween * 2.0;
@@ -156,7 +194,7 @@ var s = function (p) {
             }
             p.endShape();
             p.fill(255);
-            p.ellipse(l, 0, 5);
+            pointFunc(l, 0, tween);
           }
         ]);
       }
@@ -186,7 +224,7 @@ var s = function (p) {
 
         p.push();
         if(ii == targetII && jj == 1) {
-          p.stroke(255, 128);
+          p.stroke(255, 180);
         }
         else {
           p.stroke(255);
