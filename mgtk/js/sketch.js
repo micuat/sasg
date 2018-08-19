@@ -39,11 +39,11 @@ var s = function (p) {
       // targetII = Math.floor(p.random(-1, 2));
       {
         transformFunc = p.random([
-          function (tween, l) {
-            p.rotate(tween * Math.PI * 2.0);
-            return l;
-          }
-          ,
+          // function (tween, l) {
+          //   p.rotate(tween * Math.PI * 2.0);
+          //   return l;
+          // }
+          // ,
           function (tween, l) {
             if (tween < 0.5) {
               p.translate(0.0, tween * 300, 0.0);
@@ -55,13 +55,35 @@ var s = function (p) {
           }
           ,
           function (tween, l) {
-            p.translate(l / 2, 0);
-            p.rotate(tween * Math.PI * 2.0);
-            p.translate(-l / 2, 0);
+            if (tween < 0.5) {
+              p.translate(0.0, -tween * 300, 0.0);
+            }
+            else {
+              p.translate(0.0, -(1.0 - tween) * 300, 0.0);
+            }
             return l;
           }
           ,
+          // function (tween, l) {
+          //   p.translate(l / 2, 0);
+          //   p.rotate(tween * Math.PI * 2.0);
+          //   p.translate(-l / 2, 0);
+          //   return l;
+          // }
+          // ,
           function (tween, l) {
+            if (tween < 0.5) {
+              return p.map(tween, 0.0, 0.5, 1.0, 0.1) * l;
+            }
+            else {
+              return p.map(tween, 0.5, 1.0, 0.1, 1.0) * l;
+            }
+          }
+          ,
+          function (tween, l) {
+            p.translate(l * 0.5, 0);
+            p.scale(-1, 1);
+            p.translate(-l * 0.5, 0);
             if (tween < 0.5) {
               return p.map(tween, 0.0, 0.5, 1.0, 0.1) * l;
             }
@@ -149,34 +171,44 @@ var s = function (p) {
     // p.image(p.movies[0], -213,-213,426,426);
 
     for (let ii = -1; ii <= 1; ii++) {
-      let tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
-      let tweenp = 2.0;
-      if (tween < 0) {
-        tween = Math.pow(p.map(tween, -1, 0, 0, 1), tweenp) * 0.5;
-      }
-      else {
-        if (ii == targetII) {
-          tweenp = 1.0;
+      for (let jj = 0; jj < 2; jj++) {
+        let tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
+        let tweenp = 4.0;
+        if (tween < 0) {
+          tween = Math.pow(p.map(tween, -1, 0, 0, 1), tweenp) * 0.5;
         }
-        tween = 1.0 - Math.pow(p.map(tween, 0, 1, 1, 0), tweenp) * 0.5;
+        else {
+          if (ii == targetII && jj == 1) {
+            tweenp = 1.0;
+          }
+          tween = 1.0 - Math.pow(p.map(tween, 0, 1, 1, 0), tweenp) * 0.5;
+        }
+
+        p.push();
+        if(ii == targetII && jj == 1) {
+          p.stroke(255, 128);
+        }
+        else {
+          p.stroke(255);
+        }
+
+        p.translate(ii * p.width / 3, 0);
+        // if (ii == targetII) {
+        //   let alpha = p.map(getCount() % 240, 220, 240, 1.0, 0.0);
+        //   if(alpha > 1.0) alpha = 1.0;
+        //   alpha = Math.pow(alpha, 4.0);
+        //   // p.tint(tintR * alpha, tintG * alpha, tintB * alpha);
+        //   // p.image(theVideo, -135,-265,370,560);
+        //   // p.tint(255, 255, 255);
+        // }
+        let l = p.width / 3.0;
+        p.translate(-l / 2.0, 0);
+        l = transformFunc(tween, l);
+        lineFunc(tween, l);
+
+        p.pop();
+        if(ii != targetII) break;
       }
-
-      p.push();
-      p.translate(ii * p.width / 3, 0);
-      p.translate(-50, 0);
-      // if (ii == targetII) {
-      //   let alpha = p.map(getCount() % 240, 220, 240, 1.0, 0.0);
-      //   if(alpha > 1.0) alpha = 1.0;
-      //   alpha = Math.pow(alpha, 4.0);
-      //   // p.tint(tintR * alpha, tintG * alpha, tintB * alpha);
-      //   // p.image(theVideo, -135,-265,370,560);
-      //   // p.tint(255, 255, 255);
-      // }
-      let l = 100;
-      l = transformFunc(tween, l);
-      lineFunc(tween, l);
-
-      p.pop();
     }
 
     p.syphonServer.sendScreen();

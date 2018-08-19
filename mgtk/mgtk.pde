@@ -263,7 +263,7 @@ void initNashorn() {
 }
 
 void draw() {
-  if(frameCount < 42) loadVideos(frameCount);
+  //if(frameCount < 42) loadVideos(frameCount);
 
   if (libInited == false) {
     try {
