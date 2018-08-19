@@ -93,6 +93,10 @@ var s = function (p) {
           }
           ,
           function (tween, ii) {
+            return p.constrain(tween * 1.25 - Math.abs(ii) * 0.25, -1, 1);
+          }
+          ,
+          function (tween, ii) {
             return tween;
           }
         ]);
