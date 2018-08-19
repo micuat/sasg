@@ -53,6 +53,23 @@ var s = function (p) {
               alpha = p.map(tween, 0.5, 1.0, 1.0, 0.0);
             }
             p.push();
+            p.fill(255, 255 * alpha);
+            p.noStroke();
+            let pw = 1280 * 0.5 / 3.0;
+            let n = pw / 10.0;
+            p.rect(-pw * 0.5, -p.height * 0.5, pw, p.height);
+            p.pop();
+          }
+          ,
+          function (tween) {
+            let alpha;
+            if (tween < 0.5) {
+              alpha = p.map(tween, 0, 0.5, 0.0, 1.0);
+            }
+            else {
+              alpha = p.map(tween, 0.5, 1.0, 1.0, 0.0);
+            }
+            p.push();
             p.stroke(255, 255 * alpha);
             p.strokeWeight(1.0);
             let pw = 1280 * 0.5 / 3.0;
