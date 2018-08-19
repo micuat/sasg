@@ -7,6 +7,7 @@ var s = function (p) {
     this.sigFunc;
   }
   let backgroundFunc;
+  let orderFunc;
   let transformFunc;
   let lineFunc;
   let sigFunc;
@@ -82,6 +83,19 @@ var s = function (p) {
             p.pop();
           }
         ]);
+        orderFunc = p.random([
+          function (tween, ii) {
+            return p.constrain(tween * 1.25 + ii * 0.25, -1, 1);
+          }
+          ,
+          function (tween, ii) {
+            return p.constrain(tween * 1.25 - ii * 0.25, -1, 1);
+          }
+          ,
+          function (tween, ii) {
+            return tween;
+          }
+        ]);
         transformFunc = p.random([
           // function (tween, l) {
           //   p.rotate(tween * Math.PI * 2.0);
@@ -124,6 +138,15 @@ var s = function (p) {
             }
           }
           ,
+          // function (tween, l) {
+          //   if (tween < 0.5) {
+          //     return Math.floor(p.map(tween, 0.0, 0.5, 1.0, 0.1) * 10.0) / 10.0 * l;
+          //   }
+          //   else {
+          //     return Math.floor(p.map(tween, 0.5, 1.0, 0.1, 1.0) * 10.0) / 10.0 * l;
+          //   }
+          // }
+          // ,
           function (tween, l) {
             p.translate(l * 0.5, 0);
             p.scale(-1, 1);
@@ -254,6 +277,7 @@ var s = function (p) {
     for (let ii = -1; ii <= 1; ii++) {
       for (let jj = 0; jj < 2; jj++) {
         let tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
+        tween = orderFunc(tween, ii);
         let tweenp = 4.0;
         if (tween < 0) {
           tween = Math.pow(p.map(tween, -1, 0, 0, 1), tweenp) * 0.5;
