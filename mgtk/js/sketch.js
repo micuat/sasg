@@ -6,6 +6,7 @@ var s = function (p) {
     this.lineFunc;
     this.sigFunc;
   }
+  let backgroundFunc;
   let transformFunc;
   let lineFunc;
   let sigFunc;
@@ -39,6 +40,31 @@ var s = function (p) {
     if (getCount() % 60 == 0) {
       // targetII = Math.floor(p.random(-1, 2));
       {
+        backgroundFunc = p.random([
+          function (tween) {
+          }
+          ,
+          function (tween) {
+            let alpha;
+            if (tween < 0.5) {
+              alpha = p.map(tween, 0, 0.5, 0.0, 1.0);
+            }
+            else {
+              alpha = p.map(tween, 0.5, 1.0, 1.0, 0.0);
+            }
+            p.push();
+            p.stroke(255, 255 * alpha);
+            p.strokeWeight(1.0);
+            let pw = 1280 * 0.5 / 3.0;
+            let n = pw / 10.0;
+            for(let j = -6; j <= 6; j++) {
+              if(j >= -5 && j <= 5)
+                p.line(j * n, -p.height * 0.5, j * n, p.height * 0.5);
+              p.line(-pw * 0.5, j * n, pw * 0.5, j * n);
+            }
+            p.pop();
+          }
+        ]);
         transformFunc = p.random([
           // function (tween, l) {
           //   p.rotate(tween * Math.PI * 2.0);
@@ -231,6 +257,8 @@ var s = function (p) {
         }
 
         p.translate(ii * p.width / 3, 0);
+        backgroundFunc(tween);
+
         // if (ii == targetII) {
         //   let alpha = p.map(getCount() % 240, 220, 240, 1.0, 0.0);
         //   if(alpha > 1.0) alpha = 1.0;
