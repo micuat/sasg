@@ -39,6 +39,9 @@ import geomerative.*;
 
 import codeanticode.syphon.*;
 
+import processing.video.*;
+public ArrayList<Movie> movies = new ArrayList<Movie>();
+
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 
@@ -84,7 +87,7 @@ void setup() {
   //gPdf = (PGraphicsPDF)g;
   surface.setResizable(true);
   frameRate(60);
-
+  
 
   libPaths.add(sketchPath("libs/event-loop-nashorn.js"));
   libPaths.add(sketchPath("libs/shader-helper.js"));
@@ -95,7 +98,27 @@ void setup() {
 
   syphonServer = new SyphonServer(this, "mgtk");
 
-  initNashorn();
+}
+
+public void loadVideos(int i) {
+  println(sketchPath() + "/videos");
+  File[] files = listFiles(sketchPath() + "/data/videos");
+  println(files.length);
+  //for (int i = 0; i < files.length; i++)
+  if(i < files.length)
+  {
+    File f = files[i];
+    println(f.getName());
+    //println(i);
+    Movie myMovie = new Movie(this, sketchPath() + "/data/videos/" + f.getName());
+    myMovie.stop();
+    //myMovie.loop();
+    movies.add(myMovie);
+  }
+}
+// Called every time a new frame is available to read
+void movieEvent(Movie m) {
+  m.read();
 }
 
 void initNashorn() {
@@ -240,8 +263,11 @@ void initNashorn() {
 }
 
 void draw() {
+  if(frameCount < 42) loadVideos(frameCount);
+
   if (libInited == false) {
     try {
+      initNashorn();
       readLibs(libPaths);
       libInited = true;
     }
