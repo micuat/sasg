@@ -25,6 +25,18 @@ var s = function (p) {
       this.tween = 1.0 - Math.pow(p.map(this.tween, 0, 1, 1, 0), tweenp) * 0.5;
     }
 
+    // power, [0, 1]
+    this.tweenPowZO = function () { return this.tween; }
+    // power, 0 -> 1 -> 0
+    this.tweenPowReturn = function () {
+      if (this.tween < 0.5) {
+        return p.map(this.tween, 0, 0.5, 0.0, 1.0);
+      }
+      else {
+        return p.map(this.tween, 0.5, 1.0, 1.0, 0.0);
+      }
+    }
+
     this.draw = function () {
       p.push();
       if(this.isTarget) {
@@ -85,13 +97,7 @@ var s = function (p) {
           }
           ,
           function (agent) {
-            let alpha;
-            if (agent.tween < 0.5) {
-              alpha = p.map(agent.tween, 0, 0.5, 0.0, 1.0);
-            }
-            else {
-              alpha = p.map(agent.tween, 0.5, 1.0, 1.0, 0.0);
-            }
+            let alpha = agent.tweenPowReturn();
             p.push();
             p.fill(255, 255 * alpha);
             p.noStroke();
@@ -102,13 +108,7 @@ var s = function (p) {
           }
           ,
           function (agent) {
-            let alpha;
-            if (agent.tween < 0.5) {
-              alpha = p.map(agent.tween, 0, 0.5, 0.0, 1.0);
-            }
-            else {
-              alpha = p.map(agent.tween, 0.5, 1.0, 1.0, 0.0);
-            }
+            let alpha = agent.tweenPowReturn();
             p.push();
             p.stroke(255, 255 * alpha);
             p.strokeWeight(1.0);
@@ -141,44 +141,24 @@ var s = function (p) {
         ]);
         transformFunc = p.random([
           function (agent) {
-            if (agent.tween < 0.5) {
-              p.translate(0.0, agent.tween * 300, 0.0);
-            }
-            else {
-              p.translate(0.0, (1.0 - agent.tween) * 300, 0.0);
-            }
+            p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
             return agent.l;
           }
           ,
           function (agent) {
-            if (agent.tween < 0.5) {
-              p.translate(0.0, -agent.tween * 300, 0.0);
-            }
-            else {
-              p.translate(0.0, -(1.0 - agent.tween) * 300, 0.0);
-            }
+            p.translate(0.0, agent.tweenPowReturn() * -150, 0.0);
             return agent.l;
           }
           ,
           function (agent) {
-            if (agent.tween < 0.5) {
-              return p.map(agent.tween, 0.0, 0.5, 1.0, 0.1) * agent.l;
-            }
-            else {
-              return p.map(agent.tween, 0.5, 1.0, 0.1, 1.0) * agent.l;
-            }
+            return (1.0 - agent.tweenPowReturn()) * agent.l;
           }
           ,
           function (agent) {
             p.translate(agent.l * 0.5, 0);
             p.scale(-1, 1);
             p.translate(-agent.l * 0.5, 0);
-            if (agent.tween < 0.5) {
-              return p.map(agent.tween, 0.0, 0.5, 1.0, 0.1) * agent.l;
-            }
-            else {
-              return p.map(agent.tween, 0.5, 1.0, 0.1, 1.0) * agent.l;
-            }
+            return (1.0 - agent.tweenPowReturn()) * agent.l;
           }
         ]);
 
@@ -241,13 +221,7 @@ var s = function (p) {
           ,
           function (agent) {
             pointFunc(0, 0, agent.tween);
-            let tw;
-            if (agent.tween < 0.5) {
-              tw = agent.tween * 2.0;
-            }
-            else {
-              tw = 2.0 - agent.tween * 2.0;
-            }
+            let tw = agent.tweenPowReturn();
             p.noFill();
             p.beginShape(p.POINTS);
             for (let dx = 0.0; dx < agent.l; dx += 1.0) {
