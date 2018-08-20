@@ -1,5 +1,97 @@
+
+var SCircleMorph = function (p) {
+  let cirPath = [];
+  let triPath = [];
+  let spacing = 20;
+  let theta = 0;
+  let seq = 0;
+
+  polarToCartesian = function (r, angle) {
+    return p.createVector(r * p.cos(angle), r * p.sin(angle));
+  }
+
+  this.setup = function () {
+    // p.createCanvas(800, 800);
+    // p.angleMode(p.DEGREES);
+    let radius = 200;
+    let startA = 0;
+    let endA = 120;
+    let start = polarToCartesian(radius, p.radians(startA));
+    let end = polarToCartesian(radius, p.radians(endA));
+    for (let a = startA; a < 360; a += spacing) {
+      let cv = polarToCartesian(radius, p.radians(a));
+      cirPath.push(cv);
+      let amt = (a % 120) / (endA - startA);
+      let tv = p5.Vector.lerp(start, end, amt);
+      triPath.push(tv);
+
+      if ((a + spacing) % 120 === 0) {
+        startA = startA + 120;
+        endA = endA + 120;
+        start = polarToCartesian(radius, p.radians(startA));
+        end = polarToCartesian(radius, p.radians(endA));
+      }
+    }
+  }
+
+  this.draw = function () {
+    t = p.frameCount / 30.0;
+    seq = Math.floor((p.frameCount % 120) / 30);
+    // p.background(255);
+    p.push();
+    p.scale(p.height / 800.0, p.height / 800.0);
+    p.translate(p.width / 2, p.height / 2 + 50);
+
+    let shape = p.createShape();
+    shape.beginShape();
+    shape.noFill();
+    theta = t * p.TWO_PI;
+    let amt = 1 - (p.sin(theta) + 1) / 2 / 2;
+    for (let i = 0; i < cirPath.length; i++) {
+      let th = -p.cos(i / cirPath.length * 6 * p.PI);
+      th = p.map(th, -1, 1, 0, 8);
+      th = p.lerp(8, th, amt);
+      // p.strokeWeight(th);
+      let cv = cirPath[i];
+      let tv = triPath[i];
+      let x = p.lerp(cv.x, tv.x, amt);
+      let y = p.lerp(cv.y, tv.y, amt);
+      shape.vertex(x, y);
+    }
+    shape.endShape(p.CLOSE);
+    
+    for (let i = -2; i <= 1; i++) {
+      for (let j = -5; j <= 4; j++) {
+        p.push();
+        p.translate(j * 200 * p.sqrt(3), i * 300);
+        if((i+10) % 2 == 1) {
+          p.translate(100 * p.sqrt(3), 0);
+        }
+        p.rotate(p.radians(30));
+
+        if (seq == 0 && t > 0.5){
+          p.rotate(t * p.TWO_PI * 2 / 3);
+          let sc = p.cos(t * p.TWO_PI * 2);
+          sc = p.map(sc, -1, 1, 0.75, 1);
+          p.scale(sc, sc);
+        }
+        if (seq == 2 && t > 0.5){
+          p.rotate(-t * p.TWO_PI * 2 / 3);
+          let sc = p.cos(t * p.TWO_PI * 2);
+          sc = p.map(sc, -1, 1, 0.75, 1);
+          p.scale(sc, sc);
+        }
+        p.shape(shape, 0, 0);
+        p.pop();
+      }
+    }
+    p.pop();
+  }
+};
+
 var s = function (p) {
   let name;
+  let sCircleMorph = new SCircleMorph(p);
 
   function Agent (t, tween, ii, jj, isTarget) {
     this.t = t;
@@ -86,8 +178,29 @@ var s = function (p) {
       p.translate(-tw * p.width / 3.0, 0.0);
     }
   ]);
-  let backgroundFuncs = new FuncList([
+  let backgroundFunc = new FuncList([
     function (agent) {
+    }
+    ,
+    function (agent) {
+      if(agent.jj == 0 && agent.ii == 0) {
+        let alpha = agent.tweenPowReturn();
+        p.push();
+        p.stroke(255, alpha * 255);
+        sCircleMorph.draw();
+        p.pop();
+      }
+    }
+    ,
+    function (agent) {
+      let alpha = agent.tweenPowReturn();
+      p.push();
+      p.fill(255, 255 * alpha);
+      p.noStroke();
+      let pw = 1280 * 0.5 / 3.0;
+      let n = pw / 10.0;
+      p.rect(-pw * 0.5, -p.height * 0.5, pw, p.height);
+      p.pop();
     }
     ,
     function (agent) {
@@ -235,6 +348,8 @@ var s = function (p) {
     p.createCanvas(1280/2, 560/2);
     p.frameRate(60);
     startFrame = p.frameCount;
+
+    sCircleMorph.setup();
   }
 
   function getCount() { return p.frameCount - startFrame };
@@ -262,6 +377,7 @@ var s = function (p) {
       }
     }
 
+    p.blendMode(p.BLEND);
     p.background(0);
     p.stroke(255);
     p.strokeWeight(2);
