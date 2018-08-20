@@ -7,7 +7,7 @@ var s = function (p) {
     this.jj = jj;
     this.isTarget = isTarget;
     this.tween = tween;
-    this.tween = orderFunc(this);
+    this.tween = orderFunc.exec(this);
     let tweenp = 4.0;
     if (this.tween < 0) {
       this.tween = Math.pow(p.map(this.tween, -1, 0, 0, 1), tweenp) * 0.5;
@@ -41,26 +41,26 @@ var s = function (p) {
       }
 
       p.translate(this.ii * p.width / 3, 0);
-      backgroundFunc(this);
+      backgroundFunc.exec(this);
 
       this.l = p.width / 3.0;
       p.translate(-this.l / 2.0, 0);
-      this.l = transformFunc(this);
-      lineFunc(this);
+      this.l = transformFunc.exec(this);
+      lineFunc.exec(this);
 
       p.pop();
     }
   }
 
-  let globalTransformFunc;
-  let backgroundFunc;
-  let orderFunc;
-  let transformFunc;
-  let lineFunc;
-  let sigFunc;
-  let pointFunc;
+  let FuncList = function (funcs) {
+    this.funcs = funcs;
+    this.exec;
+    this.update = function () {
+      this.exec = p.random(this.funcs);
+    }
+  }
 
-  let globalTransformFuncs = [
+  let globalTransformFunc = new FuncList([
     function (tween) {
     }
     ,
@@ -85,8 +85,8 @@ var s = function (p) {
       }
       p.translate(-tw * p.width / 3.0, 0.0);
     }
-  ];
-  let backgroundFuncs = [
+  ]);
+  let backgroundFuncs = new FuncList([
     function (agent) {
     }
     ,
@@ -115,8 +115,8 @@ var s = function (p) {
       }
       p.pop();
     }
-  ];
-  let orderFuncs = [
+  ]);
+  let orderFunc = new FuncList([
     function (agent) {
       return p.constrain(agent.tween * 1.25 + agent.ii * 0.25, -1, 1);
     }
@@ -132,8 +132,8 @@ var s = function (p) {
     function (agent) {
       return agent.tween;
     }
-  ];
-  let transformFuncs = [
+  ]);
+  let transformFunc = new FuncList([
     function (agent) {
       p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
       return agent.l;
@@ -154,8 +154,8 @@ var s = function (p) {
       p.translate(-agent.l * 0.5, 0);
       return (1.0 - agent.tweenPowReturn()) * agent.l;
     }
-  ];
-  let sigFuncs = [
+  ]);
+  let sigFunc = new FuncList([
     function (dx, tw) {
       return Math.sin(dx * 0.1 + tw * 10.0);
     }
@@ -167,8 +167,8 @@ var s = function (p) {
     function (dx, tw) {
       return p.random(-1, 1);
     }
-  ];
-  let pointFuncs = [
+  ]);
+  let pointFunc = new FuncList([
     function (x, y, tween) {
       p.ellipse(x, y, 7);
     }
@@ -204,28 +204,28 @@ var s = function (p) {
       }
       p.pop();
     }
-  ];
-  let lineFuncs = [
+  ]);
+  let lineFunc = new FuncList([
     function (agent) {
-      pointFunc(0, 0, agent.tween);
+      pointFunc.exec(0, 0, agent.tween);
       p.line(0, 0, agent.l, 0);
-      pointFunc(agent.l, 0, agent.tween);
+      pointFunc.exec(agent.l, 0, agent.tween);
     }
     ,
     function (agent) {
-      pointFunc(0, 0, agent.tween);
+      pointFunc.exec(0, 0, agent.tween);
       let tw = agent.tweenPowReturn();
       p.noFill();
       p.beginShape(p.POINTS);
       for (let dx = 0.0; dx < agent.l; dx += 1.0) {
-        let y = Math.sin(dx / agent.l * Math.PI) * sigFunc(dx, tw, agent.l) * tw;
+        let y = Math.sin(dx / agent.l * Math.PI) * sigFunc.exec(dx, tw, agent.l) * tw;
         p.vertex(dx, y * 50);
       }
       p.endShape();
       p.fill(255);
-      pointFunc(agent.l, 0, agent.tween);
+      pointFunc.exec(agent.l, 0, agent.tween);
     }
-  ];
+  ]);
 
   let startFrame;
   let targetII;
@@ -255,13 +255,13 @@ var s = function (p) {
       doUpdate = false;
       targetII = Math.floor(p.random(-1, 2));
       {
-        globalTransformFunc = p.random(globalTransformFuncs)
-        backgroundFunc = p.random(backgroundFuncs);
-        orderFunc = p.random(orderFuncs);
-        transformFunc = p.random(transformFuncs);
-        sigFunc = p.random(sigFuncs);
-        pointFunc = p.random(pointFuncs);
-        lineFunc = p.random(lineFuncs);
+        globalTransformFunc.update();
+        backgroundFunc.update();
+        orderFunc.update();
+        transformFunc.update();
+        sigFunc.update();
+        pointFunc.update();
+        lineFunc.update();
       }
     }
 
@@ -279,7 +279,7 @@ var s = function (p) {
       tween = p.constrain((t * 1.0) * 2.0 - 1.0, -1.0, 1.0);
     }
 
-    globalTransformFunc(tween);
+    globalTransformFunc.exec(tween);
 
     for (let ii = -2; ii <= 2; ii++) {
       for (let jj = 0; jj < 2; jj++) {
