@@ -84,7 +84,7 @@ void setup() {
   //gPdf = (PGraphicsPDF)g;
   surface.setResizable(true);
   frameRate(60);
-  
+  pixelDensity(2);
 
   libPaths.add(sketchPath("libs/event-loop-nashorn.js"));
   libPaths.add(sketchPath("libs/shader-helper.js"));
