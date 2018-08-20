@@ -7,7 +7,7 @@ var s = function (p) {
     this.jj = jj;
     this.isTarget = isTarget;
     this.tween = tween;
-    this.tween = orderFunc.exec(this);
+    orderFunc.exec(this);
     let tweenp = 4.0;
     if (this.tween < 0) {
       this.tween = Math.pow(p.map(this.tween, -1, 0, 0, 1), tweenp) * 0.5;
@@ -45,7 +45,7 @@ var s = function (p) {
 
       this.l = p.width / 3.0;
       p.translate(-this.l / 2.0, 0);
-      this.l = transformFunc.exec(this);
+      transformFunc.exec(this);
       lineFunc.exec(this);
 
       p.pop();
@@ -118,41 +118,38 @@ var s = function (p) {
   ]);
   let orderFunc = new FuncList([
     function (agent) {
-      return p.constrain(agent.tween * 1.25 + agent.ii * 0.25, -1, 1);
+      agent.tween = p.constrain(agent.tween * 1.25 + agent.ii * 0.25, -1, 1);
     }
     ,
     function (agent) {
-      return p.constrain(agent.tween * 1.25 - agent.ii * 0.25, -1, 1);
+      agent.tween = p.constrain(agent.tween * 1.25 - agent.ii * 0.25, -1, 1);
     }
     ,
     function (agent) {
-      return p.constrain(agent.tween * 1.25 - Math.abs(agent.ii) * 0.25, -1, 1);
+      agent.tween = p.constrain(agent.tween * 1.25 - Math.abs(agent.ii) * 0.25, -1, 1);
     }
     ,
     function (agent) {
-      return agent.tween;
     }
   ]);
   let transformFunc = new FuncList([
     function (agent) {
       p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
-      return agent.l;
     }
     ,
     function (agent) {
       p.translate(0.0, agent.tweenPowReturn() * -150, 0.0);
-      return agent.l;
     }
     ,
     function (agent) {
-      return (1.0 - agent.tweenPowReturn()) * agent.l;
+      agent.l *= (1.0 - agent.tweenPowReturn());
     }
     ,
     function (agent) {
       p.translate(agent.l * 0.5, 0);
       p.scale(-1, 1);
       p.translate(-agent.l * 0.5, 0);
-      return (1.0 - agent.tweenPowReturn()) * agent.l;
+      agent.l *= (1.0 - agent.tweenPowReturn());
     }
   ]);
   let sigFunc = new FuncList([
