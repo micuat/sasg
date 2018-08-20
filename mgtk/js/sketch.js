@@ -13,7 +13,7 @@ var s = function (p) {
     else {
       this.tween = p.constrain((this.t * 1.0) * 2.0 - 1.0, -1.0, 1.0);
     }
-    this.tween = orderFunc(this.tween, this.ii);
+    this.tween = orderFunc(this);
     let tweenp = 4.0;
     if (this.tween < 0) {
       this.tween = Math.pow(p.map(this.tween, -1, 0, 0, 1), tweenp) * 0.5;
@@ -23,6 +23,26 @@ var s = function (p) {
         tweenp = 1.0;
       }
       this.tween = 1.0 - Math.pow(p.map(this.tween, 0, 1, 1, 0), tweenp) * 0.5;
+    }
+
+    this.draw = function () {
+      p.push();
+      if(this.isTarget) {
+        p.stroke(255, 180);
+      }
+      else {
+        p.stroke(255);
+      }
+
+      p.translate(this.ii * p.width / 3, 0);
+      backgroundFunc(this);
+
+      this.l = p.width / 3.0;
+      p.translate(-this.l / 2.0, 0);
+      this.l = transformFunc(this);
+      lineFunc(this);
+
+      p.pop();
     }
   }
 
@@ -61,16 +81,16 @@ var s = function (p) {
       targetII = Math.floor(p.random(-1, 2));
       {
         backgroundFunc = p.random([
-          function (tween) {
+          function (agent) {
           }
           ,
-          function (tween) {
+          function (agent) {
             let alpha;
-            if (tween < 0.5) {
-              alpha = p.map(tween, 0, 0.5, 0.0, 1.0);
+            if (agent.tween < 0.5) {
+              alpha = p.map(agent.tween, 0, 0.5, 0.0, 1.0);
             }
             else {
-              alpha = p.map(tween, 0.5, 1.0, 1.0, 0.0);
+              alpha = p.map(agent.tween, 0.5, 1.0, 1.0, 0.0);
             }
             p.push();
             p.fill(255, 255 * alpha);
@@ -81,13 +101,13 @@ var s = function (p) {
             p.pop();
           }
           ,
-          function (tween) {
+          function (agent) {
             let alpha;
-            if (tween < 0.5) {
-              alpha = p.map(tween, 0, 0.5, 0.0, 1.0);
+            if (agent.tween < 0.5) {
+              alpha = p.map(agent.tween, 0, 0.5, 0.0, 1.0);
             }
             else {
-              alpha = p.map(tween, 0.5, 1.0, 1.0, 0.0);
+              alpha = p.map(agent.tween, 0.5, 1.0, 1.0, 0.0);
             }
             p.push();
             p.stroke(255, 255 * alpha);
@@ -103,61 +123,61 @@ var s = function (p) {
           }
         ]);
         orderFunc = p.random([
-          function (tween, ii) {
-            return p.constrain(tween * 1.25 + ii * 0.25, -1, 1);
+          function (agent) {
+            return p.constrain(agent.tween * 1.25 + agent.ii * 0.25, -1, 1);
           }
           ,
-          function (tween, ii) {
-            return p.constrain(tween * 1.25 - ii * 0.25, -1, 1);
+          function (agent) {
+            return p.constrain(agent.tween * 1.25 - agent.ii * 0.25, -1, 1);
           }
           ,
-          function (tween, ii) {
-            return p.constrain(tween * 1.25 - Math.abs(ii) * 0.25, -1, 1);
+          function (agent) {
+            return p.constrain(agent.tween * 1.25 - Math.abs(agent.ii) * 0.25, -1, 1);
           }
           ,
-          function (tween, ii) {
-            return tween;
+          function (agent) {
+            return agent.tween;
           }
         ]);
         transformFunc = p.random([
-          function (tween, l) {
-            if (tween < 0.5) {
-              p.translate(0.0, tween * 300, 0.0);
+          function (agent) {
+            if (agent.tween < 0.5) {
+              p.translate(0.0, agent.tween * 300, 0.0);
             }
             else {
-              p.translate(0.0, (1.0 - tween) * 300, 0.0);
+              p.translate(0.0, (1.0 - agent.tween) * 300, 0.0);
             }
-            return l;
+            return agent.l;
           }
           ,
-          function (tween, l) {
-            if (tween < 0.5) {
-              p.translate(0.0, -tween * 300, 0.0);
+          function (agent) {
+            if (agent.tween < 0.5) {
+              p.translate(0.0, -agent.tween * 300, 0.0);
             }
             else {
-              p.translate(0.0, -(1.0 - tween) * 300, 0.0);
+              p.translate(0.0, -(1.0 - agent.tween) * 300, 0.0);
             }
-            return l;
+            return agent.l;
           }
           ,
-          function (tween, l) {
-            if (tween < 0.5) {
-              return p.map(tween, 0.0, 0.5, 1.0, 0.1) * l;
+          function (agent) {
+            if (agent.tween < 0.5) {
+              return p.map(agent.tween, 0.0, 0.5, 1.0, 0.1) * agent.l;
             }
             else {
-              return p.map(tween, 0.5, 1.0, 0.1, 1.0) * l;
+              return p.map(agent.tween, 0.5, 1.0, 0.1, 1.0) * agent.l;
             }
           }
           ,
-          function (tween, l) {
-            p.translate(l * 0.5, 0);
+          function (agent) {
+            p.translate(agent.l * 0.5, 0);
             p.scale(-1, 1);
-            p.translate(-l * 0.5, 0);
-            if (tween < 0.5) {
-              return p.map(tween, 0.0, 0.5, 1.0, 0.1) * l;
+            p.translate(-agent.l * 0.5, 0);
+            if (agent.tween < 0.5) {
+              return p.map(agent.tween, 0.0, 0.5, 1.0, 0.1) * agent.l;
             }
             else {
-              return p.map(tween, 0.5, 1.0, 0.1, 1.0) * l;
+              return p.map(agent.tween, 0.5, 1.0, 0.1, 1.0) * agent.l;
             }
           }
         ]);
@@ -213,30 +233,30 @@ var s = function (p) {
           }
         ]);
         lineFunc = p.random([
-          function (tween, l) {
-            pointFunc(0, 0, tween);
-            p.line(0, 0, l, 0);
-            pointFunc(l, 0, tween);
+          function (agent) {
+            pointFunc(0, 0, agent.tween);
+            p.line(0, 0, agent.l, 0);
+            pointFunc(agent.l, 0, agent.tween);
           }
           ,
-          function (tween, l) {
-            pointFunc(0, 0, tween);
+          function (agent) {
+            pointFunc(0, 0, agent.tween);
             let tw;
-            if (tween < 0.5) {
-              tw = tween * 2.0;
+            if (agent.tween < 0.5) {
+              tw = agent.tween * 2.0;
             }
             else {
-              tw = 2.0 - tween * 2.0;
+              tw = 2.0 - agent.tween * 2.0;
             }
             p.noFill();
             p.beginShape(p.POINTS);
-            for (let dx = 0.0; dx < l; dx += 1.0) {
-              let y = Math.sin(dx / l * Math.PI) * sigFunc(dx, tw, l) * tw;
+            for (let dx = 0.0; dx < agent.l; dx += 1.0) {
+              let y = Math.sin(dx / agent.l * Math.PI) * sigFunc(dx, tw, agent.l) * tw;
               p.vertex(dx, y * 50);
             }
             p.endShape();
             p.fill(255);
-            pointFunc(l, 0, tween);
+            pointFunc(agent.l, 0, agent.tween);
           }
         ]);
       }
@@ -251,23 +271,8 @@ var s = function (p) {
     for (let ii = -1; ii <= 1; ii++) {
       for (let jj = 0; jj < 2; jj++) {
         let agent = new Agent(t, ii, jj, ii == targetII && jj == 1);
-        p.push();
-        if(agent.isTarget) {
-          p.stroke(255, 180);
-        }
-        else {
-          p.stroke(255);
-        }
+        agent.draw();
 
-        p.translate(ii * p.width / 3, 0);
-        backgroundFunc(agent.tween);
-
-        let l = p.width / 3.0;
-        p.translate(-l / 2.0, 0);
-        l = transformFunc(agent.tween, l);
-        lineFunc(agent.tween, l);
-
-        p.pop();
         if(ii != targetII) break;
       }
     }
