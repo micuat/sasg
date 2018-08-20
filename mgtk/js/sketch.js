@@ -35,8 +35,6 @@ var s = function (p) {
   let startFrame;
   let targetII;
   let agents = [];
-  let theVideo;
-  let tintR, tintG, tintB;
   let autoPilot = true;
   let doUpdate = true;
 
@@ -60,9 +58,6 @@ var s = function (p) {
     let t = getCount() / 60.0;
     if ((autoPilot && getCount() % 60 == 0) || (!autoPilot && doUpdate)) {
       doUpdate = false;
-      tintR = p.random(255);
-      tintG = p.random(255);
-      tintB = p.random(255);
       targetII = Math.floor(p.random(-1, 2));
       {
         backgroundFunc = p.random([
@@ -125,11 +120,6 @@ var s = function (p) {
           }
         ]);
         transformFunc = p.random([
-          // function (tween, l) {
-          //   p.rotate(tween * Math.PI * 2.0);
-          //   return l;
-          // }
-          // ,
           function (tween, l) {
             if (tween < 0.5) {
               p.translate(0.0, tween * 300, 0.0);
@@ -150,13 +140,6 @@ var s = function (p) {
             return l;
           }
           ,
-          // function (tween, l) {
-          //   p.translate(l / 2, 0);
-          //   p.rotate(tween * Math.PI * 2.0);
-          //   p.translate(-l / 2, 0);
-          //   return l;
-          // }
-          // ,
           function (tween, l) {
             if (tween < 0.5) {
               return p.map(tween, 0.0, 0.5, 1.0, 0.1) * l;
@@ -166,15 +149,6 @@ var s = function (p) {
             }
           }
           ,
-          // function (tween, l) {
-          //   if (tween < 0.5) {
-          //     return Math.floor(p.map(tween, 0.0, 0.5, 1.0, 0.1) * 10.0) / 10.0 * l;
-          //   }
-          //   else {
-          //     return Math.floor(p.map(tween, 0.5, 1.0, 0.1, 1.0) * 10.0) / 10.0 * l;
-          //   }
-          // }
-          // ,
           function (tween, l) {
             p.translate(l * 0.5, 0);
             p.scale(-1, 1);
@@ -245,32 +219,6 @@ var s = function (p) {
             pointFunc(l, 0, tween);
           }
           ,
-          // function (tween, l) {
-          //   pointFunc(0, 0, tween);
-          //   if (tween < 0.5) {
-          //     p.line(0, 0, p.map(tween, 0.0, 0.5, 1.0, 0.1) * l, 0);
-          //   }
-          //   else {
-          //     p.line(0, 0, p.map(tween, 0.5, 1.0, 0.1, 1.0) * l, 0);
-          //   }
-          //   pointFunc(l, 0, tween);
-          // }
-          // ,
-          // function (tween, l) {
-          //   pointFunc(0, 0, tween);
-          //   p.line(tween * l, 0, (1.0 - tween) * l, 0);
-          //   pointFunc(l, 0, tween);
-          // }
-          // ,
-          // function (tween, l) {
-          //   pointFunc(0, 0, tween);
-          //   p.push();
-          //   p.rotate(tween * Math.PI * 2.0);
-          //   p.line(0, 0, l, 0);
-          //   p.pop();
-          //   pointFunc(l, 0, tween);
-          // }
-          // ,
           function (tween, l) {
             pointFunc(0, 0, tween);
             let tw;
