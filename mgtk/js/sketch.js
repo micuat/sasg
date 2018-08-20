@@ -1,11 +1,31 @@
 var s = function (p) {
   let name;
 
-  function Agent () {
-    this.transformFunc;
-    this.lineFunc;
-    this.sigFunc;
+  function Agent (t, ii, jj, isTarget) {
+    this.t = t;
+    this.ii = ii;
+    this.jj = jj;
+    this.isTarget = isTarget;
+    this.tween = 0.0;
+    if(autoPilot) {
+      this.tween = (this.t * 1.0 % 1.0) * 2.0 - 1.0;
+    }
+    else {
+      this.tween = p.constrain((this.t * 1.0) * 2.0 - 1.0, -1.0, 1.0);
+    }
+    this.tween = orderFunc(this.tween, this.ii);
+    let tweenp = 4.0;
+    if (this.tween < 0) {
+      this.tween = Math.pow(p.map(this.tween, -1, 0, 0, 1), tweenp) * 0.5;
+    }
+    else {
+      if (this.isTarget) {
+        tweenp = 1.0;
+      }
+      this.tween = 1.0 - Math.pow(p.map(this.tween, 0, 1, 1, 0), tweenp) * 0.5;
+    }
   }
+
   let backgroundFunc;
   let orderFunc;
   let transformFunc;
@@ -17,6 +37,8 @@ var s = function (p) {
   let agents = [];
   let theVideo;
   let tintR, tintG, tintB;
+  let autoPilot = true;
+  let doUpdate = true;
 
   p.setup = function () {
     name = p.folderName;
@@ -27,19 +49,21 @@ var s = function (p) {
 
   function getCount() { return p.frameCount - startFrame };
 
+  p.keyPressed = function () {
+    if(!autoPilot) {
+      startFrame = p.frameCount;
+      doUpdate = true;
+    }
+  }
+
   p.draw = function () {
     let t = getCount() / 60.0;
-    if (getCount() % 60 == 0) {
+    if ((autoPilot && getCount() % 60 == 0) || (!autoPilot && doUpdate)) {
+      doUpdate = false;
       tintR = p.random(255);
       tintG = p.random(255);
       tintB = p.random(255);
       targetII = Math.floor(p.random(-1, 2));
-      // if(theVideo != undefined) theVideo.stop();
-      // theVideo = p.movies[Math.floor(p.random(p.movies.length))];
-      // theVideo.loop();
-    }
-    if (getCount() % 60 == 0) {
-      // targetII = Math.floor(p.random(-1, 2));
       {
         backgroundFunc = p.random([
           function (tween) {
@@ -276,25 +300,11 @@ var s = function (p) {
 
     p.translate(p.width / 2, p.height / 2);
 
-    // p.image(p.movies[0], -213,-213,426,426);
-
     for (let ii = -1; ii <= 1; ii++) {
       for (let jj = 0; jj < 2; jj++) {
-        let tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
-        tween = orderFunc(tween, ii);
-        let tweenp = 4.0;
-        if (tween < 0) {
-          tween = Math.pow(p.map(tween, -1, 0, 0, 1), tweenp) * 0.5;
-        }
-        else {
-          if (ii == targetII && jj == 1) {
-            tweenp = 1.0;
-          }
-          tween = 1.0 - Math.pow(p.map(tween, 0, 1, 1, 0), tweenp) * 0.5;
-        }
-
+        let agent = new Agent(t, ii, jj, ii == targetII && jj == 1);
         p.push();
-        if(ii == targetII && jj == 1) {
+        if(agent.isTarget) {
           p.stroke(255, 180);
         }
         else {
@@ -302,20 +312,12 @@ var s = function (p) {
         }
 
         p.translate(ii * p.width / 3, 0);
-        backgroundFunc(tween);
+        backgroundFunc(agent.tween);
 
-        // if (ii == targetII) {
-        //   let alpha = p.map(getCount() % 240, 220, 240, 1.0, 0.0);
-        //   if(alpha > 1.0) alpha = 1.0;
-        //   alpha = Math.pow(alpha, 4.0);
-        //   // p.tint(tintR * alpha, tintG * alpha, tintB * alpha);
-        //   // p.image(theVideo, -135,-265,370,560);
-        //   // p.tint(255, 255, 255);
-        // }
         let l = p.width / 3.0;
         p.translate(-l / 2.0, 0);
-        l = transformFunc(tween, l);
-        lineFunc(tween, l);
+        l = transformFunc(agent.tween, l);
+        lineFunc(agent.tween, l);
 
         p.pop();
         if(ii != targetII) break;
