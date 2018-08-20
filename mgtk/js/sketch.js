@@ -1,18 +1,12 @@
 var s = function (p) {
   let name;
 
-  function Agent (t, ii, jj, isTarget) {
+  function Agent (t, tween, ii, jj, isTarget) {
     this.t = t;
     this.ii = ii;
     this.jj = jj;
     this.isTarget = isTarget;
-    this.tween = 0.0;
-    if(autoPilot) {
-      this.tween = (this.t * 1.0 % 1.0) * 2.0 - 1.0;
-    }
-    else {
-      this.tween = p.constrain((this.t * 1.0) * 2.0 - 1.0, -1.0, 1.0);
-    }
+    this.tween = tween;
     this.tween = orderFunc(this);
     let tweenp = 4.0;
     if (this.tween < 0) {
@@ -58,6 +52,7 @@ var s = function (p) {
     }
   }
 
+  let globalTransformFunc;
   let backgroundFunc;
   let orderFunc;
   let transformFunc;
@@ -92,6 +87,32 @@ var s = function (p) {
       doUpdate = false;
       targetII = Math.floor(p.random(-1, 2));
       {
+        globalTransformFunc = p.random([
+          function (tween) {
+          }
+          ,
+          function (tween) {
+            let tw = tween;
+            if (tw < 0) {
+              tw = Math.pow(p.map(tw, -1, 0, 0, 1), 4.0) * 0.5;
+            }
+            else {
+              tw = 1.0 - Math.pow(p.map(tw, 0, 1, 1, 0), 4.0) * 0.5;
+            }
+            p.translate(tw * p.width / 3.0, 0.0);
+          }
+          ,
+          function (tween) {
+            let tw = tween;
+            if (tw < 0) {
+              tw = Math.pow(p.map(tw, -1, 0, 0, 1), 4.0) * 0.5;
+            }
+            else {
+              tw = 1.0 - Math.pow(p.map(tw, 0, 1, 1, 0), 4.0) * 0.5;
+            }
+            p.translate(-tw * p.width / 3.0, 0.0);
+          }
+        ])
         backgroundFunc = p.random([
           function (agent) {
           }
@@ -242,9 +263,19 @@ var s = function (p) {
 
     p.translate(p.width / 2, p.height / 2);
 
-    for (let ii = -1; ii <= 1; ii++) {
+    let tween = 0.0;
+    if(autoPilot) {
+      tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
+    }
+    else {
+      tween = p.constrain((t * 1.0) * 2.0 - 1.0, -1.0, 1.0);
+    }
+
+    globalTransformFunc(tween);
+
+    for (let ii = -2; ii <= 2; ii++) {
       for (let jj = 0; jj < 2; jj++) {
-        let agent = new Agent(t, ii, jj, ii == targetII && jj == 1);
+        let agent = new Agent(t, tween, ii, jj, ii == targetII && jj == 1);
         agent.draw();
 
         if(ii != targetII) break;
