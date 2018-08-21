@@ -349,6 +349,24 @@ var s = function (p) {
     }
     ,
     function (agent) {
+      if(agent.tween < 0.5) {
+        p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+      }
+      else {
+        p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
+      }
+    }
+    ,
+    function (agent) {
+      if(agent.tween < 0.5) {
+        p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
+      }
+      else {
+        p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+      }
+    }
+    ,
+    function (agent) {
       p.rotateY(agent.tween * Math.PI);
     }
   ]);
