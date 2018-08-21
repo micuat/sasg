@@ -132,6 +132,7 @@ var s = function (p) {
         p.stroke(255);
       }
 
+      backdropFunc.exec(this);
       p.translate(this.ii * p.width / 3, 0);
       backgroundFunc.exec(this);
 
@@ -178,18 +179,22 @@ var s = function (p) {
       p.translate(-tw * p.width / 3.0, 0.0);
     }
   ]);
-  let backgroundFunc = new FuncList([
+  let backdropFunc = new FuncList([
     function (agent) {
     }
     ,
     function (agent) {
       if(agent.jj == 0 && agent.ii == 0) {
-        let alpha = agent.tweenPowReturn();
+        let alpha = 1.0 - agent.tween;
         p.push();
         p.stroke(255, alpha * 255);
         sCircleMorph.draw();
         p.pop();
       }
+    }
+  ]);
+  let backgroundFunc = new FuncList([
+    function (agent) {
     }
     ,
     function (agent) {
@@ -368,6 +373,7 @@ var s = function (p) {
       targetII = Math.floor(p.random(-1, 2));
       {
         globalTransformFunc.update();
+        backdropFunc.update();
         backgroundFunc.update();
         orderFunc.update();
         transformFunc.update();
