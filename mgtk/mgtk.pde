@@ -74,6 +74,7 @@ float frameRate() {
 void setup() {
   noSmooth();
   hint(DISABLE_TEXTURE_MIPMAPS);
+  hint(DISABLE_DEPTH_TEST);
 
   //smooth();
   //hint(ENABLE_TEXTURE_MIPMAPS);

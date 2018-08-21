@@ -1,4 +1,3 @@
-
 var SCircleMorph = function (p) {
   let cirPath = [];
   let triPath = [];
@@ -89,9 +88,78 @@ var SCircleMorph = function (p) {
   }
 };
 
+var SStarField = function(p) {
+  let stars = [];
+  let speed = 0;
+  this.alpha = 1.0;
+
+  function Star() {
+    this.x = p.random(-p.width, p.width)/2;
+    this.y = p.random(-p.height, p.height)/2;
+    this.z = p.random(p.width);
+    this.pz = this.z;
+    if(p.random(1) > 0.) {
+      this.tail = 10;
+    }
+    else {
+      this.tail = 1;
+    }
+
+    this.update = function(speed) {
+      this.z = this.z - speed;
+      if (this.z < 0.0) {
+        this.z = p.width;
+        this.x = p.random(-p.height, p.height)/2;
+        this.y = p.random(-p.height, p.height)/2;
+        this.pz = this.z;
+      }
+    }
+
+    this.show = function(alpha) {
+      let sx = p.map(this.x / this.z, 0, 1, 0, p.width);
+      let sy = p.map(this.y / this.z, 0, 1, 0, p.height);
+
+      for(let i = 0; i < this.tail; i++) {
+        let pz = this.pz + i * 20;
+        let px = p.map(this.x / (this.pz+i*10), 0, 1, 0, p.width);
+        let py = p.map(this.y / (this.pz+i*10), 0, 1, 0, p.height);
+
+        p.noStroke();
+        p.fill(255, p.map(i, 0, 10, 255, 0) * alpha);
+        let r = p.map(pz, 0, p.width, 12, 0);
+        p.ellipse(px, py, r, r);
+      }
+      this.pz = this.z;
+    }
+  }
+
+  this.setup = function () {
+    for (let i = 0; i < 50; i++) {
+      stars.push(new Star());
+    }
+  }
+
+  this.draw = function () {
+    if(p.frameCount % 30 == 0) {
+      if(p.frameCount % 60 > 30) {
+        speed = p.random(5, 10);
+      }
+      else {
+        speed = p.random(25, 50);
+      }
+    }
+    // p.translate(p.width / 2, p.height / 2);
+    for (let i = 0; i < stars.length; i++) {
+      stars[i].update(speed);
+      stars[i].show(this.alpha);
+    }
+  };
+};
+
 var s = function (p) {
   let name;
   let sCircleMorph = new SCircleMorph(p);
+  let sStarField = new SStarField(p);
 
   function Agent (t, tween, ii, jj, isTarget) {
     this.t = t;
@@ -132,7 +200,6 @@ var s = function (p) {
         p.stroke(255);
       }
 
-      backdropFunc.exec(this);
       p.translate(this.ii * p.width / 3, 0);
       backgroundFunc.exec(this);
 
@@ -180,17 +247,24 @@ var s = function (p) {
     }
   ]);
   let backdropFunc = new FuncList([
-    function (agent) {
+    function (tween) {
     }
     ,
-    function (agent) {
-      if(agent.jj == 0 && agent.ii == 0) {
-        let alpha = 1.0 - agent.tween;
-        p.push();
-        p.stroke(255, alpha * 255);
-        sCircleMorph.draw();
-        p.pop();
-      }
+    function (tween) {
+      let alpha = 1.0 - tween;
+      p.push();
+      p.stroke(255, alpha * 255);
+      sCircleMorph.draw();
+      p.pop();
+    }
+    ,
+    function (tween) {
+      let alpha = 1.0 - tween;
+      p.push();
+      p.translate(tween * p.width / 3.0, 0);
+      sStarField.alpha = alpha;
+      sStarField.draw();
+      p.pop();
     }
   ]);
   let backgroundFunc = new FuncList([
@@ -269,6 +343,14 @@ var s = function (p) {
       p.translate(-agent.l * 0.5, 0);
       agent.l *= (1.0 - agent.tweenPowReturn());
     }
+    ,
+    function (agent) {
+      p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+    }
+    ,
+    function (agent) {
+      p.rotateY(agent.tween * Math.PI);
+    }
   ]);
   let sigFunc = new FuncList([
     function (dx, tw) {
@@ -340,6 +422,16 @@ var s = function (p) {
       p.fill(255);
       pointFunc.exec(agent.l, 0, agent.tween);
     }
+    ,
+    function (agent) {
+      pointFunc.exec(0, 0, agent.tween);
+      p.push();
+      p.noFill();
+      p.rotateX(Math.PI * 0.5 + agent.tween * Math.PI * 2.0);
+      p.rect(0, -50, agent.l, 100);
+      p.pop();
+      pointFunc.exec(agent.l, 0, agent.tween);
+    }
   ]);
 
   let startFrame;
@@ -355,6 +447,7 @@ var s = function (p) {
     startFrame = p.frameCount;
 
     sCircleMorph.setup();
+    sStarField.setup();
   }
 
   function getCount() { return p.frameCount - startFrame };
@@ -368,12 +461,14 @@ var s = function (p) {
 
   p.draw = function () {
     let t = getCount() / 60.0;
+    if ((autoPilot && getCount() % 120 == 0) || (!autoPilot && doUpdate)) {
+      backdropFunc.update();
+    }
     if ((autoPilot && getCount() % 60 == 0) || (!autoPilot && doUpdate)) {
       doUpdate = false;
       targetII = Math.floor(p.random(-1, 2));
       {
         globalTransformFunc.update();
-        backdropFunc.update();
         backgroundFunc.update();
         orderFunc.update();
         transformFunc.update();
@@ -397,6 +492,15 @@ var s = function (p) {
     else {
       tween = p.constrain((t * 1.0) * 2.0 - 1.0, -1.0, 1.0);
     }
+
+    let tween2 = 0.0;
+    if(autoPilot) {
+      tween2 = (t * 0.5 % 1.0) * 2.0 - 1.0;
+    }
+    else {
+      tween2 = p.constrain((t * 0.5) * 2.0 - 1.0, -1.0, 1.0);
+    }
+    backdropFunc.exec(tween2);
 
     globalTransformFunc.exec(tween);
 
