@@ -110,52 +110,54 @@ var s = function (p) {
     pg.translate(p.width / 2.0, p.height / 2.0);
 
     // let shape = p.createShape();
-    for(let j = -1; j <= 1; j++) {
+    for(let j = -3; j <= 3; j++) {
       pg.pushMatrix();
-      pg.translate(j * 250, 0);
-      if(j == 0)
-        pg.rotate(tween * Math.PI);
+      pg.translate(j * 100, 0);
+      if(j % 2 == 0)
+        pg.rotate(tween * Math.PI * 2.0);
       else
-        pg.rotate(-tween * Math.PI);
+        pg.rotate(-tween * Math.PI * 2.0 - Math.PI / 6.0);
       for(let icolor = 0; icolor < 2; icolor++) {
         if(icolor == 0)
-          fillAt((j + 1) % 2 * 2 + 1);
+          fillAt(((j+4) % 2) % 2 * 2 + 1);
         else {
-          fillAt((j + 1) % 2 * 2);
+          fillAt(((j+4) % 2) % 2 * 2);
         }
-        for(let i = 0; i < 6; i++) {
+        let n = 3;
+        if((j+2) % 2 == 0) n = 6;
+        for(let i = 0; i < n; i++) {
           let tw = 0;
           if(i == targetI) tw = tweenPowReturn();
 
           pg.pushMatrix();
-          pg.rotate(i / 6.0 * p.TWO_PI);
+          pg.rotate(i / n * p.TWO_PI);
 
           if(icolor == 1)
           pg.scale(0.6, 0.95);
 
           pg.pushMatrix();
           pg.rotate(1.5 / 6.0 * p.TWO_PI);
-          pg.translate(p.map(tw, 0.0, 1.0, -0.0, -80.0), 0);
+          pg.translate(p.map(tw, 0.0, 1.0, -0.0, -40.0), 0);
           pg.beginShape();
           let da = 0.15;
-          let r = 100;
+          let r = 50;
           let angle = 0.0;
-          r = 100;
+          r = 50;
           pg.vertex(r * Math.cos(angle - da), r * Math.sin(angle - da));
-          r = 108;
-          if(icolor == 1) r = 104;
+          r = 54;
+          if(icolor == 1) r = 52;
           pg.vertex(r * Math.cos(angle), r * Math.sin(angle));
-          r = 100;
+          r = 50;
           pg.vertex(r * Math.cos(angle + da), r * Math.sin(angle + da));
-          r = 30;
+          r = 15;
           angle = (i + 0.5) / 6.0 * p.TWO_PI;
 
           pg.endShape();
           pg.popMatrix();
           // pg.rotate(-1.5 / 6.0 * p.TWO_PI);
-          let w = p.map(tw, 0.0, 1.0, 79.0, -0.0);
-          pg.rect(-15, 20, 30, w);
-          pg.rect(-15, 20, 30, -20);
+          let w = p.map(tw, 0.0, 1.0, 40.0, -0.0);
+          pg.rect(-7.5, 10, 15, w);
+          pg.rect(-7.5, 10, 15, -10);
           pg.popMatrix();
         }
       }

@@ -28,12 +28,12 @@ void main() {
   vec2 fragCoord = vertTexCoord.st;
 	vec2 nFragCoord = fragCoord.st - vec2(0.5);
 
-	float lfc = length(nFragCoord);
+	float lfc = length(nFragCoord) - 0.001;
 	float afc = atan(nFragCoord.t, nFragCoord.s);
 
 	vec4 pgCol = texture(pgTex, vertTexCoord.st);
 	vec4 backCol;
-  float dth = 0.02;// * lfo1;// * (2.0 + lfc);// * (lfo0 * 2.0 - 1.0);
+  float dth = 0.0;// * lfo1;// * (2.0 + lfc);// * (lfo0 * 2.0 - 1.0);
 	backCol = texture(backTex, vec2(0.5) + vec2(lfc*cos(afc + dth), lfc*sin(afc + dth)));
 
   float x = fragCoord.x - 0.5;
@@ -48,10 +48,7 @@ void main() {
 	float alpha = pgCol.r;
 
 	vec4 finalColor = pgCol*1.0;// + fragCol0 * 1.0 + fragCol1 * 0.0;
-  if(lfo0 > 0.75)
-  	finalColor.rgb = mix(finalColor.rgb, backCol.rgb, (lfo0 - 0.5) * 2.0);
-  else
-  	finalColor.rgb = mix(finalColor.rgb, backCol.rgb, 0.5);
+  finalColor.rgb = mix(finalColor.rgb, backCol.rgb, 0.99*0.99 - pow(lfo0 * 0.99, 2.0));
 	gl_FragColor = finalColor;
 	// gl_FragColor = pgCol;
 }
