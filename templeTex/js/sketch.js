@@ -35,6 +35,8 @@ var s = function (p) {
   let shader, feedbackShader;
   let pg;
   let targetI;
+  let autoPilot = false;
+  let doUpdate = true;
 
   p.setup = function () {
     name = p.folderName;
@@ -54,6 +56,13 @@ var s = function (p) {
 
   function getCount() { return p.frameCount - startFrame };
 
+  p.keyPressed = function () {
+    if(!autoPilot) {
+      startFrame = p.frameCount;
+      doUpdate = true;
+    }
+  }
+
   p.draw = function () {
     p.background(0);
     p.stroke(255);
@@ -61,7 +70,8 @@ var s = function (p) {
     if(getCount() % 60 == 0) {
       shader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
     }
-    if(getCount() % 240 == 0) {
+    if ((autoPilot && getCount() % 60 == 0) || (!autoPilot && doUpdate)) {
+      doUpdate = false;
       targetI = Math.floor(p.random(0, 6));
     }
 
@@ -84,8 +94,14 @@ var s = function (p) {
       pg.stroke(colorSc[i][0], colorSc[i][1], colorSc[i][2]);
     }
 
-    let lfo0 = Math.cos(t * Math.PI * 0.25) * 0.5 + 0.5;
-    let tween = (t * 0.25 % 1.0) * 2.0 - 1.0;
+    let lfo0 = 1.0;//Math.cos(t * Math.PI * 0.25) * 0.5 + 0.5;
+    let tween;
+    if(autoPilot) {
+      tween = (t * 0.25 % 1.0) * 2.0 - 1.0;
+    }
+    else {
+      tween = p.constrain(t * 0.25, 0.0, 1.0) * 2.0 - 1.0;
+    }
     let tweenp = 2.0;
     if (tween < 0) {
       tween = Math.pow(p.map(tween, -1, 0, 0, 1), tweenp) * 0.5;
@@ -110,13 +126,13 @@ var s = function (p) {
     pg.translate(p.width / 2.0, p.height / 2.0);
 
     // let shape = p.createShape();
-    for(let j = -3; j <= 3; j++) {
+    for(let j = -4; j <= 4; j++) {
       pg.pushMatrix();
-      pg.translate(j * 100, 0);
+      pg.translate(j * 77, 0);
       if(j % 2 == 0)
-        pg.rotate(tween * Math.PI * 2.0);
+        pg.rotate(tween * Math.PI * 2.0 + j * Math.PI / 6.0);
       else
-        pg.rotate(-tween * Math.PI * 2.0 - Math.PI / 6.0);
+        pg.rotate(-tween * Math.PI * 2.0 + (j+2) * Math.PI / 6.0);
       for(let icolor = 0; icolor < 2; icolor++) {
         if(icolor == 0)
           fillAt(((j+4) % 2) % 2 * 2 + 1);
