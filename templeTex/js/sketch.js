@@ -35,8 +35,9 @@ var s = function (p) {
   let shader, feedbackShader;
   let pg;
   let targetI;
-  let autoPilot = false;
+  let autoPilot = true;
   let doUpdate = true;
+  let curCol = [0, 0, 0];
 
   p.setup = function () {
     name = p.folderName;
@@ -199,10 +200,17 @@ var s = function (p) {
     shader.set("vMirror", p.mouseX/800.0);
     let centerDirection = 0.99;//p.map(Math.sin(t * 0.1), -1, 1, 0.99, 1.0);
     shader.set("centerDirection", centerDirection);
-    let rgb = HSVtoRGB((t * 0.1) % 1.0, 1.0, 1.0);
-    shader.set("bgColor0", rgb.r, rgb.g, rgb.b);
-    rgb = HSVtoRGB((t + 0.5) % 1.0, 1.0, 1.0);
-    shader.set("bgColor1", rgb.r, rgb.g, rgb.b);
+    // let rgb = HSVtoRGB((t * 0.1) % 1.0, 1.0, 1.0);
+    // shader.set("bgColor0", rgb.r, rgb.g, rgb.b);
+    curCol[0] = p.lerp(curCol[0], colorSc[Math.floor(t % 3) * 2][0] / 255.0, 0.05);
+    curCol[1] = p.lerp(curCol[1], colorSc[Math.floor(t % 3) * 2][1] / 255.0, 0.05);
+    curCol[2] = p.lerp(curCol[2], colorSc[Math.floor(t % 3) * 2][2] / 255.0, 0.05);
+    shader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
+    // rgb = HSVtoRGB((t + 0.5) % 1.0, 1.0, 1.0);
+    // shader.set("bgColor1", rgb.r, rgb.g, rgb.b);
+    shader.set("bgColor1", colorSc[Math.floor(t % 3) * 2+1][0] / 255.0,
+    colorSc[Math.floor(t % 3) * 2+1][1] / 255.0,
+    colorSc[Math.floor(t % 3) * 2+1][2] / 255.0);
     shader.set("pgTex", pg);
     shader.set("waveTex", wavePg);
     shader.set("backTex", backPg);

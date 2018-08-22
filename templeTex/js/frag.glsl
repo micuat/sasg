@@ -33,13 +33,14 @@ void main() {
 
 	vec4 pgCol = texture(pgTex, vertTexCoord.st);
 	vec4 backCol;
-  float dth = 0.0;// * lfo1;// * (2.0 + lfc);// * (lfo0 * 2.0 - 1.0);
+  float dth = 0.002;// * lfo1;// * (2.0 + lfc);// * (lfo0 * 2.0 - 1.0);
 	backCol = texture(backTex, vec2(0.5) + vec2(lfc*cos(afc + dth), lfc*sin(afc + dth)));
 
   float x = fragCoord.x - 0.5;
   float y = 1.0 - fragCoord.y;
-	vec4 fragCol0 = vec4(vec3(pow(sin(y * (lfo0 * 10.0 + 50.0) - iTime - x * 10.0) * cos(x * (lfo0 * 5.0 + 10.0)), 4.0)), 1.0);//texture(waveTex, vec2(y, 0.5));
-	fragCol0.rgb *= mix(bgColor0, vec3(1.0), 1.0 - lfo2);
+	vec4 fragCol0 = vec4(vec3(pow(sin(y * (lfo0 * 10.0 + 50.0) - iTime * 1.0 - x * 10.0) * cos(x * (lfo0 * 5.0 + 10.0)), 4.0)), 1.0);//texture(waveTex, vec2(y, 0.5));
+	// fragCol0.rgb *= bgColor0 * 10.0;//mix(bgColor0, vec3(0.0), 0.5 - lfo2 * 0.5);
+  fragCol0.rgb = mix(bgColor0 * 3.0, bgColor1, 1.0-pow(fragCol0.r, 4.0));
 
   y = y * 2.0 - floor(y * 2.0);
 	vec4 fragCol1 = texture(waveTex, vec2(y, 0.5));
@@ -47,8 +48,8 @@ void main() {
 
 	float alpha = pgCol.r;
 
-	vec4 finalColor = pgCol*1.0;// + fragCol0 * 1.0 + fragCol1 * 0.0;
-  finalColor.rgb = mix(finalColor.rgb, backCol.rgb, 0.99*0.99 - pow(lfo0 * 0.99, 2.0));
+	vec4 finalColor = pgCol*0.0 + fragCol0 * 1.0 + fragCol1 * 0.0;
+  finalColor.rgb = mix(finalColor.rgb, backCol.rgb, 0.99);//1.0 - pow(lfo0 * 1.0, 1.0));
 	gl_FragColor = finalColor;
 	// gl_FragColor = pgCol;
 }
