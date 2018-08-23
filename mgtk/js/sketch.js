@@ -341,253 +341,335 @@ var s = function (p) {
 
   let FuncList = function (funcs) {
     this.funcs = funcs;
-    this.exec;
+    this.execFunc;
+    this.preset = 0;
     this.update = function () {
-      this.exec = p.random(this.funcs);
+      let flist = [];
+      for(let i in this.funcs) {
+        if(this.funcs[i].preset == this.preset) {
+          flist.push(this.funcs[i]);
+        }
+      }
+      if(flist.length > 0) {
+        this.execFunc = p.random(flist);
+      }
+      else {
+        this.execFunc = this.funcs[0];
+      }      
+    }
+    this.exec = function (a, b, c, d, e, f, g) {
+      if(this.execFunc != undefined)
+        return this.execFunc.f(a, b, c, d, e, f, g);
     }
   }
 
   let globalTransformFunc = new FuncList([
-    function (tween) {
+    {
+      preset: [0],
+      f: function (tween) {
+      }
     }
     ,
-    function (tween) {
-      let tw = tween;
-      if (tw < 0) {
-        tw = Math.pow(p.map(tw, -1, 0, 0, 1), 4.0) * 0.5;
+    {
+      preset: [0],
+      f: function (tween) {
+        let tw = tween;
+        if (tw < 0) {
+          tw = Math.pow(p.map(tw, -1, 0, 0, 1), 4.0) * 0.5;
+        }
+        else {
+          tw = 1.0 - Math.pow(p.map(tw, 0, 1, 1, 0), 4.0) * 0.5;
+        }
+        p.translate(tw * p.width / 3.0, 0.0);
       }
-      else {
-        tw = 1.0 - Math.pow(p.map(tw, 0, 1, 1, 0), 4.0) * 0.5;
-      }
-      p.translate(tw * p.width / 3.0, 0.0);
     }
     ,
-    function (tween) {
-      let tw = tween;
-      if (tw < 0) {
-        tw = Math.pow(p.map(tw, -1, 0, 0, 1), 4.0) * 0.5;
+    {
+      preset: [0],
+      f: function (tween) {
+        let tw = tween;
+        if (tw < 0) {
+          tw = Math.pow(p.map(tw, -1, 0, 0, 1), 4.0) * 0.5;
+        }
+        else {
+          tw = 1.0 - Math.pow(p.map(tw, 0, 1, 1, 0), 4.0) * 0.5;
+        }
+        p.translate(-tw * p.width / 3.0, 0.0);
       }
-      else {
-        tw = 1.0 - Math.pow(p.map(tw, 0, 1, 1, 0), 4.0) * 0.5;
-      }
-      p.translate(-tw * p.width / 3.0, 0.0);
-    }
-  ]);
+    }]);
   let backdropFunc = new FuncList([
-    function (tween) {
-    }
-    ,
-    function (tween) {
-      let alpha = 1.0 - tween;
-      p.push();
-      p.stroke(255, beatFader * alpha * 255);
-      sCircleMorph.draw();
-      p.pop();
-    }
-    ,
-    function (tween) {
-      let alpha = 1.0 - tween;
-      p.push();
-      p.translate(tween * p.width / 3.0, 0);
-      sStarField.alpha = alpha * beatFader;
-      sStarField.draw();
-      p.pop();
-    }
-    ,
-    function (tween) {
-      let alpha = 1.0 - tween;
-      p.push();
-      sGameOfLife.alpha = alpha * beatFader;
-      sGameOfLife.draw();
-      p.pop();
-    }
-  ]);
+    {
+      preset: [0],
+      f: function (tween) {
+      }
+    },
+    {
+      preset: [1],
+      f: function (tween) {
+        let alpha = 1.0 - tween;
+        p.push();
+        p.stroke(255, beatFader * alpha * 255);
+        sCircleMorph.draw();
+        p.pop();
+      }
+    },
+    {
+      preset: [1],
+      f: function (tween) {
+        let alpha = 1.0 - tween;
+        p.push();
+        p.translate(tween * p.width / 3.0, 0);
+        sStarField.alpha = alpha * beatFader;
+        sStarField.draw();
+        p.pop();
+      }
+    },
+    {
+      preset: [1],
+      f: function (tween) {
+        let alpha = 1.0 - tween;
+        p.push();
+        sGameOfLife.alpha = alpha * beatFader;
+        sGameOfLife.draw();
+        p.pop();
+      }
+    }]);
   let backgroundFunc = new FuncList([
-    function (agent) {
-    }
-    ,
-    function (agent) {
-      let alpha = agent.tweenPowReturn();
-      p.push();
-      p.fill(255, 255 * alpha * beatFader);
-      p.noStroke();
-      let pw = 1280 * 0.5 / 3.0;
-      let n = pw / 10.0;
-      p.rect(-pw * 0.5, -p.height * 0.5, pw, p.height);
-      p.pop();
-    }
-    ,
-    function (agent) {
-      let alpha = agent.tweenPowReturn();
-      p.push();
-      p.fill(255, 255 * alpha * beatFader);
-      p.noStroke();
-      let pw = 1280 * 0.5 / 3.0;
-      let n = pw / 10.0;
-      p.rect(-pw * 0.5, -p.height * 0.5, pw, p.height);
-      p.pop();
-    }
-    ,
-    function (agent) {
-      let alpha = agent.tweenPowReturn();
-      p.push();
-      p.stroke(255, 255 * alpha * beatFader);
-      p.strokeWeight(1.0);
-      let pw = 1280 * 0.5 / 3.0;
-      let n = pw / 10.0;
-      for (let j = -6; j <= 6; j++) {
-        if (j >= -5 && j <= 5)
-          p.line(j * n, -p.height * 0.5, j * n, p.height * 0.5);
-        p.line(-pw * 0.5, j * n, pw * 0.5, j * n);
+    {
+      preset: [0],
+      f: function (agent) {
       }
-      p.pop();
-    }
-  ]);
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        let alpha = agent.tweenPowReturn();
+        p.push();
+        p.fill(255, 255 * alpha * beatFader);
+        p.noStroke();
+        let pw = 1280 * 0.5 / 3.0;
+        let n = pw / 10.0;
+        p.rect(-pw * 0.5, -p.height * 0.5, pw, p.height);
+        p.pop();
+      }
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        let alpha = agent.tweenPowReturn();
+        p.push();
+        p.fill(255, 255 * alpha * beatFader);
+        p.noStroke();
+        let pw = 1280 * 0.5 / 3.0;
+        let n = pw / 10.0;
+        p.rect(-pw * 0.5, -p.height * 0.5, pw, p.height);
+        p.pop();
+      }
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        let alpha = agent.tweenPowReturn();
+        p.push();
+        p.stroke(255, 255 * alpha * beatFader);
+        p.strokeWeight(1.0);
+        let pw = 1280 * 0.5 / 3.0;
+        let n = pw / 10.0;
+        for (let j = -6; j <= 6; j++) {
+          if (j >= -5 && j <= 5)
+            p.line(j * n, -p.height * 0.5, j * n, p.height * 0.5);
+          p.line(-pw * 0.5, j * n, pw * 0.5, j * n);
+        }
+        p.pop();
+      }
+    }]);
   let orderFunc = new FuncList([
-    function (agent) {
-      agent.tween = p.constrain(agent.tween * 1.25 + agent.ii * 0.25, -1, 1);
-    }
-    ,
-    function (agent) {
-      agent.tween = p.constrain(agent.tween * 1.25 - agent.ii * 0.25, -1, 1);
-    }
-    ,
-    function (agent) {
-      agent.tween = p.constrain(agent.tween * 1.25 - Math.abs(agent.ii) * 0.25, -1, 1);
-    }
-    ,
-    function (agent) {
-    }
-  ]);
+    {
+      preset: [0],
+      f: function (agent) {
+        agent.tween = p.constrain(agent.tween * 1.25 + agent.ii * 0.25, -1, 1);
+      }
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        agent.tween = p.constrain(agent.tween * 1.25 - agent.ii * 0.25, -1, 1);
+      }
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        agent.tween = p.constrain(agent.tween * 1.25 - Math.abs(agent.ii) * 0.25, -1, 1);
+      }
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+      }
+    }]);
   let transformFunc = new FuncList([
-    function (agent) {
-      p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
-    }
-    ,
-    function (agent) {
-      p.translate(0.0, agent.tweenPowReturn() * -150, 0.0);
-    }
-    ,
-    function (agent) {
-      agent.l *= (1.0 - agent.tweenPowReturn());
-    }
-    ,
-    function (agent) {
-      p.translate(agent.l * 0.5, 0);
-      p.scale(-1, 1);
-      p.translate(-agent.l * 0.5, 0);
-      agent.l *= (1.0 - agent.tweenPowReturn());
-    }
-    ,
-    function (agent) {
-      p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
-    }
-    ,
-    function (agent) {
-      if (agent.tween < 0.5) {
+    {
+      preset: [0],
+      f: function (agent) {
         p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
       }
-      else {
-        p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        p.translate(0.0, agent.tweenPowReturn() * -150, 0.0);
       }
-    }
-    ,
-    function (agent) {
-      if (agent.tween < 0.5) {
-        p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        agent.l *= (1.0 - agent.tweenPowReturn());
       }
-      else {
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        p.translate(agent.l * 0.5, 0);
+        p.scale(-1, 1);
+        p.translate(-agent.l * 0.5, 0);
+        agent.l *= (1.0 - agent.tweenPowReturn());
+      }
+    },
+    {
+      preset: [0],
+      f: function (agent) {
         p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
       }
-    }
-    ,
-    function (agent) {
-      p.rotateY(agent.tween * Math.PI);
-    }
-  ]);
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        if (agent.tween < 0.5) {
+          p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+        }
+        else {
+          p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
+        }
+      }
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        if (agent.tween < 0.5) {
+          p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
+        }
+        else {
+          p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+        }
+      }
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        p.rotateY(agent.tween * Math.PI);
+      }
+    }]);
   let sigFunc = new FuncList([
-    function (dx, tw) {
-      return Math.sin(dx * 0.1 + tw * 10.0);
-    }
-    ,
-    function (dx, tw) {
-      return Math.sin(dx * 0.1);
-    }
-    ,
-    function (dx, tw) {
-      return p.random(-1, 1);
-    }
-  ]);
+    {
+      preset: [0],
+      f: function (dx, tw) {
+        return Math.sin(dx * 0.1 + tw * 10.0);
+      }
+    },
+    {
+      preset: [0],
+      f: function (dx, tw) {
+        return Math.sin(dx * 0.1);
+      }
+    },
+    {
+      preset: [0],
+      f: function (dx, tw) {
+        return p.random(-1, 1);
+      }
+    }]);
   let pointFunc = new FuncList([
-    function (x, y, tween) {
-      p.ellipse(x, y, 7);
-    }
-    ,
-    function (x, y, tween) {
-      p.ellipse(x, y, 7);
-      p.push();
-      let r = 1.0;
-      let alpha = 1.0;
-      if (tween < 0.5) {
-        r *= p.map(tween, 0, 0.5, 1.0, 10.0);
-        alpha *= p.map(tween, 0, 0.5, 1.0, 0.0);
-        p.noFill();
-        p.stroke(255, 255 * alpha * beatFader);
-        p.strokeWeight(1.0);
-        p.ellipse(x, y, 7 * r);
+    {
+      preset: [0],
+      f: function (x, y, tween) {
+        p.ellipse(x, y, 7);
       }
-      p.pop();
-    }
-    ,
-    function (x, y, tween) {
-      p.ellipse(x, y, 7);
-      p.push();
-      let r = 1.0;
-      let alpha = 1.0;
-      if (tween > 0.5) {
-        r *= p.map(tween, 0.5, 1.0, 10.0, 1.0);
-        alpha *= p.map(tween, 0.5, 1.0, 0.0, 1.0);
-        p.noFill();
-        p.stroke(255, 255 * alpha * beatFader);
-        p.strokeWeight(1.0);
-        p.ellipse(x, y, 7 * r);
+    },
+    {
+      preset: [0],
+      f: function (x, y, tween) {
+        p.ellipse(x, y, 7);
+        p.push();
+        let r = 1.0;
+        let alpha = 1.0;
+        if (tween < 0.5) {
+          r *= p.map(tween, 0, 0.5, 1.0, 10.0);
+          alpha *= p.map(tween, 0, 0.5, 1.0, 0.0);
+          p.noFill();
+          p.stroke(255, 255 * alpha * beatFader);
+          p.strokeWeight(1.0);
+          p.ellipse(x, y, 7 * r);
+        }
+        p.pop();
       }
-      p.pop();
-    }
-  ]);
+    },
+    {
+      preset: [0],
+      f: function (x, y, tween) {
+        p.ellipse(x, y, 7);
+        p.push();
+        let r = 1.0;
+        let alpha = 1.0;
+        if (tween > 0.5) {
+          r *= p.map(tween, 0.5, 1.0, 10.0, 1.0);
+          alpha *= p.map(tween, 0.5, 1.0, 0.0, 1.0);
+          p.noFill();
+          p.stroke(255, 255 * alpha * beatFader);
+          p.strokeWeight(1.0);
+          p.ellipse(x, y, 7 * r);
+        }
+        p.pop();
+      }
+    }]);
   let lineFunc = new FuncList([
-    function (agent) {
-      p.fill(255, 255 * beatFader);
-      pointFunc.exec(0, 0, agent.tween);
-      p.line(0, 0, agent.l, 0);
-      pointFunc.exec(agent.l, 0, agent.tween);
-    }
-    ,
-    function (agent) {
-      p.fill(255, 255 * beatFader);
-      pointFunc.exec(0, 0, agent.tween);
-      let tw = agent.tweenPowReturn();
-      p.noFill();
-      p.beginShape(p.POINTS);
-      for (let dx = 0.0; dx < agent.l; dx += 1.0) {
-        let y = Math.sin(dx / agent.l * Math.PI) * sigFunc.exec(dx, tw, agent.l) * tw;
-        p.vertex(dx, y * 50);
+    {
+      preset: [0],
+      f: function (agent) {
+        p.fill(255, 255 * beatFader);
+        pointFunc.exec(0, 0, agent.tween);
+        p.line(0, 0, agent.l, 0);
+        pointFunc.exec(agent.l, 0, agent.tween);
       }
-      p.endShape();
-      pointFunc.exec(agent.l, 0, agent.tween);
-    }
-    ,
-    function (agent) {
-      p.fill(255, 255 * beatFader);
-      pointFunc.exec(0, 0, agent.tween);
-      p.push();
-      p.noFill();
-      p.rotateX(Math.PI * 0.5 + agent.tween * Math.PI * 2.0);
-      p.rect(0, -50, agent.l, 100);
-      p.pop();
-      pointFunc.exec(agent.l, 0, agent.tween);
-    }
-  ]);
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        p.fill(255, 255 * beatFader);
+        pointFunc.exec(0, 0, agent.tween);
+        let tw = agent.tweenPowReturn();
+        p.noFill();
+        p.beginShape(p.POINTS);
+        for (let dx = 0.0; dx < agent.l; dx += 1.0) {
+          let y = Math.sin(dx / agent.l * Math.PI) * sigFunc.exec(dx, tw, agent.l) * tw;
+          p.vertex(dx, y * 50);
+        }
+        p.endShape();
+        pointFunc.exec(agent.l, 0, agent.tween);
+      }
+    },
+    {
+      preset: [0],
+      f: function (agent) {
+        p.fill(255, 255 * beatFader);
+        pointFunc.exec(0, 0, agent.tween);
+        p.push();
+        p.noFill();
+        p.rotateX(Math.PI * 0.5 + agent.tween * Math.PI * 2.0);
+        p.rect(0, -50, agent.l, 100);
+        p.pop();
+        pointFunc.exec(agent.l, 0, agent.tween);
+      }
+    }]);
 
   let startFrame;
   let targetII;
