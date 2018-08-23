@@ -345,20 +345,20 @@ var s = function (p) {
     this.preset = 0;
     this.update = function () {
       let flist = [];
-      for(let i in this.funcs) {
-        if(this.funcs[i].preset == this.preset) {
+      for (let i in this.funcs) {
+        if (this.funcs[i].preset.indexOf(this.preset) >= 0) {
           flist.push(this.funcs[i]);
         }
       }
-      if(flist.length > 0) {
+      if (flist.length > 0) {
         this.execFunc = p.random(flist);
       }
       else {
         this.execFunc = this.funcs[0];
-      }      
+      }
     }
     this.exec = function (a, b, c, d, e, f, g) {
-      if(this.execFunc != undefined)
+      if (this.execFunc != undefined)
         return this.execFunc.f(a, b, c, d, e, f, g);
     }
   }
@@ -399,7 +399,7 @@ var s = function (p) {
     }]);
   let backdropFunc = new FuncList([
     {
-      preset: [0],
+      preset: [0, 1],
       f: function (tween) {
       }
     },
@@ -725,19 +725,22 @@ var s = function (p) {
     }
 
     if ((seq != lastSeq && seq % 2 == 0) || (!autoPilot && doUpdate)) {
+      backdropFunc.preset = p.oscButton;
       backdropFunc.update();
     }
     if ((seq != lastSeq) || (!autoPilot && doUpdate)) {
       doUpdate = false;
       targetII = Math.floor(p.random(-1, 2));
-      {
-        globalTransformFunc.update();
-        backgroundFunc.update();
-        orderFunc.update();
-        transformFunc.update();
-        sigFunc.update();
-        pointFunc.update();
-        lineFunc.update();
+      let functions = [globalTransformFunc,
+        backgroundFunc,
+        orderFunc,
+        transformFunc,
+        sigFunc,
+        pointFunc,
+        lineFunc];
+      for (let i in functions) {
+        functions[i].preset = p.oscButton;
+        functions[i].update();
       }
     }
     lastSeq = seq;
