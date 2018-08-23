@@ -321,10 +321,10 @@ var s = function (p) {
     this.draw = function () {
       p.push();
       if (this.isTarget) {
-        p.stroke(255, 180);
+        p.stroke(255, 180 * beatFader);
       }
       else {
-        p.stroke(255);
+        p.stroke(255, 255 * beatFader);
       }
 
       p.translate(this.ii * p.width / 3, 0);
@@ -380,7 +380,7 @@ var s = function (p) {
     function (tween) {
       let alpha = 1.0 - tween;
       p.push();
-      p.stroke(255, alpha * 255);
+      p.stroke(255, beatFader * alpha * 255);
       sCircleMorph.draw();
       p.pop();
     }
@@ -389,7 +389,7 @@ var s = function (p) {
       let alpha = 1.0 - tween;
       p.push();
       p.translate(tween * p.width / 3.0, 0);
-      sStarField.alpha = alpha;
+      sStarField.alpha = alpha * beatFader;
       sStarField.draw();
       p.pop();
     }
@@ -397,7 +397,7 @@ var s = function (p) {
     function (tween) {
       let alpha = 1.0 - tween;
       p.push();
-      sGameOfLife.alpha = alpha;
+      sGameOfLife.alpha = alpha * beatFader;
       sGameOfLife.draw();
       p.pop();
     }
@@ -409,7 +409,7 @@ var s = function (p) {
     function (agent) {
       let alpha = agent.tweenPowReturn();
       p.push();
-      p.fill(255, 255 * alpha);
+      p.fill(255, 255 * alpha * beatFader);
       p.noStroke();
       let pw = 1280 * 0.5 / 3.0;
       let n = pw / 10.0;
@@ -420,7 +420,7 @@ var s = function (p) {
     function (agent) {
       let alpha = agent.tweenPowReturn();
       p.push();
-      p.fill(255, 255 * alpha);
+      p.fill(255, 255 * alpha * beatFader);
       p.noStroke();
       let pw = 1280 * 0.5 / 3.0;
       let n = pw / 10.0;
@@ -431,7 +431,7 @@ var s = function (p) {
     function (agent) {
       let alpha = agent.tweenPowReturn();
       p.push();
-      p.stroke(255, 255 * alpha);
+      p.stroke(255, 255 * alpha * beatFader);
       p.strokeWeight(1.0);
       let pw = 1280 * 0.5 / 3.0;
       let n = pw / 10.0;
@@ -532,7 +532,7 @@ var s = function (p) {
         r *= p.map(tween, 0, 0.5, 1.0, 10.0);
         alpha *= p.map(tween, 0, 0.5, 1.0, 0.0);
         p.noFill();
-        p.stroke(255, 255 * alpha);
+        p.stroke(255, 255 * alpha * beatFader);
         p.strokeWeight(1.0);
         p.ellipse(x, y, 7 * r);
       }
@@ -548,7 +548,7 @@ var s = function (p) {
         r *= p.map(tween, 0.5, 1.0, 10.0, 1.0);
         alpha *= p.map(tween, 0.5, 1.0, 0.0, 1.0);
         p.noFill();
-        p.stroke(255, 255 * alpha);
+        p.stroke(255, 255 * alpha * beatFader);
         p.strokeWeight(1.0);
         p.ellipse(x, y, 7 * r);
       }
@@ -557,12 +557,14 @@ var s = function (p) {
   ]);
   let lineFunc = new FuncList([
     function (agent) {
+      p.fill(255, 255 * beatFader);
       pointFunc.exec(0, 0, agent.tween);
       p.line(0, 0, agent.l, 0);
       pointFunc.exec(agent.l, 0, agent.tween);
     }
     ,
     function (agent) {
+      p.fill(255, 255 * beatFader);
       pointFunc.exec(0, 0, agent.tween);
       let tw = agent.tweenPowReturn();
       p.noFill();
@@ -572,11 +574,11 @@ var s = function (p) {
         p.vertex(dx, y * 50);
       }
       p.endShape();
-      p.fill(255);
       pointFunc.exec(agent.l, 0, agent.tween);
     }
     ,
     function (agent) {
+      p.fill(255, 255 * beatFader);
       pointFunc.exec(0, 0, agent.tween);
       p.push();
       p.noFill();
@@ -594,6 +596,8 @@ var s = function (p) {
   let doUpdate = true;
   let curCol = [0, 0, 0];
   let lastSeq = -1;
+  let beatFader = 1;
+  let texShader, levelShader;
 
   p.setup = function () {
     name = p.folderName;
@@ -608,11 +612,14 @@ var s = function (p) {
       backPg = p.createGraphics(p.width, p.height, p.P3D);
     if(wavePg == undefined)
       wavePg = p.createGraphics(100, 100);
-    shader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
+    texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
+    levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
 
     sCircleMorph.setup();
     sStarField.setup();
     sGameOfLife.setup();
+
+    backdropFunc.update();
   }
 
   p.getCount = function () { return p.frameCount - startFrame + Math.floor(p.oscFaders[1] * 60) };
@@ -631,7 +638,8 @@ var s = function (p) {
     let seq = Math.floor(tElapsed * (bpm / 120.0));
 
     if(p.getCount() % 60 == 0) {
-      shader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
+      texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
+      levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
     }
 
     if ((seq != lastSeq && seq % 2 == 0) || (!autoPilot && doUpdate)) {
@@ -674,28 +682,28 @@ var s = function (p) {
       wavePg.endDraw();
   
       let lfo0 = 1.0;//Math.cos(t * Math.PI * 0.25) * 0.5 + 0.5;
-      shader.set("iTime", t);
-      shader.set("lfo0", lfo0);
+      texShader.set("iTime", t);
+      texShader.set("lfo0", lfo0);
       let frontColIdx = Math.floor(t % 3) * 2;
       let backColIdx = Math.floor(t % 3) * 2 + 1;
       curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
       curCol[1] = p.lerp(curCol[1], colorSc[frontColIdx][1] / 255.0, 0.05);
       curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
-      shader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
+      texShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
       // rgb = HSVtoRGB((t + 0.5) % 1.0, 1.0, 1.0);
-      // shader.set("bgColor1", rgb.r, rgb.g, rgb.b);
-      shader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
+      // texShader.set("bgColor1", rgb.r, rgb.g, rgb.b);
+      texShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
       colorSc[backColIdx][1] / 255.0,
       colorSc[backColIdx][2] / 255.0);
-      shader.set("pgTex", pg);
-      shader.set("waveTex", wavePg);
-      shader.set("backTex", backPg);
-      shader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
-      shader.set("phaseFader", p.oscFaders[5]);
-      shader.set("xFader", p.oscFaders[6] * 10.0);
-      shader.set("rAmountFader", p.oscFaders[7] * 1.0);
+      texShader.set("pgTex", pg);
+      texShader.set("waveTex", wavePg);
+      texShader.set("backTex", backPg);
+      texShader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
+      texShader.set("phaseFader", p.oscFaders[5]);
+      texShader.set("xFader", p.oscFaders[6] * 10.0);
+      texShader.set("rAmountFader", p.oscFaders[7] * 1.0);
       frontPg.beginDraw();
-      frontPg.filter(shader);
+      frontPg.filter(texShader);
       frontPg.endDraw();
   
       p.resetShader();
@@ -705,45 +713,51 @@ var s = function (p) {
       backPg = intermediatePg;
     }
     drawShader();
-    p.tint(255 * p.oscFaders[0]);
-    p.image(frontPg, 0, 0);
+    // p.tint(255 * p.oscFaders[0]);
+    // p.image(frontPg, 0, 0);
+    levelShader.set("pgTexture", frontPg);
+    levelShader.set("masterFader", p.oscFaders[0] * 1.0);
+    p.filter(levelShader);
     p.syphonServer.sendImage(frontPg);
 
-    p.blendMode(p.BLEND);
-    // p.background(0);
-    p.stroke(255);
-    p.strokeWeight(2);
+    function drawBeat () {
+      beatFader = p.oscFaders[3];
+      p.blendMode(p.BLEND);
+      // p.background(0);
+      p.stroke(255, 255 * beatFader);
+      p.strokeWeight(2);
 
-    p.translate(p.width / 2, p.height / 2);
+      p.translate(p.width / 2, p.height / 2);
 
-    let tween = 0.0;
-    if (autoPilot) {
-      tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
-    }
-    else {
-      tween = p.constrain((t * 1.0) * 2.0 - 1.0, -1.0, 1.0);
-    }
+      let tween = 0.0;
+      if (autoPilot) {
+        tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
+      }
+      else {
+        tween = p.constrain((t * 1.0) * 2.0 - 1.0, -1.0, 1.0);
+      }
 
-    let tween2 = 0.0;
-    if (autoPilot) {
-      tween2 = (t * 0.5 % 1.0) * 2.0 - 1.0;
-    }
-    else {
-      tween2 = p.constrain((t * 0.5) * 2.0 - 1.0, -1.0, 1.0);
-    }
-    backdropFunc.exec(tween2);
+      let tween2 = 0.0;
+      if (autoPilot) {
+        tween2 = (t * 0.5 % 1.0) * 2.0 - 1.0;
+      }
+      else {
+        tween2 = p.constrain((t * 0.5) * 2.0 - 1.0, -1.0, 1.0);
+      }
+      backdropFunc.exec(tween2);
 
-    globalTransformFunc.exec(tween);
+      globalTransformFunc.exec(tween);
 
-    for (let ii = -2; ii <= 2; ii++) {
-      for (let jj = 0; jj < 2; jj++) {
-        let agent = new Agent(t, tween, ii, jj, ii == targetII && jj == 1);
-        agent.draw();
+      for (let ii = -2; ii <= 2; ii++) {
+        for (let jj = 0; jj < 2; jj++) {
+          let agent = new Agent(t, tween, ii, jj, ii == targetII && jj == 1);
+          agent.draw();
 
-        if (ii != targetII) break;
+          if (ii != targetII) break;
+        }
       }
     }
-
+    drawBeat();
     p.syphonServer.sendScreen();
   }
 };
