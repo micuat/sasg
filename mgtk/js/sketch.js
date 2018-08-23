@@ -184,13 +184,13 @@ var SGameOfLife = function (p) {
     for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
         //grid[i][j] = p.floor(p.random(2));
-        if(p.random(1) < 0.01) {
+        if (p.random(1) < 0.01) {
           grid[i][j] = 1;
           grid[i][j] = 1;
         }
         else if (i % 2 == 0 && j > 1 && j < rows - 1 && i > 5 && i < cols - 5) {
           grid[i][j] = 1;
-        } 
+        }
         else {
           grid[i][j] = 0;
         }
@@ -606,11 +606,11 @@ var s = function (p) {
     startFrame = p.frameCount;
 
     pg = p.createGraphics(p.width, p.height, p.P3D);
-    if(frontPg == undefined)
+    if (frontPg == undefined)
       frontPg = p.createGraphics(p.width, p.height, p.P3D);
-    if(backPg == undefined)
+    if (backPg == undefined)
       backPg = p.createGraphics(p.width, p.height, p.P3D);
-    if(wavePg == undefined)
+    if (wavePg == undefined)
       wavePg = p.createGraphics(100, 100);
     texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
     levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
@@ -637,7 +637,7 @@ var s = function (p) {
     let t = tElapsed * (bpm / 120.0);
     let seq = Math.floor(tElapsed * (bpm / 120.0));
 
-    if(p.getCount() % 60 == 0) {
+    if (p.getCount() % 60 == 0) {
       texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
       levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
     }
@@ -671,16 +671,16 @@ var s = function (p) {
       [135, 30, 0]
     ]
 
-    function drawShader () {
+    function drawShader() {
       wavePg.beginDraw();
       wavePg.strokeWeight(2);
-      for(let i = 0; i < 100; i++) {
-        let y = Math.pow((p.noise(((i*0.1 - t * (2.0))), t * -0.0)), 4.0) * 250;
+      for (let i = 0; i < 100; i++) {
+        let y = Math.pow((p.noise(((i * 0.1 - t * (2.0))), t * -0.0)), 4.0) * 250;
         wavePg.stroke(y);
         wavePg.line(i, 0, i, 100);
       }
       wavePg.endDraw();
-  
+
       let lfo0 = 1.0;//Math.cos(t * Math.PI * 0.25) * 0.5 + 0.5;
       texShader.set("iTime", t);
       texShader.set("lfo0", lfo0);
@@ -693,8 +693,8 @@ var s = function (p) {
       // rgb = HSVtoRGB((t + 0.5) % 1.0, 1.0, 1.0);
       // texShader.set("bgColor1", rgb.r, rgb.g, rgb.b);
       texShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
-      colorSc[backColIdx][1] / 255.0,
-      colorSc[backColIdx][2] / 255.0);
+        colorSc[backColIdx][1] / 255.0,
+        colorSc[backColIdx][2] / 255.0);
       texShader.set("pgTex", pg);
       texShader.set("waveTex", wavePg);
       texShader.set("backTex", backPg);
@@ -705,9 +705,9 @@ var s = function (p) {
       frontPg.beginDraw();
       frontPg.filter(texShader);
       frontPg.endDraw();
-  
+
       p.resetShader();
-  
+
       let intermediatePg = frontPg;
       frontPg = backPg;
       backPg = intermediatePg;
@@ -720,7 +720,7 @@ var s = function (p) {
     p.filter(levelShader);
     p.syphonServer.sendImage(frontPg);
 
-    function drawBeat () {
+    function drawBeat() {
       beatFader = p.oscFaders[3];
       p.blendMode(p.BLEND);
       // p.background(0);
