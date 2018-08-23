@@ -143,7 +143,7 @@ void mousePressed(MouseEvent event) {
 }
 
 void oscEvent(OscMessage theOscMessage) {
-  if (theOscMessage.checkAddrPattern("/livid")==true) {
+  if (theOscMessage.checkAddrPattern("/livid/control")==true) {
     int index = theOscMessage.get(0).intValue();
     if (index < 8) {
       oscFaders[index] = theOscMessage.get(1).intValue() / 127.0;

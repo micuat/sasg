@@ -17,6 +17,8 @@ uniform vec3 bgColor0, bgColor1;
 uniform float masterFader;
 uniform float feedbackFader;
 uniform float phaseFader;
+uniform float xFader;
+uniform float rAmountFader;
 
 uniform sampler2D texture;
 uniform sampler2D pgTex;
@@ -36,12 +38,12 @@ void main() {
 
 	vec4 pgCol = texture(pgTex, vertTexCoord.st);
 	vec4 backCol;
-  float dth = 0.002;// * lfo1;// * (2.0 + lfc);// * (lfo0 * 2.0 - 1.0);
+  float dth = rAmountFader * 0.01;// * lfo1;// * (2.0 + lfc);// * (lfo0 * 2.0 - 1.0);
 	backCol = texture(backTex, vec2(0.5) + vec2(lfc*cos(afc + dth), lfc*sin(afc + dth)));
 
   float x = fragCoord.x - 0.5;
   float y = 1.0 - fragCoord.y;
-	vec4 fragCol0 = vec4(vec3(pow(sin(y * (lfo0 * 10.0 + phaseFader * 50.0) - iTime * 1.0 - x * 10.0) * cos(x * (lfo0 * 5.0 + 10.0)), 4.0)), 1.0);//texture(waveTex, vec2(y, 0.5));
+	vec4 fragCol0 = vec4(vec3(pow(sin(y * (lfo0 * 10.0 + phaseFader * 50.0) - iTime * 0.0 - x * 10.0) * cos(x * (lfo0 * 5.0 + 10.0) - iTime * xFader), 4.0)), 1.0);//texture(waveTex, vec2(y, 0.5));
 	// fragCol0.rgb *= bgColor0 * 10.0;//mix(bgColor0, vec3(0.0), 0.5 - lfo2 * 0.5);
   fragCol0.rgb = mix(bgColor0 * 3.0, bgColor1, 1.0-pow(fragCol0.r, 4.0));
 

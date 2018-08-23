@@ -219,6 +219,8 @@ var s = function (p) {
     shader.set("masterFader", p.oscFaders[0]);
     shader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
     shader.set("phaseFader", p.oscFaders[5]);
+    shader.set("xFader", p.oscFaders[6] * 10.0);
+    shader.set("rAmountFader", p.oscFaders[7] * 1.0);
     frontPg.beginDraw();
     frontPg.filter(shader);
     frontPg.endDraw();
