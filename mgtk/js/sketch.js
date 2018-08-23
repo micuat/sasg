@@ -1,3 +1,5 @@
+var bpm = 124;
+
 var SCircleMorph = function (p) {
   let cirPath = [];
   let triPath = [];
@@ -213,7 +215,7 @@ var SGameOfLife = function (p) {
   this.draw = function () {
     p.noStroke();
     p.translate(-p.width / 2, -p.height / 2);
-    if (p.getCount() % 120 == 0) {
+    if (p.getCount() % bpm == 0) {
       gap = gap - 1;
       if (gap < 12) gap = 16;
       this.setup();
@@ -591,6 +593,7 @@ var s = function (p) {
   let autoPilot = true;
   let doUpdate = true;
   let curCol = [0, 0, 0];
+  let lastSeq = -1;
 
   p.setup = function () {
     name = p.folderName;
@@ -612,7 +615,7 @@ var s = function (p) {
     sGameOfLife.setup();
   }
 
-  p.getCount = function () { return p.frameCount - startFrame };
+  p.getCount = function () { return p.frameCount - startFrame + Math.floor(p.oscFaders[1] * 60) };
 
   p.keyPressed = function () {
     if (!autoPilot) {
@@ -622,15 +625,19 @@ var s = function (p) {
   }
 
   p.draw = function () {
-    let t = p.getCount() / 60.0;
+    // let t = p.getCount() / 60.0 * (bpm / 120.0);
+    let tElapsed = p.millis() * 0.001 + p.oscFaders[1];
+    let t = tElapsed * (bpm / 120.0);
+    let seq = Math.floor(tElapsed * (bpm / 120.0));
+
     if(p.getCount() % 60 == 0) {
       shader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
     }
 
-    if ((autoPilot && p.getCount() % 120 == 0) || (!autoPilot && doUpdate)) {
+    if ((seq != lastSeq && seq % 2 == 0) || (!autoPilot && doUpdate)) {
       backdropFunc.update();
     }
-    if ((autoPilot && p.getCount() % 60 == 0) || (!autoPilot && doUpdate)) {
+    if ((seq != lastSeq) || (!autoPilot && doUpdate)) {
       doUpdate = false;
       targetII = Math.floor(p.random(-1, 2));
       {
@@ -643,6 +650,7 @@ var s = function (p) {
         lineFunc.update();
       }
     }
+    lastSeq = seq;
 
     let colorSc = [
       [0, 255, 150],
