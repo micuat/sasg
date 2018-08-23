@@ -42,6 +42,8 @@ import codeanticode.syphon.*;
 import processing.video.*;
 public ArrayList<Movie> movies = new ArrayList<Movie>();
 
+public float[] oscFaders = new float[8];
+
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 
@@ -79,7 +81,7 @@ void setup() {
   //smooth();
   //hint(ENABLE_TEXTURE_MIPMAPS);
 
-  oscP5 = new OscP5(this, 7000);
+  oscP5 = new OscP5(this, 13000);
 
   RG.init(this);
 

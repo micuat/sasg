@@ -202,23 +202,29 @@ var s = function (p) {
     shader.set("centerDirection", centerDirection);
     // let rgb = HSVtoRGB((t * 0.1) % 1.0, 1.0, 1.0);
     // shader.set("bgColor0", rgb.r, rgb.g, rgb.b);
-    curCol[0] = p.lerp(curCol[0], colorSc[Math.floor(t % 3) * 2][0] / 255.0, 0.05);
-    curCol[1] = p.lerp(curCol[1], colorSc[Math.floor(t % 3) * 2][1] / 255.0, 0.05);
-    curCol[2] = p.lerp(curCol[2], colorSc[Math.floor(t % 3) * 2][2] / 255.0, 0.05);
+    let frontColIdx = Math.floor(t % 3) * 2;
+    let backColIdx = Math.floor(t % 3) * 2 + 1;
+    curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
+    curCol[1] = p.lerp(curCol[1], colorSc[frontColIdx][1] / 255.0, 0.05);
+    curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
     shader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
     // rgb = HSVtoRGB((t + 0.5) % 1.0, 1.0, 1.0);
     // shader.set("bgColor1", rgb.r, rgb.g, rgb.b);
-    shader.set("bgColor1", colorSc[Math.floor(t % 3) * 2+1][0] / 255.0,
-    colorSc[Math.floor(t % 3) * 2+1][1] / 255.0,
-    colorSc[Math.floor(t % 3) * 2+1][2] / 255.0);
+    shader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
+    colorSc[backColIdx][1] / 255.0,
+    colorSc[backColIdx][2] / 255.0);
     shader.set("pgTex", pg);
     shader.set("waveTex", wavePg);
     shader.set("backTex", backPg);
+    shader.set("masterFader", p.oscFaders[0]);
+    shader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
+    shader.set("phaseFader", p.oscFaders[5]);
     frontPg.beginDraw();
     frontPg.filter(shader);
     frontPg.endDraw();
 
     p.resetShader();
+    p.tint(255 * p.oscFaders[0]);
     p.image(frontPg, 0, 0);
     p.syphonServer.sendImage(frontPg);
 

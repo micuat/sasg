@@ -143,17 +143,23 @@ void mousePressed(MouseEvent event) {
 }
 
 void oscEvent(OscMessage theOscMessage) {
-  try {
-    nashorn.eval("for(var prop in pApplet) {if(!this.isReservedFunction(prop)) {globalSketch[prop] = pApplet[prop]}}");
-
-    nashorn.eval("var theOscMessage = {}");
-    Object theOscMessageObject = nashorn.eval("this.theOscMessage");
-    Object jsObject = nashorn.eval("Object");
-    ((Invocable)nashorn).invokeMethod(jsObject, "bindProperties", theOscMessageObject, (OscMessage)theOscMessage);
-
-    nashorn.eval("if(globalSketch.oscEvent != null) globalSketch.oscEvent(this.theOscMessage)");
+  if (theOscMessage.checkAddrPattern("/livid")==true) {
+    int index = theOscMessage.get(0).intValue();
+    if (index < 8) {
+      oscFaders[index] = theOscMessage.get(1).intValue() / 127.0;
+    }
   }
-  catch (Exception e) {
-    e.printStackTrace();
-  }
+  //try {
+  //  nashorn.eval("for(var prop in pApplet) {if(!this.isReservedFunction(prop)) {globalSketch[prop] = pApplet[prop]}}");
+
+  //  nashorn.eval("var theOscMessage = {}");
+  //  Object theOscMessageObject = nashorn.eval("this.theOscMessage");
+  //  Object jsObject = nashorn.eval("Object");
+  //  ((Invocable)nashorn).invokeMethod(jsObject, "bindProperties", theOscMessageObject, (OscMessage)theOscMessage);
+
+  //  nashorn.eval("if(globalSketch.oscEvent != null) globalSketch.oscEvent(this.theOscMessage)");
+  //}
+  //catch (Exception e) {
+  //  e.printStackTrace();
+  //}
 }
