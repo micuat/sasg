@@ -276,6 +276,10 @@ var SGameOfLife = function (p) {
   }
 };
 
+var frontPg;
+var backPg;
+var wavePg;
+
 var s = function (p) {
   let name;
   let sCircleMorph = new SCircleMorph(p);
@@ -586,12 +590,22 @@ var s = function (p) {
   let agents = [];
   let autoPilot = true;
   let doUpdate = true;
+  let curCol = [0, 0, 0];
 
   p.setup = function () {
     name = p.folderName;
     p.createCanvas(1280 / 2, 560 / 2);
     p.frameRate(60);
     startFrame = p.frameCount;
+
+    pg = p.createGraphics(p.width, p.height, p.P3D);
+    if(frontPg == undefined)
+      frontPg = p.createGraphics(p.width, p.height, p.P3D);
+    if(backPg == undefined)
+      backPg = p.createGraphics(p.width, p.height, p.P3D);
+    if(wavePg == undefined)
+      wavePg = p.createGraphics(100, 100);
+    shader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
 
     sCircleMorph.setup();
     sStarField.setup();
@@ -609,6 +623,10 @@ var s = function (p) {
 
   p.draw = function () {
     let t = p.getCount() / 60.0;
+    if(p.getCount() % 60 == 0) {
+      shader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
+    }
+
     if ((autoPilot && p.getCount() % 120 == 0) || (!autoPilot && doUpdate)) {
       backdropFunc.update();
     }
@@ -626,8 +644,65 @@ var s = function (p) {
       }
     }
 
+    let colorSc = [
+      [0, 255, 150],
+      [0, 155, 50],
+      [50, 100, 255],
+      [0, 70, 155],
+      [230, 230, 100],
+      [205, 70, 0],
+      [20, 205, 200],
+      [135, 30, 0]
+    ]
+
+    function drawShader () {
+      wavePg.beginDraw();
+      wavePg.strokeWeight(2);
+      for(let i = 0; i < 100; i++) {
+        let y = Math.pow((p.noise(((i*0.1 - t * (2.0))), t * -0.0)), 4.0) * 250;
+        wavePg.stroke(y);
+        wavePg.line(i, 0, i, 100);
+      }
+      wavePg.endDraw();
+  
+      let lfo0 = 1.0;//Math.cos(t * Math.PI * 0.25) * 0.5 + 0.5;
+      shader.set("iTime", t);
+      shader.set("lfo0", lfo0);
+      let frontColIdx = Math.floor(t % 3) * 2;
+      let backColIdx = Math.floor(t % 3) * 2 + 1;
+      curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
+      curCol[1] = p.lerp(curCol[1], colorSc[frontColIdx][1] / 255.0, 0.05);
+      curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
+      shader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
+      // rgb = HSVtoRGB((t + 0.5) % 1.0, 1.0, 1.0);
+      // shader.set("bgColor1", rgb.r, rgb.g, rgb.b);
+      shader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
+      colorSc[backColIdx][1] / 255.0,
+      colorSc[backColIdx][2] / 255.0);
+      shader.set("pgTex", pg);
+      shader.set("waveTex", wavePg);
+      shader.set("backTex", backPg);
+      shader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
+      shader.set("phaseFader", p.oscFaders[5]);
+      shader.set("xFader", p.oscFaders[6] * 10.0);
+      shader.set("rAmountFader", p.oscFaders[7] * 1.0);
+      frontPg.beginDraw();
+      frontPg.filter(shader);
+      frontPg.endDraw();
+  
+      p.resetShader();
+  
+      let intermediatePg = frontPg;
+      frontPg = backPg;
+      backPg = intermediatePg;
+    }
+    drawShader();
+    p.tint(255 * p.oscFaders[0]);
+    p.image(frontPg, 0, 0);
+    p.syphonServer.sendImage(frontPg);
+
     p.blendMode(p.BLEND);
-    p.background(0);
+    // p.background(0);
     p.stroke(255);
     p.strokeWeight(2);
 

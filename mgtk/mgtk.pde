@@ -32,6 +32,8 @@ import toxi.geom.*;
 
 // import SimpleOpenNI.*;
 
+public float[] oscFaders = new float[8];
+
 import oscP5.*;
 import netP5.*;
 
@@ -79,7 +81,7 @@ void setup() {
   //smooth();
   //hint(ENABLE_TEXTURE_MIPMAPS);
 
-  oscP5 = new OscP5(this, 7000);
+  oscP5 = new OscP5(this, 13000);
 
   RG.init(this);
 
