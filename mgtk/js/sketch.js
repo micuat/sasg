@@ -282,7 +282,7 @@ var SRibbons = function (p) {
   let targetRotY = 0;
   let tSpeed = 0;
   let rotPower = 0;
-  let pg = p.createGraphics(p.width, p.height, p.P3D);
+  this.pg = p.createGraphics(p.width, p.height, p.P3D);
   let isSolid = true;
 
   this.setup = function () {
@@ -293,38 +293,38 @@ var SRibbons = function (p) {
     isSolid = p.random(1.0) > 0.5 ? true : false;
   }
   this.draw = function () {
-    pg.beginDraw();
-    pg.clear();
-    pg.pushMatrix();
-    pg.translate(pg.width / 2, pg.height / 2);
+    this.pg.beginDraw();
+    this.pg.clear();
+    this.pg.pushMatrix();
+    this.pg.translate(this.pg.width / 2, this.pg.height / 2);
     let tw = this.tween;
     let l = p.width * 2.0;
     if (isSolid) {
-      pg.lights();
-      pg.noStroke();
-      pg.fill(255, 255 * this.alpha);
+      this.pg.lights();
+      this.pg.noStroke();
+      this.pg.fill(255, 255);// * this.alpha);
     }
     else {
-      pg.noFill();
-      pg.stroke(255, 255 * this.alpha);
+      this.pg.noFill();
+      this.pg.stroke(255, 255);// * this.alpha);
     }
     let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, rotPower);
-    pg.rotateX(rotw * targetRotX + Math.PI * 0.5);
-    pg.rotateY(rotw * targetRotY);
+    this.pg.rotateX(rotw * targetRotX + Math.PI * 0.5);
+    this.pg.rotateY(rotw * targetRotY);
     for (let y = -200; y < 200; y += 50) {
-      pg.beginShape(p.TRIANGLE_STRIP);
+      this.pg.beginShape(p.TRIANGLE_STRIP);
       let tSpeedMod = tSpeed;
       if (y == 0) tSpeedMod *= 3;
       for (let dx = -l; dx < l; dx += 5.0) {
         let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * tSpeedMod);
-        pg.vertex(dx, y, z * 50);
-        pg.vertex(dx, y + 10, z * 50);
+        this.pg.vertex(dx, y, z * 50);
+        this.pg.vertex(dx, y + 10, z * 50);
       }
-      pg.endShape();
+      this.pg.endShape();
     }
-    pg.popMatrix();
-    pg.endDraw();
-    p.image(pg, -p.width * 0.5, -p.height * 0.5);
+    this.pg.popMatrix();
+    this.pg.endDraw();
+    // p.image(this.pg, -p.width * 0.5, -p.height * 0.5);
   }
 }
 
@@ -985,7 +985,8 @@ var s = function (p) {
       texShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
         colorSc[backColIdx][1] / 255.0,
         colorSc[backColIdx][2] / 255.0);
-      texShader.set("pgTex", pg);
+      if(sRibbons.pg != undefined)
+        texShader.set("pgTex", sRibbons.pg);
       texShader.set("waveTex", wavePg);
       texShader.set("backTex", backPg);
       texShader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
