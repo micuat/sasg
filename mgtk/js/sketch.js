@@ -280,10 +280,14 @@ var SGameOfLife = function (p) {
 var SRibbons = function (p) {
   let targetRotX = 0;
   let targetRotY = 0;
+  let tSpeed = 0;
+  let rotPower = 0;
   
   this.setup = function () {
     targetRotX = p.random(-Math.PI, Math.PI) * 2.0;
     targetRotY = p.random(-Math.PI, Math.PI) * 2.0;
+    tSpeed = p.random(2.0, 6.0);
+    rotPower = Math.floor(p.random(1.0, 5.0));
   }
   this.draw = function () {
     p.push();
@@ -291,13 +295,13 @@ var SRibbons = function (p) {
     let l = p.width * 2.0;
     p.noFill();
     p.stroke(255, 255 * this.alpha);
-    let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, 2.0);
+    let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, rotPower);
     p.rotateX(rotw * targetRotX + Math.PI * 0.5);
     p.rotateY(rotw * targetRotY);
     for (let y = -200; y < 200; y += 50) {
       p.beginShape(p.TRIANGLE_STRIP);
       for (let dx = -l; dx < l; dx += 5.0) {
-        let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * 4.0);
+        let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * tSpeed);
         p.vertex(dx, y, z * 50);
         p.vertex(dx, y + 10, z * 50);
       }
