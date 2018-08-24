@@ -347,7 +347,10 @@ var s = function (p) {
       if (seq % this.everyNSeq == 0 || this.execFunc == undefined) {
         let flist = [];
         for (let i in this.funcs) {
-          if (this.preset.indexOf(this.funcs[i].name) >= 0) {
+          if (this.preset.length == 0) {
+            flist.push(this.funcs[i]);
+          }
+          else if (this.preset.indexOf(this.funcs[i].name) >= 0) {
             flist.push(this.funcs[i]);
           }
         }
@@ -450,7 +453,7 @@ var s = function (p) {
       }
     },
     {
-      name: "default",
+      name: "blink",
       f: function (agent) {
         let alpha = agent.tweenPowReturn();
         p.push();
@@ -463,20 +466,7 @@ var s = function (p) {
       }
     },
     {
-      name: "default",
-      f: function (agent) {
-        let alpha = agent.tweenPowReturn();
-        p.push();
-        p.fill(255, 255 * alpha * beatFader);
-        p.noStroke();
-        let pw = 1280 * 0.5 / 3.0;
-        let n = pw / 10.0;
-        p.rect(-pw * 0.5, -p.height * 0.5, pw, p.height);
-        p.pop();
-      }
-    },
-    {
-      name: "default",
+      name: "grid",
       f: function (agent) {
         let alpha = agent.tweenPowReturn();
         p.push();
@@ -494,19 +484,19 @@ var s = function (p) {
     }]);
   funcAssets.orderFunc = new FuncList(1, [
     {
-      name: "default",
+      name: "rightToLeft",
       f: function (agent) {
         agent.tween = p.constrain(agent.tween * 1.25 + agent.ii * 0.25, -1, 1);
       }
     },
     {
-      name: "default",
+      name: "leftToRight",
       f: function (agent) {
         agent.tween = p.constrain(agent.tween * 1.25 - agent.ii * 0.25, -1, 1);
       }
     },
     {
-      name: "default",
+      name: "centerToSide",
       f: function (agent) {
         agent.tween = p.constrain(agent.tween * 1.25 - Math.abs(agent.ii) * 0.25, -1, 1);
       }
@@ -520,23 +510,28 @@ var s = function (p) {
     {
       name: "default",
       f: function (agent) {
+      }
+    },
+    {
+      name: "bounceDown",
+      f: function (agent) {
         p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
       }
     },
     {
-      name: "default",
+      name: "bounceUp",
       f: function (agent) {
         p.translate(0.0, agent.tweenPowReturn() * -150, 0.0);
       }
     },
     {
-      name: "default",
+      name: "bounceLeft",
       f: function (agent) {
         agent.l *= (1.0 - agent.tweenPowReturn());
       }
     },
     {
-      name: "default",
+      name: "bounceRight",
       f: function (agent) {
         p.translate(agent.l * 0.5, 0);
         p.scale(-1, 1);
@@ -545,13 +540,7 @@ var s = function (p) {
       }
     },
     {
-      name: "default",
-      f: function (agent) {
-        p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
-      }
-    },
-    {
-      name: "default",
+      name: "toDown",
       f: function (agent) {
         if (agent.tween < 0.5) {
           p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
@@ -562,7 +551,7 @@ var s = function (p) {
       }
     },
     {
-      name: "default",
+      name: "toUp",
       f: function (agent) {
         if (agent.tween < 0.5) {
           p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
@@ -573,7 +562,7 @@ var s = function (p) {
       }
     },
     {
-      name: "default",
+      name: "rotateY",
       f: function (agent) {
         p.rotateY(agent.tween * Math.PI);
       }
@@ -582,17 +571,23 @@ var s = function (p) {
     {
       name: "default",
       f: function (dx, tw) {
+        return 0.0;
+      }
+    },
+    {
+      name: "sineT",
+      f: function (dx, tw) {
         return Math.sin(dx * 0.1 + tw * 10.0);
       }
     },
     {
-      name: "default",
+      name: "sine",
       f: function (dx, tw) {
         return Math.sin(dx * 0.1);
       }
     },
     {
-      name: "default",
+      name: "random",
       f: function (dx, tw) {
         return p.random(-1, 1);
       }
@@ -605,7 +600,7 @@ var s = function (p) {
       }
     },
     {
-      name: "default",
+      name: "out",
       f: function (x, y, tween) {
         p.ellipse(x, y, 7);
         p.push();
@@ -623,7 +618,7 @@ var s = function (p) {
       }
     },
     {
-      name: "default",
+      name: "in",
       f: function (x, y, tween) {
         p.ellipse(x, y, 7);
         p.push();
@@ -639,6 +634,28 @@ var s = function (p) {
         }
         p.pop();
       }
+    },
+    {
+      name: "inout",
+      f: function (x, y, tween) {
+        p.ellipse(x, y, 7);
+        p.push();
+        let r = 1.0;
+        let alpha = 1.0;
+        if (tween < 0.5) {
+          r *= p.map(tween, 0, 0.5, 1.0, 10.0);
+          alpha *= p.map(tween, 0, 0.5, 1.0, 0.0);
+        }
+        else {
+          r *= p.map(tween, 0.5, 1.0, 10.0, 1.0);
+          alpha *= p.map(tween, 0.5, 1.0, 0.0, 1.0);
+        }
+        p.noFill();
+        p.stroke(255, 255 * alpha * beatFader);
+        p.strokeWeight(1.0);
+        p.ellipse(x, y, 7 * r);
+        p.pop();
+      }
     }]);
   funcAssets.lineFunc = new FuncList(1, [
     {
@@ -651,7 +668,7 @@ var s = function (p) {
       }
     },
     {
-      name: "default",
+      name: "sig",
       f: function (agent) {
         p.fill(255, 255 * beatFader);
         funcAssets.pointFunc.exec(0, 0, agent.tween);
@@ -667,7 +684,7 @@ var s = function (p) {
       }
     },
     {
-      name: "default",
+      name: "rect",
       f: function (agent) {
         p.fill(255, 255 * beatFader);
         funcAssets.pointFunc.exec(0, 0, agent.tween);
@@ -687,27 +704,74 @@ var s = function (p) {
     "sigFunc",
     "pointFunc",
     "lineFunc"];
-  let midiToPreset = [{
-    globalTransformFunc: ["default"],
-    backdropFunc: ["default"],
-    backgroundFunc: ["default"],
-    orderFunc: ["default"],
-    transformFunc: ["default"],
-    sigFunc: ["default"],
-    pointFunc: ["default"],
-    lineFunc: ["default"]
-  },
-  {
-    globalTransformFunc: ["default"],
-    backdropFunc: ["gameOfLife"],
-    backgroundFunc: ["default"],
-    orderFunc: ["default"],
-    transformFunc: ["default"],
-    sigFunc: ["default"],
-    pointFunc: ["default"],
-    lineFunc: ["default"]
-  }
-  ];
+  let bPreset = {
+    default: {
+      globalTransformFunc: ["default"],
+      backdropFunc: ["default"],
+      backgroundFunc: ["default"],
+      orderFunc: ["default"],
+      transformFunc: ["default"],
+      sigFunc: ["default"],
+      pointFunc: ["default"],
+      lineFunc: ["default"]
+    },
+    toLeft: {
+      globalTransformFunc: ["default"],
+      backdropFunc: ["default"],
+      backgroundFunc: [],
+      orderFunc: ["default"],
+      transformFunc: ["bounceLeft"],
+      sigFunc: [],
+      pointFunc: [],
+      lineFunc: []
+    },
+    toRight: {
+      globalTransformFunc: ["default"],
+      backdropFunc: ["default"],
+      backgroundFunc: [],
+      orderFunc: ["default"],
+      transformFunc: ["bounceRight"],
+      sigFunc: [],
+      pointFunc: [],
+      lineFunc: []
+    },
+    toUp: {
+      globalTransformFunc: ["default"],
+      backdropFunc: ["default"],
+      backgroundFunc: [],
+      orderFunc: ["default"],
+      transformFunc: ["bounceUp"],
+      sigFunc: [],
+      pointFunc: [],
+      lineFunc: []
+    },
+    toDown: {
+      globalTransformFunc: ["default"],
+      backdropFunc: ["default"],
+      backgroundFunc: [],
+      orderFunc: ["default"],
+      transformFunc: ["bounceDown"],
+      sigFunc: [],
+      pointFunc: [],
+      lineFunc: []
+    },
+    gameOfLife: {
+      globalTransformFunc: ["default"],
+      backdropFunc: ["gameOfLife"],
+      backgroundFunc: ["default"],
+      orderFunc: ["default"],
+      transformFunc: ["default"],
+      sigFunc: ["default"],
+      pointFunc: ["default"],
+      lineFunc: ["default"]
+    }
+  };
+  let midiToPreset = [
+    [bPreset.default, bPreset.default, bPreset.default, bPreset.default],
+    [bPreset.toLeft, bPreset.toRight, bPreset.toLeft, bPreset.toRight],
+    [bPreset.toLeft, bPreset.toRight, bPreset.toUp, bPreset.toDown],
+    [bPreset.gameOfLife, bPreset.gameOfLife, bPreset.default, bPreset.default]
+  ]
 
   let startFrame;
   let targetII;
@@ -767,7 +831,8 @@ var s = function (p) {
       targetII = Math.floor(p.random(-1, 2));
       for (let i in functions) {
         let funcTypeName = functions[i];
-        funcAssets[funcTypeName].preset = midiToPreset[p.oscButton][funcTypeName];
+        let curPreset = midiToPreset[p.oscButton][seq % 4];
+        funcAssets[funcTypeName].preset = curPreset[funcTypeName];
         funcAssets[funcTypeName].update(seq);
       }
     }
