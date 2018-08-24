@@ -277,6 +277,36 @@ var SGameOfLife = function (p) {
   }
 };
 
+var SRibbons = function (p) {
+  let targetRotX = 0;
+  let targetRotY = 0;
+  
+  this.setup = function () {
+    targetRotX = p.random(-Math.PI, Math.PI) * 2.0;
+    targetRotY = p.random(-Math.PI, Math.PI) * 2.0;
+  }
+  this.draw = function () {
+    p.push();
+    let tw = this.tween;
+    let l = p.width * 2.0;
+    p.noFill();
+    p.stroke(255, 255 * this.alpha);
+    let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, 2.0);
+    p.rotateX(rotw * targetRotX + Math.PI * 0.5);
+    p.rotateY(rotw * targetRotY);
+    for (let y = -200; y < 200; y += 50) {
+      p.beginShape(p.TRIANGLE_STRIP);
+      for (let dx = -l; dx < l; dx += 5.0) {
+        let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * 4.0);
+        p.vertex(dx, y, z * 50);
+        p.vertex(dx, y + 10, z * 50);
+      }
+      p.endShape();
+    }
+    p.pop();
+  }
+}
+
 var frontPg;
 var backPg;
 var wavePg;
@@ -286,6 +316,7 @@ var s = function (p) {
   let sCircleMorph = new SCircleMorph(p);
   let sStarField = new SStarField(p);
   let sGameOfLife = new SGameOfLife(p);
+  let sRibbons = new SRibbons(p);
 
   function Agent(t, tween, ii, jj, isTarget) {
     this.t = t;
@@ -316,6 +347,18 @@ var s = function (p) {
         return p.map(this.tween, 0.5, 1.0, 1.0, 0.0);
       }
     }
+    // power of 16, 0 -> 1 -> 0
+    this.tweenPowReturn16 = function () {
+      if (tween < -0.5) {
+        return p.map(tween, -1, -0.5, 0.0, 1.0);
+      }
+      else if (tween < 0.5) {
+        return 1.0;
+      }
+      else {
+        return p.map(tween, 0.5, 1.0, 1.0, 0.0);
+      }
+    }
 
     this.draw = function () {
       p.push();
@@ -326,10 +369,11 @@ var s = function (p) {
         p.stroke(255, 255 * beatFader);
       }
 
+      this.l = p.width / 3.0;
+
       p.translate(this.ii * p.width / 3, 0);
       funcAssets.backgroundFunc.exec(this);
 
-      this.l = p.width / 3.0;
       p.translate(-this.l / 2.0, 0);
       funcAssets.transformFunc.exec(this);
       funcAssets.lineFunc.exec(this);
@@ -444,6 +488,20 @@ var s = function (p) {
       },
       setup: function () {
         sGameOfLife.setup();
+      }
+    },
+    {
+      name: "ribbons",
+      f: function (tween) {
+        let alpha = 1.0 - tween;
+        p.push();
+        sRibbons.tween = tween;
+        sRibbons.alpha = alpha * beatFader;
+        sRibbons.draw();
+        p.pop();
+      },
+      setup: function () {
+        sRibbons.setup();
       }
     }]);
   funcAssets.backgroundFunc = new FuncList(1, [
@@ -736,6 +794,16 @@ var s = function (p) {
       pointFunc: ["default"],
       lineFunc: ["default"]
     },
+    ribbons: {
+      globalTransformFunc: [],
+      backdropFunc: ["ribbons"],
+      backgroundFunc: [],
+      orderFunc: [],
+      transformFunc: [],
+      sigFunc: [],
+      pointFunc: [],
+      lineFunc: []
+    },
     toLeft: {
       globalTransformFunc: ["default"],
       backdropFunc: ["default"],
@@ -789,6 +857,7 @@ var s = function (p) {
   };
   let midiToPreset = [
     [bPreset.default, bPreset.default, bPreset.default, bPreset.default],
+    [bPreset.ribbons, bPreset.ribbons, bPreset.ribbons, bPreset.ribbons],
     [bPreset.toLeft, bPreset.toRight, bPreset.toLeft, bPreset.toDown],
     [bPreset.toLeft, bPreset.toRight, bPreset.toUp, bPreset.toDown],
     [bPreset.gameOfLife, bPreset.gameOfLife, bPreset.default, bPreset.default]
