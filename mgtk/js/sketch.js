@@ -789,7 +789,7 @@ var s = function (p) {
   };
   let midiToPreset = [
     [bPreset.default, bPreset.default, bPreset.default, bPreset.default],
-    [bPreset.toLeft, bPreset.toRight, bPreset.toLeft, bPreset.toRight],
+    [bPreset.toLeft, bPreset.toRight, bPreset.toLeft, bPreset.toDown],
     [bPreset.toLeft, bPreset.toRight, bPreset.toUp, bPreset.toDown],
     [bPreset.gameOfLife, bPreset.gameOfLife, bPreset.default, bPreset.default]
   ]
