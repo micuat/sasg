@@ -218,7 +218,6 @@ var SGameOfLife = function (p) {
     if (p.getCount() % bpm == 0) {
       gap = gap - 1;
       if (gap < 12) gap = 16;
-      this.setup();
     }
 
     // if(p.frameCount % 60 < 15) {
@@ -339,22 +338,28 @@ var s = function (p) {
     }
   }
 
-  let FuncList = function (funcs) {
+  let FuncList = function (everyNSeq, funcs) {
+    this.everyNSeq = everyNSeq;
     this.funcs = funcs;
     this.execFunc;
     this.preset = 0;
-    this.update = function () {
-      let flist = [];
-      for (let i in this.funcs) {
-        if (this.funcs[i].preset.indexOf(this.preset) >= 0) {
-          flist.push(this.funcs[i]);
+    this.update = function (seq) {
+      if(seq % this.everyNSeq == 0 || this.execFunc == undefined) {
+        let flist = [];
+        for (let i in this.funcs) {
+          if (this.funcs[i].preset.indexOf(this.preset) >= 0) {
+            flist.push(this.funcs[i]);
+          }
         }
-      }
-      if (flist.length > 0) {
-        this.execFunc = p.random(flist);
-      }
-      else {
-        this.execFunc = this.funcs[0];
+        if (flist.length > 0) {
+          this.execFunc = p.random(flist);
+        }
+        else {
+          this.execFunc = this.funcs[0];
+        }
+        if(this.execFunc.setup != undefined) {
+          this.execFunc.setup();
+        }
       }
     }
     this.exec = function (a, b, c, d, e, f, g) {
@@ -363,15 +368,16 @@ var s = function (p) {
     }
   }
 
-  let globalTransformFunc = new FuncList([
+  let midiToPreset = ["A", "B"];
+  let globalTransformFunc = new FuncList(1, [
     {
-      preset: [0],
+      preset: ["A"],
       f: function (tween) {
       }
     }
     ,
     {
-      preset: [0],
+      preset: ["A"],
       f: function (tween) {
         let tw = tween;
         if (tw < 0) {
@@ -385,7 +391,7 @@ var s = function (p) {
     }
     ,
     {
-      preset: [0],
+      preset: ["A"],
       f: function (tween) {
         let tw = tween;
         if (tw < 0) {
@@ -397,14 +403,14 @@ var s = function (p) {
         p.translate(-tw * p.width / 3.0, 0.0);
       }
     }]);
-  let backdropFunc = new FuncList([
+  let backdropFunc = new FuncList(2, [
     {
-      preset: [0, 1],
+      preset: ["A", "B"],
       f: function (tween) {
       }
     },
     {
-      preset: [1],
+      preset: ["B"],
       f: function (tween) {
         let alpha = 1.0 - tween;
         p.push();
@@ -414,7 +420,7 @@ var s = function (p) {
       }
     },
     {
-      preset: [1],
+      preset: ["B"],
       f: function (tween) {
         let alpha = 1.0 - tween;
         p.push();
@@ -425,36 +431,26 @@ var s = function (p) {
       }
     },
     {
-      preset: [1],
+      preset: ["B"],
       f: function (tween) {
         let alpha = 1.0 - tween;
         p.push();
         sGameOfLife.alpha = alpha * beatFader;
         sGameOfLife.draw();
         p.pop();
+      },
+      setup: function () {
+        sGameOfLife.setup();
       }
     }]);
-  let backgroundFunc = new FuncList([
+  let backgroundFunc = new FuncList(1, [
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
       }
     },
     {
-      preset: [0],
-      f: function (agent) {
-        let alpha = agent.tweenPowReturn();
-        p.push();
-        p.fill(255, 255 * alpha * beatFader);
-        p.noStroke();
-        let pw = 1280 * 0.5 / 3.0;
-        let n = pw / 10.0;
-        p.rect(-pw * 0.5, -p.height * 0.5, pw, p.height);
-        p.pop();
-      }
-    },
-    {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         let alpha = agent.tweenPowReturn();
         p.push();
@@ -467,7 +463,20 @@ var s = function (p) {
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
+      f: function (agent) {
+        let alpha = agent.tweenPowReturn();
+        p.push();
+        p.fill(255, 255 * alpha * beatFader);
+        p.noStroke();
+        let pw = 1280 * 0.5 / 3.0;
+        let n = pw / 10.0;
+        p.rect(-pw * 0.5, -p.height * 0.5, pw, p.height);
+        p.pop();
+      }
+    },
+    {
+      preset: ["A"],
       f: function (agent) {
         let alpha = agent.tweenPowReturn();
         p.push();
@@ -483,51 +492,51 @@ var s = function (p) {
         p.pop();
       }
     }]);
-  let orderFunc = new FuncList([
+  let orderFunc = new FuncList(1, [
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         agent.tween = p.constrain(agent.tween * 1.25 + agent.ii * 0.25, -1, 1);
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         agent.tween = p.constrain(agent.tween * 1.25 - agent.ii * 0.25, -1, 1);
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         agent.tween = p.constrain(agent.tween * 1.25 - Math.abs(agent.ii) * 0.25, -1, 1);
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
       }
     }]);
-  let transformFunc = new FuncList([
+  let transformFunc = new FuncList(1, [
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         p.translate(0.0, agent.tweenPowReturn() * -150, 0.0);
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         agent.l *= (1.0 - agent.tweenPowReturn());
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         p.translate(agent.l * 0.5, 0);
         p.scale(-1, 1);
@@ -536,13 +545,13 @@ var s = function (p) {
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         if (agent.tween < 0.5) {
           p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
@@ -553,7 +562,7 @@ var s = function (p) {
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         if (agent.tween < 0.5) {
           p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
@@ -564,39 +573,39 @@ var s = function (p) {
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         p.rotateY(agent.tween * Math.PI);
       }
     }]);
-  let sigFunc = new FuncList([
+  let sigFunc = new FuncList(1, [
     {
-      preset: [0],
+      preset: ["A"],
       f: function (dx, tw) {
         return Math.sin(dx * 0.1 + tw * 10.0);
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (dx, tw) {
         return Math.sin(dx * 0.1);
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (dx, tw) {
         return p.random(-1, 1);
       }
     }]);
-  let pointFunc = new FuncList([
+  let pointFunc = new FuncList(1, [
     {
-      preset: [0],
+      preset: ["A"],
       f: function (x, y, tween) {
         p.ellipse(x, y, 7);
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (x, y, tween) {
         p.ellipse(x, y, 7);
         p.push();
@@ -614,7 +623,7 @@ var s = function (p) {
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (x, y, tween) {
         p.ellipse(x, y, 7);
         p.push();
@@ -631,9 +640,9 @@ var s = function (p) {
         p.pop();
       }
     }]);
-  let lineFunc = new FuncList([
+  let lineFunc = new FuncList(1, [
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         p.fill(255, 255 * beatFader);
         pointFunc.exec(0, 0, agent.tween);
@@ -642,7 +651,7 @@ var s = function (p) {
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         p.fill(255, 255 * beatFader);
         pointFunc.exec(0, 0, agent.tween);
@@ -658,7 +667,7 @@ var s = function (p) {
       }
     },
     {
-      preset: [0],
+      preset: ["A"],
       f: function (agent) {
         p.fill(255, 255 * beatFader);
         pointFunc.exec(0, 0, agent.tween);
@@ -724,14 +733,11 @@ var s = function (p) {
       levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
     }
 
-    if ((seq != lastSeq && seq % 2 == 0) || (!autoPilot && doUpdate)) {
-      backdropFunc.preset = p.oscButton;
-      backdropFunc.update();
-    }
     if ((seq != lastSeq) || (!autoPilot && doUpdate)) {
       doUpdate = false;
       targetII = Math.floor(p.random(-1, 2));
       let functions = [globalTransformFunc,
+        backdropFunc,
         backgroundFunc,
         orderFunc,
         transformFunc,
@@ -739,8 +745,8 @@ var s = function (p) {
         pointFunc,
         lineFunc];
       for (let i in functions) {
-        functions[i].preset = p.oscButton;
-        functions[i].update();
+        functions[i].preset = midiToPreset[p.oscButton];
+        functions[i].update(seq);
       }
     }
     lastSeq = seq;
