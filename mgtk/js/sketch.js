@@ -677,9 +677,30 @@ var s = function (p) {
         p.beginShape(p.POINTS);
         for (let dx = 0.0; dx < agent.l; dx += 1.0) {
           let y = Math.sin(dx / agent.l * Math.PI) * funcAssets.sigFunc.exec(dx, tw, agent.l) * tw;
-          p.vertex(dx, y * 50);
+          p.vertex(dx, y * 75);
         }
         p.endShape();
+        funcAssets.pointFunc.exec(agent.l, 0, agent.tween);
+      }
+    },
+    {
+      name: "sigBar",
+      f: function (agent) {
+        p.fill(255, 255 * beatFader);
+        funcAssets.pointFunc.exec(0, 0, agent.tween);
+        let tw = agent.tweenPowReturn();
+        p.line(0, 0, agent.l, 0);
+        p.push();
+        p.strokeWeight(1.0);
+        p.noFill();
+        p.beginShape(p.LINES);
+        for (let dx = 0.0; dx < agent.l; dx += 4.0) {
+          let y = Math.sin(dx / agent.l * Math.PI) * funcAssets.sigFunc.exec(dx, tw, agent.l) * tw;
+          p.vertex(dx, y * 75);
+          p.vertex(dx, 0);
+        }
+        p.endShape();
+        p.pop();
         funcAssets.pointFunc.exec(agent.l, 0, agent.tween);
       }
     },
