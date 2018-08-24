@@ -282,32 +282,49 @@ var SRibbons = function (p) {
   let targetRotY = 0;
   let tSpeed = 0;
   let rotPower = 0;
-  
+  let pg = p.createGraphics(p.width, p.height, p.P3D);
+  let isSolid = true;
+
   this.setup = function () {
     targetRotX = p.random(-Math.PI, Math.PI) * 2.0;
     targetRotY = p.random(-Math.PI, Math.PI) * 2.0;
     tSpeed = p.random(2.0, 6.0);
     rotPower = Math.floor(p.random(1.0, 5.0));
+    isSolid = p.random(1.0) > 0.5 ? true : false;
   }
   this.draw = function () {
-    p.push();
+    pg.beginDraw();
+    pg.clear();
+    pg.pushMatrix();
+    pg.translate(pg.width / 2, pg.height / 2);
     let tw = this.tween;
     let l = p.width * 2.0;
-    p.noFill();
-    p.stroke(255, 255 * this.alpha);
-    let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, rotPower);
-    p.rotateX(rotw * targetRotX + Math.PI * 0.5);
-    p.rotateY(rotw * targetRotY);
-    for (let y = -200; y < 200; y += 50) {
-      p.beginShape(p.TRIANGLE_STRIP);
-      for (let dx = -l; dx < l; dx += 5.0) {
-        let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * tSpeed);
-        p.vertex(dx, y, z * 50);
-        p.vertex(dx, y + 10, z * 50);
-      }
-      p.endShape();
+    if (isSolid) {
+      pg.lights();
+      pg.noStroke();
+      pg.fill(255, 255 * this.alpha);
     }
-    p.pop();
+    else {
+      pg.noFill();
+      pg.stroke(255, 255 * this.alpha);
+    }
+    let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, rotPower);
+    pg.rotateX(rotw * targetRotX + Math.PI * 0.5);
+    pg.rotateY(rotw * targetRotY);
+    for (let y = -200; y < 200; y += 50) {
+      pg.beginShape(p.TRIANGLE_STRIP);
+      let tSpeedMod = tSpeed;
+      if (y == 0) tSpeedMod *= 3;
+      for (let dx = -l; dx < l; dx += 5.0) {
+        let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * tSpeedMod);
+        pg.vertex(dx, y, z * 50);
+        pg.vertex(dx, y + 10, z * 50);
+      }
+      pg.endShape();
+    }
+    pg.popMatrix();
+    pg.endDraw();
+    p.image(pg, -p.width * 0.5, -p.height * 0.5);
   }
 }
 
@@ -896,6 +913,7 @@ var s = function (p) {
     sCircleMorph.setup();
     sStarField.setup();
     sGameOfLife.setup();
+    sRibbons.setup();
 
     funcAssets.backdropFunc.update();
   }
