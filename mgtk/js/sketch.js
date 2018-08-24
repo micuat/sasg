@@ -368,7 +368,7 @@ var s = function (p) {
     }
   }
 
-  let midiToPreset = ["A", "B"];
+  let midiToPreset = ["A", "B", "plot"];
   let globalTransformFunc = new FuncList(1, [
     {
       preset: ["A"],
@@ -445,7 +445,7 @@ var s = function (p) {
     }]);
   let backgroundFunc = new FuncList(1, [
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
       }
     },
@@ -476,7 +476,7 @@ var s = function (p) {
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         let alpha = agent.tweenPowReturn();
         p.push();
@@ -494,49 +494,49 @@ var s = function (p) {
     }]);
   let orderFunc = new FuncList(1, [
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         agent.tween = p.constrain(agent.tween * 1.25 + agent.ii * 0.25, -1, 1);
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         agent.tween = p.constrain(agent.tween * 1.25 - agent.ii * 0.25, -1, 1);
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         agent.tween = p.constrain(agent.tween * 1.25 - Math.abs(agent.ii) * 0.25, -1, 1);
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
       }
     }]);
   let transformFunc = new FuncList(1, [
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         p.translate(0.0, agent.tweenPowReturn() * -150, 0.0);
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         agent.l *= (1.0 - agent.tweenPowReturn());
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         p.translate(agent.l * 0.5, 0);
         p.scale(-1, 1);
@@ -545,13 +545,13 @@ var s = function (p) {
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         if (agent.tween < 0.5) {
           p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
@@ -562,7 +562,7 @@ var s = function (p) {
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         if (agent.tween < 0.5) {
           p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
@@ -580,32 +580,32 @@ var s = function (p) {
     }]);
   let sigFunc = new FuncList(1, [
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (dx, tw) {
         return Math.sin(dx * 0.1 + tw * 10.0);
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (dx, tw) {
         return Math.sin(dx * 0.1);
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (dx, tw) {
         return p.random(-1, 1);
       }
     }]);
   let pointFunc = new FuncList(1, [
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (x, y, tween) {
         p.ellipse(x, y, 7);
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (x, y, tween) {
         p.ellipse(x, y, 7);
         p.push();
@@ -623,7 +623,7 @@ var s = function (p) {
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (x, y, tween) {
         p.ellipse(x, y, 7);
         p.push();
@@ -642,7 +642,7 @@ var s = function (p) {
     }]);
   let lineFunc = new FuncList(1, [
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         p.fill(255, 255 * beatFader);
         pointFunc.exec(0, 0, agent.tween);
@@ -651,7 +651,7 @@ var s = function (p) {
       }
     },
     {
-      preset: ["A"],
+      preset: ["A", "plot"],
       f: function (agent) {
         p.fill(255, 255 * beatFader);
         pointFunc.exec(0, 0, agent.tween);
