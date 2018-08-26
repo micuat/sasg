@@ -1,3 +1,5 @@
+var windowWidth = 1280 / 2;
+var windowHeight = 560 / 2;
 var bpm = 124;
 
 var SCircleMorph = function (p) {
@@ -333,7 +335,7 @@ var SBeesAndBombs = function (p) {
   let w = 40;
   let ma;
   let maxD;
-  this.pg = p.createGraphics(p.width, p.height, p.P3D);
+  this.pg = p.createGraphics(windowWidth, windowHeight, p.P3D);
   this.tween = 0;
   this.alpha = 0;
 
@@ -974,7 +976,7 @@ var s = function (p) {
 
   p.setup = function () {
     name = p.folderName;
-    p.createCanvas(1280 / 2, 560 / 2);
+    p.createCanvas(windowWidth, windowHeight);
     p.frameRate(60);
     startFrame = p.frameCount;
 
