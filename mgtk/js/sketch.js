@@ -284,7 +284,6 @@ var SRibbons = function (p) {
   let targetRotY = 0;
   let tSpeed = 0;
   let rotPower = 0;
-  this.pg = p.createGraphics(p.width, p.height, p.P3D);
   let isSolid = true;
 
   this.setup = function () {
@@ -295,38 +294,38 @@ var SRibbons = function (p) {
     isSolid = p.random(1.0) > 0.5 ? true : false;
   }
   this.draw = function () {
-    this.pg.beginDraw();
-    this.pg.clear();
-    this.pg.pushMatrix();
-    this.pg.translate(this.pg.width / 2, this.pg.height / 2);
+    bgpg.beginDraw();
+    bgpg.clear();
+    bgpg.pushMatrix();
+    bgpg.translate(bgpg.width / 2, bgpg.height / 2);
     let tw = this.tween;
     let l = p.width * 2.0;
     if (isSolid) {
-      this.pg.lights();
-      this.pg.noStroke();
-      this.pg.fill(255, 255);// * this.alpha);
+      bgpg.lights();
+      bgpg.noStroke();
+      bgpg.fill(255, 255);// * this.alpha);
     }
     else {
-      this.pg.noFill();
-      this.pg.stroke(255, 255);// * this.alpha);
+      bgpg.noFill();
+      bgpg.stroke(255, 255);// * this.alpha);
     }
     let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, rotPower);
-    this.pg.rotateX(rotw * targetRotX + Math.PI * 0.5);
-    this.pg.rotateY(rotw * targetRotY);
+    bgpg.rotateX(rotw * targetRotX + Math.PI * 0.5);
+    bgpg.rotateY(rotw * targetRotY);
     for (let y = -200; y < 200; y += 50) {
-      this.pg.beginShape(p.TRIANGLE_STRIP);
+      bgpg.beginShape(p.TRIANGLE_STRIP);
       let tSpeedMod = tSpeed;
       if (y == 0) tSpeedMod *= 3;
       for (let dx = -l; dx < l; dx += 5.0) {
         let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * tSpeedMod);
-        this.pg.vertex(dx, y, z * 50);
-        this.pg.vertex(dx, y + 10, z * 50);
+        bgpg.vertex(dx, y, z * 50);
+        bgpg.vertex(dx, y + 10, z * 50);
       }
-      this.pg.endShape();
+      bgpg.endShape();
     }
-    this.pg.popMatrix();
-    this.pg.endDraw();
-    // p.image(this.pg, -p.width * 0.5, -p.height * 0.5);
+    bgpg.popMatrix();
+    bgpg.endDraw();
+    // p.image(bgpg, -p.width * 0.5, -p.height * 0.5);
   }
 }
 
@@ -335,7 +334,6 @@ var SBeesAndBombs = function (p) {
   let w = 40;
   let ma;
   let maxD;
-  this.pg = p.createGraphics(windowWidth, windowHeight, p.P3D);
   this.tween = 0;
   this.alpha = 0;
 
@@ -345,18 +343,18 @@ var SBeesAndBombs = function (p) {
   }
 
   this.draw = function () {
-    this.pg.beginDraw();
-    this.pg.clear();
-    this.pg.noStroke();
-    this.pg.fill(255);
+    bgpg.beginDraw();
+    bgpg.clear();
+    bgpg.noStroke();
+    bgpg.fill(255);
     // p.ortho(-400, 400, 400, -400, 0, 1000);
 
-    this.pg.translate(p.width / 2, p.height / 2, -500);
-    this.pg.rotateX(-p.QUARTER_PI * 0.8);
-    this.pg.rotateY(-p.QUARTER_PI * this.tween)
-    this.pg.directionalLight(90, 95, 226, -1, 0, 0);
-    this.pg.pointLight(200, 95, 96, 300, -100, 1000);
-    this.pg.pointLight(200, 200, 200, 0, -1000, 0);
+    bgpg.translate(p.width / 2, p.height / 2, -500);
+    bgpg.rotateX(-p.QUARTER_PI * 0.8);
+    bgpg.rotateY(-p.QUARTER_PI * this.tween)
+    bgpg.directionalLight(90, 95, 226, -1, 0, 0);
+    bgpg.pointLight(200, 95, 96, 300, -100, 1000);
+    bgpg.pointLight(200, 200, 200, 0, -1000, 0);
 
     angle = p.millis() * 0.001 * p.TWO_PI;
     let decay = p.sin(p.millis() * 0.001);
@@ -364,27 +362,28 @@ var SBeesAndBombs = function (p) {
     let winh = 560;
     for (let z = 0; z < winh; z += w) {
       for (let x = 0; x < winh; x += w) {
-        this.pg.pushMatrix();
+        bgpg.pushMatrix();
         let d = p.dist(x, z, winh / 2, winh / 2);
         let offset = p.map(d, 0, maxD, -p.PI, p.PI);
         let a = angle + -offset;
         let h = p.floor(p.map(p.sin(a), -1, 1, 0.5, 1)*winh);
         h = p.map(decay, 0, 1, winh, h);
-        this.pg.translate(x - winh / 2, 0, z - winh / 2);
+        bgpg.translate(x - winh / 2, 0, z - winh / 2);
         // p.normalMaterial();
-        this.pg.box(w, h, w);
+        bgpg.box(w, h, w);
         //rect(x - width / 2 + w / 2, 0, w - 2, h);
-        this.pg.popMatrix();
+        bgpg.popMatrix();
       }
     }
-    this.pg.endDraw();
-    // p.image(this.pg, -p.width / 2, -p.height / 2);
+    bgpg.endDraw();
+    // p.image(bgpg, -p.width / 2, -p.height / 2);
   }
 };
 
 var frontPg;
 var backPg;
 var wavePg;
+var bgpg;
 
 var s = function (p) {
   let name;
@@ -980,13 +979,15 @@ var s = function (p) {
     p.frameRate(60);
     startFrame = p.frameCount;
 
-    pg = p.createGraphics(p.width, p.height, p.P3D);
+    pg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (frontPg == undefined)
-      frontPg = p.createGraphics(p.width, p.height, p.P3D);
+      frontPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (backPg == undefined)
-      backPg = p.createGraphics(p.width, p.height, p.P3D);
+      backPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (wavePg == undefined)
       wavePg = p.createGraphics(100, 100);
+    if (bgpg == undefined)
+      bgpg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
     levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
 
@@ -1066,10 +1067,8 @@ var s = function (p) {
       texShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
         colorSc[backColIdx][1] / 255.0,
         colorSc[backColIdx][2] / 255.0);
-      if(sRibbons.pg != undefined)
-        texShader.set("pgTex", sRibbons.pg);
-      if(sBeesAndBombs.pg != undefined)
-        texShader.set("pgTex", sBeesAndBombs.pg);
+      if(bgpg != undefined)
+        texShader.set("pgTex", bgpg);
       texShader.set("waveTex", wavePg);
       texShader.set("backTex", backPg);
       texShader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
