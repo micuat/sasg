@@ -285,13 +285,15 @@ var SRibbons = function (p) {
   let tSpeed = 0;
   let rotPower = 0;
   let isSolid = true;
+  let amplitude = 0.0;
 
   this.setup = function () {
     targetRotX = p.random(-Math.PI, Math.PI) * 2.0;
     targetRotY = p.random(-Math.PI, Math.PI) * 2.0;
-    tSpeed = p.random(2.0, 6.0);
-    rotPower = Math.floor(p.random(1.0, 5.0));
+    tSpeed = p.random(2.0, 8.0);
+    rotPower = Math.floor(p.random(2.0, 9.0));
     isSolid = p.random(1.0) > 0.5 ? true : false;
+    amplitude = Math.pow(p.random(0.5, 1.0), 2.0) * 100;
   }
   this.draw = function () {
     bgpg.beginDraw();
@@ -318,8 +320,8 @@ var SRibbons = function (p) {
       if (y == 0) tSpeedMod *= 3;
       for (let dx = -l; dx < l; dx += 5.0) {
         let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * tSpeedMod);
-        bgpg.vertex(dx, y, z * 50);
-        bgpg.vertex(dx, y + 10, z * 50);
+        bgpg.vertex(dx, y, z * amplitude);
+        bgpg.vertex(dx, y + 10, z * amplitude);
       }
       bgpg.endShape();
     }
@@ -1089,7 +1091,9 @@ var s = function (p) {
     // p.tint(255 * p.oscFaders[0]);
     // p.image(frontPg, 0, 0);
     levelShader.set("pgTexture", frontPg);
+    levelShader.set("backgroundTexture", bgpg);
     levelShader.set("masterFader", p.oscFaders[0] * 1.0);
+    levelShader.set("seq", seq % 4.0);
     p.filter(levelShader);
     p.syphonServer.sendImage(frontPg);
 
