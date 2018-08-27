@@ -1,6 +1,9 @@
 var windowWidth = 1280 / 2;
 var windowHeight = 560 / 2;
 var bpm = 124;
+var tElapsed = 0;
+var lastSeq = -1;
+var seq = 0;
 
 var SCircleMorph = function (p) {
   let cirPath = [];
@@ -385,16 +388,39 @@ var SBeesAndBombs = function (p) {
 var SDots = function (p) {
   this.tween = 0;
   this.alpha = 0;
+  let points = [];
+  let lastMiniSeq = -1;
+  let mc = 20.0;
 
+  for(let i = 0; i < 16; i++) {
+    x = Math.floor(p.random(0, windowWidth) / mc) * mc;
+    y = Math.floor(p.random(0, windowHeight) / mc) * mc;
+    points.push({x: x, y: y});
+  }
   this.setup = function () {
   }
 
   this.draw = function () {
+    let miniSeq = Math.floor(tElapsed * (bpm / 60.0));
+    let fract = tElapsed * (bpm / 60.0) - miniSeq;
+
+    if(miniSeq != lastMiniSeq) {
+      points.splice(0, 1);
+      x = Math.floor(p.random(0, windowWidth) / mc) * mc;
+      y = Math.floor(p.random(0, windowHeight) / mc) * mc;
+      points.push({x: x, y: y});
+    }
+    lastMiniSeq = miniSeq;
+
     bgpg.beginDraw();
     bgpg.clear();
     bgpg.noStroke();
     bgpg.fill(255);
-    bgpg.ellipse(p.random(0, windowWidth), p.random(0, windowHeight), 50, 50);
+    for(let i in points) {
+      let x = points[i].x;
+      let y = points[i].y;
+      bgpg.ellipse(x, y, 20, 20);
+    }
     bgpg.endDraw();
   }
 };
@@ -1026,7 +1052,6 @@ var s = function (p) {
   let autoPilot = true;
   let doUpdate = true;
   let curCol = [0, 0, 0];
-  let lastSeq = -1;
   let beatFader = 1;
   let texShader, levelShader;
 
@@ -1073,9 +1098,9 @@ var s = function (p) {
 
   p.draw = function () {
     // let t = p.getCount() / 60.0 * (bpm / 120.0);
-    let tElapsed = p.millis() * 0.001 + p.oscFaders[1];
+    tElapsed = p.millis() * 0.001 + p.oscFaders[1];
     let t = tElapsed * (bpm / 120.0);
-    let seq = Math.floor(tElapsed * (bpm / 120.0));
+    seq = Math.floor(tElapsed * (bpm / 120.0));
 
     if (p.getCount() % 60 == 0) {
       texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
@@ -1092,7 +1117,6 @@ var s = function (p) {
         funcAssets[funcTypeName].update(seq);
       }
     }
-    lastSeq = seq;
 
     let colorSc = [
       [0, 255, 150],
@@ -1196,6 +1220,7 @@ var s = function (p) {
     }
     drawBeat();
     p.syphonServer.sendScreen();
+    lastSeq = seq;
   }
 };
 
