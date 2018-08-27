@@ -32,8 +32,9 @@ import toxi.geom.*;
 
 // import SimpleOpenNI.*;
 
-public float[] oscFaders = new float[8];
-public int oscButton = 0;
+public float[] oscFaders = new float[20];
+public int oscPreset = 0;
+public int[] oscButton = new int[57];
 
 import oscP5.*;
 import netP5.*;

@@ -1143,7 +1143,7 @@ var s = function (p) {
       targetII = Math.floor(p.random(-1, 2));
       for (let i in functions) {
         let funcTypeName = functions[i];
-        let curPreset = midiToPreset[p.oscButton][seq % 4];
+        let curPreset = midiToPreset[p.oscPreset][seq % 4];
         funcAssets[funcTypeName].preset = curPreset[funcTypeName];
         funcAssets[funcTypeName].update(seq);
       }

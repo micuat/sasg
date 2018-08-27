@@ -145,14 +145,17 @@ void mousePressed(MouseEvent event) {
 void oscEvent(OscMessage theOscMessage) {
   if (theOscMessage.checkAddrPattern("/livid/control")==true) {
     int index = theOscMessage.get(0).intValue();
-    if (index < 8) {
+    if (index < 20) {
       oscFaders[index] = theOscMessage.get(1).intValue() / 127.0;
     }
   }
   else if (theOscMessage.checkAddrPattern("/livid/note")==true) {
     int index = theOscMessage.get(0).intValue();
     if (index < 35 && theOscMessage.get(1).intValue() > 0) {
-      oscButton = index;
+      oscPreset = index;
+    }
+    else if (index < 57 && theOscMessage.get(1).intValue() > 0) {
+      oscButton[index] = theOscMessage.get(1).intValue() > 0 ? 1 : 0;
     }
   }
   //try {
