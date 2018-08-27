@@ -9,6 +9,8 @@ uniform float iTime;
 uniform vec3 bgColor0, bgColor1;
 uniform float phaseFader;
 uniform float xFader;
+uniform float oscNum;
+uniform sampler2D backTex;
 
 vec2 iRes = vec2(1280, 560);
 
@@ -20,10 +22,18 @@ void main() {
   float x = fragCoord.x - 0.5;
   float y = 1.0 - fragCoord.y;
   float xcomp = cos(x * 15.0 - iTime * xFader);
-  float ycomp = sin(y * (10.0 + phaseFader * 50.0) - x * 10.0);
+  float ycomp = sin(y * (10.0 * (oscNum + 1.0) + phaseFader * 50.0) - x * 10.0);
 	vec4 fragCol0 = vec4(vec3(pow(ycomp * xcomp, 4.0)), 1.0);
   fragCol0.rgb = mix(bgColor0 * 3.0, bgColor1, 1.0-pow(fragCol0.r, 4.0));
+	// vec4 fragCol0 = vec4(vec3(pow(sin(y * (10.0 + phaseFader * 50.0) - x * 10.0), 4.0)), 1.0);
+  // if(oscNum > 0.0)
+  // 	fragCol0 = vec4(vec3(pow(sin(x * (10.0 + phaseFader * 50.0) - y * 10.0), 4.0)), 1.0);
+
+	vec4 backCol = texture(backTex, vertTexCoord.st);
 
 	vec4 finalColor = fragCol0;
+  if(oscNum == 0.0) {
+    finalColor = mix(finalColor, backCol, 0.99);
+  }
 	gl_FragColor = finalColor;
 }

@@ -1135,6 +1135,7 @@ var s = function (p) {
     if (p.getCount() % 60 == 0) {
       texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
       levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
+      oscShader = p.loadShader(p.sketchPath(name + "/osc.glsl"));
     }
 
     if ((seq != lastSeq) || (!autoPilot && doUpdate)) {
@@ -1173,6 +1174,8 @@ var s = function (p) {
           colorSc[backColIdx][2] / 255.0);
         oscShader.set("phaseFader", p.oscFaders[5]);
         oscShader.set("xFader", p.oscFaders[6] * 10.0);
+        oscShader.set("oscNum", i * 1.0);
+        oscShader.set("backTex", backPg);
         let oscPg = oscPgs[i];
         oscPg.beginDraw();
         oscPg.filter(oscShader);

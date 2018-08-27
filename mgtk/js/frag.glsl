@@ -36,13 +36,15 @@ void main() {
 	float afc = atan(nFragCoord.t, nFragCoord.s);
 
 	vec4 fragCol0 = texture(osc0Tex, vertTexCoord.st);
+	vec4 fragCol1 = texture(osc1Tex, fragCol0.st);
+	vec4 fragCol2 = texture(osc2Tex, fragCol1.st);
 
 	vec4 pgCol = texture(pgTex, vertTexCoord.st);
 	vec4 backCol;
   float dth = rAmountFader * 0.01;
 	backCol = texture(backTex, vec2(0.5) + vec2(lfc*cos(afc + dth), lfc*sin(afc + dth)));
 
-	vec4 finalColor = pgCol * 2.0 + fragCol0;
+	vec4 finalColor = pgCol * 2.0 + fragCol1;
   finalColor.rgb = mix(finalColor.rgb, backCol.rgb, feedbackFader);
 	gl_FragColor = finalColor;
 }
