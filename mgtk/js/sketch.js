@@ -394,7 +394,7 @@ var SDots = function (p) {
 
   function newPoint () {
     let x = Math.floor(p.random(0, windowWidth) / mc) * mc;
-    let y = -10;
+    let y = p.random(1.0) > 0.5 ? -10 : windowHeight + 10;
     let targetX = x;
     let targetY = Math.floor(p.random(windowHeight * 0.25, windowHeight) / mc) * mc;
     return {x: x, y: y, targetX: targetX, targetY: targetY, decay: 0.5};
@@ -423,7 +423,7 @@ var SDots = function (p) {
       let pt = points[i];
       // pt.y = p.lerp(pt.y, pt.targetY, 0.1);
       pt.y = pt.targetY * (1.0 - Math.pow((Math.sin(fract * Math.PI * 2.0) * pt.decay + 0.5), 2.0));
-      pt.decay *= 0.95;
+      pt.decay *= 0.925;
       let x = pt.x;
       let y = pt.y;
       // fgpg.ellipse(x, y, 20, 20);
