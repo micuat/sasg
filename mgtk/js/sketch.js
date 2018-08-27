@@ -303,7 +303,7 @@ var SRibbons = function (p) {
     bgpg.clear();
     bgpg.pushMatrix();
     bgpg.translate(bgpg.width / 2, bgpg.height / 2);
-    let tw = this.tween;
+    let tw = ((tElapsed * (bpm / 120.0)) % 4.0) * 0.5 - 1.0;
     let l = p.width * 2.0;
     if (isSolid) {
       bgpg.lights();
@@ -590,7 +590,7 @@ var s = function (p) {
         p.translate(-tw * p.width / 3.0, 0.0);
       }
     }]);
-  funcAssets.backdropFunc = new FuncList(2, [
+  funcAssets.backdropFunc = new FuncList(4, [
     {
       name: "default",
       f: function (tween) {
@@ -973,6 +973,15 @@ var s = function (p) {
       pointFunc: ["default"],
       lineFunc: ["default"]
     },
+    random: {
+      globalTransformFunc: [],
+      backgroundFunc: [],
+      orderFunc: [],
+      transformFunc: [],
+      sigFunc: [],
+      pointFunc: [],
+      lineFunc: []
+    },
     toLeft: {
       globalTransformFunc: ["default"],
       backgroundFunc: [],
@@ -1060,6 +1069,7 @@ var s = function (p) {
     {preset: [bPreset.toUpFlat, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "beesAndBombs"},
     {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "beesAndBombs"},
     {preset: [bPreset.toLeftSimple, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "beesAndBombs"},
+    {preset: [bPreset.random, bPreset.random, bPreset.random, bPreset.random], backdrop: "ribbons"},
     // [bPreset.bees, bPreset.bees, bPreset.bees, bPreset.bees],
     // [bPreset.ribbons, bPreset.ribbons, bPreset.ribbons, bPreset.ribbons],
     // [bPreset.toLeft, bPreset.toRight, bPreset.toLeft, bPreset.toDown],
