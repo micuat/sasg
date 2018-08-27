@@ -445,9 +445,9 @@ var SDots = function (p) {
 
 var frontPg;
 var backPg;
-var wavePg;
 var bgpg;
 var fgpg;
+var oscPg;
 
 var s = function (p) {
   let name;
@@ -1085,8 +1085,8 @@ var s = function (p) {
       frontPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (backPg == undefined)
       backPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
-    if (wavePg == undefined)
-      wavePg = p.createGraphics(100, 100);
+    if (oscPg == undefined)
+      oscPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (bgpg == undefined) {
       bgpg = p.createGraphics(windowWidth, windowHeight, p.P3D);
       bgpg.beginDraw();
@@ -1101,6 +1101,7 @@ var s = function (p) {
     }
     texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
     levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
+    oscShader = p.loadShader(p.sketchPath(name + "/osc.glsl"));
 
     sCircleMorph.setup();
     sStarField.setup();
@@ -1155,32 +1156,30 @@ var s = function (p) {
     ]
 
     function drawShader() {
-      wavePg.beginDraw();
-      wavePg.strokeWeight(2);
-      for (let i = 0; i < 100; i++) {
-        let y = Math.pow((p.noise(((i * 0.1 - t * (2.0))), t * -0.0)), 4.0) * 250;
-        wavePg.stroke(y);
-        wavePg.line(i, 0, i, 100);
-      }
-      wavePg.endDraw();
-
-      let lfo0 = 1.0;//Math.cos(t * Math.PI * 0.25) * 0.5 + 0.5;
-      texShader.set("iTime", t);
-      texShader.set("lfo0", lfo0);
+      oscShader.set("iTime", t);
       let frontColIdx = Math.floor(t % 3) * 2;
       let backColIdx = Math.floor(t % 3) * 2 + 1;
       curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
       curCol[1] = p.lerp(curCol[1], colorSc[frontColIdx][1] / 255.0, 0.05);
       curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
+      oscShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
+      oscShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
+        colorSc[backColIdx][1] / 255.0,
+        colorSc[backColIdx][2] / 255.0);
+      oscShader.set("phaseFader", p.oscFaders[5]);
+      oscShader.set("xFader", p.oscFaders[6] * 10.0);
+      oscPg.beginDraw();
+      oscPg.filter(oscShader);
+      oscPg.endDraw();
+
+      texShader.set("iTime", t);
       texShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
-      // rgb = HSVtoRGB((t + 0.5) % 1.0, 1.0, 1.0);
-      // texShader.set("bgColor1", rgb.r, rgb.g, rgb.b);
       texShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
         colorSc[backColIdx][1] / 255.0,
         colorSc[backColIdx][2] / 255.0);
       if(bgpg != undefined)
         texShader.set("pgTex", bgpg);
-      texShader.set("waveTex", wavePg);
+      texShader.set("oscTex", oscPg);
       texShader.set("backTex", backPg);
       texShader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
       texShader.set("phaseFader", p.oscFaders[5]);
