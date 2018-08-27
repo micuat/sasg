@@ -382,6 +382,23 @@ var SBeesAndBombs = function (p) {
   }
 };
 
+var SDots = function (p) {
+  this.tween = 0;
+  this.alpha = 0;
+
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    bgpg.beginDraw();
+    bgpg.clear();
+    bgpg.noStroke();
+    bgpg.fill(255);
+    bgpg.ellipse(p.random(0, windowWidth), p.random(0, windowHeight), 50, 50);
+    bgpg.endDraw();
+  }
+};
+
 var frontPg;
 var backPg;
 var wavePg;
@@ -394,6 +411,7 @@ var s = function (p) {
   let sGameOfLife = new SGameOfLife(p);
   let sRibbons = new SRibbons(p);
   let sBeesAndBombs = new SBeesAndBombs(p);
+  let sDots = new SDots(p);
 
   function Agent(t, tween, ii, jj, isTarget) {
     this.t = t;
@@ -531,11 +549,17 @@ var s = function (p) {
     {
       name: "default",
       f: function (tween) {
+        bgpg.beginDraw();
+        bgpg.clear();
+        bgpg.endDraw();
       }
     },
     {
       name: "circleMorph",
       f: function (tween) {
+        bgpg.beginDraw();
+        bgpg.clear();
+        bgpg.endDraw();
         let alpha = 1.0 - tween;
         p.push();
         p.stroke(255, beatFader * alpha * 255);
@@ -546,6 +570,9 @@ var s = function (p) {
     {
       name: "starField",
       f: function (tween) {
+        bgpg.beginDraw();
+        bgpg.clear();
+        bgpg.endDraw();
         let alpha = 1.0 - tween;
         p.push();
         p.translate(tween * p.width / 3.0, 0);
@@ -557,6 +584,9 @@ var s = function (p) {
     {
       name: "gameOfLife",
       f: function (tween) {
+        bgpg.beginDraw();
+        bgpg.clear();
+        bgpg.endDraw();
         let alpha = 1.0 - tween;
         p.push();
         sGameOfLife.alpha = alpha * beatFader;
@@ -593,6 +623,20 @@ var s = function (p) {
       },
       setup: function () {
         sBeesAndBombs.setup();
+      }
+    },
+    {
+      name: "dots",
+      f: function (tween) {
+        let alpha = 1.0 - tween;
+        p.push();
+        sDots.tween = tween;
+        sDots.alpha = alpha * beatFader;
+        sDots.draw();
+        p.pop();
+      },
+      setup: function () {
+        sDots.setup();
       }
     }]);
   funcAssets.backgroundFunc = new FuncList(1, [
@@ -885,6 +929,16 @@ var s = function (p) {
       pointFunc: ["default"],
       lineFunc: ["default"]
     },
+    dots: {
+      globalTransformFunc: [],
+      backdropFunc: ["dots"],
+      backgroundFunc: [],
+      orderFunc: [],
+      transformFunc: [],
+      sigFunc: [],
+      pointFunc: [],
+      lineFunc: []
+    },
     bees: {
       globalTransformFunc: [],
       backdropFunc: ["beesAndBombs"],
@@ -958,6 +1012,7 @@ var s = function (p) {
   };
   let midiToPreset = [
     [bPreset.default, bPreset.default, bPreset.default, bPreset.default],
+    [bPreset.dots, bPreset.dots, bPreset.dots, bPreset.dots],
     [bPreset.bees, bPreset.bees, bPreset.bees, bPreset.bees],
     [bPreset.ribbons, bPreset.ribbons, bPreset.ribbons, bPreset.ribbons],
     [bPreset.toLeft, bPreset.toRight, bPreset.toLeft, bPreset.toDown],
@@ -988,8 +1043,12 @@ var s = function (p) {
       backPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (wavePg == undefined)
       wavePg = p.createGraphics(100, 100);
-    if (bgpg == undefined)
+    if (bgpg == undefined) {
       bgpg = p.createGraphics(windowWidth, windowHeight, p.P3D);
+      bgpg.beginDraw();
+      bgpg.clear();
+      bgpg.endDraw();
+    }
     texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
     levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
 
@@ -998,6 +1057,7 @@ var s = function (p) {
     sGameOfLife.setup();
     sRibbons.setup();
     sBeesAndBombs.setup();
+    sDots.setup();
 
     funcAssets.backdropFunc.update();
   }
