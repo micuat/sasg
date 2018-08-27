@@ -1152,26 +1152,28 @@ var s = function (p) {
     let colorSc = [
       [0, 255, 150],
       [0, 155, 50],
-      [50, 100, 255],
-      [0, 70, 155],
       [230, 230, 100],
       [205, 70, 0],
+      [50, 100, 255],
+      [0, 70, 155],
       [20, 205, 200],
       [135, 30, 0]
     ]
 
     function drawShader() {
-      let backColIdx = Math.floor(t % 3) * 2 + 1;
+      let backColIdx = Math.floor(t % 2) * 2 + 1;
+      let backCol = [colorSc[backColIdx][0] / 255.0,
+      colorSc[backColIdx][1] / 255.0,
+      colorSc[backColIdx][2] / 255.0];
+      backCol = [0, 0, 0];
       for(let i = 0; i < oscPgs.length; i++) {
         oscShader.set("iTime", t);
-        let frontColIdx = Math.floor(t % 3) * 2;
+        let frontColIdx = Math.floor(t % 2) * 2;
         curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
         curCol[1] = p.lerp(curCol[1], colorSc[frontColIdx][1] / 255.0, 0.05);
         curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
         oscShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
-        oscShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
-          colorSc[backColIdx][1] / 255.0,
-          colorSc[backColIdx][2] / 255.0);
+        oscShader.set("bgColor1", backCol[0], backCol[1], backCol[2]);
         oscShader.set("phaseFader", p.oscFaders[5]);
         oscShader.set("xFader", p.oscFaders[6] * 10.0);
         oscShader.set("oscNum", i * 1.0);
@@ -1197,6 +1199,7 @@ var s = function (p) {
       texShader.set("phaseFader", p.oscFaders[5]);
       texShader.set("xFader", p.oscFaders[6] * 10.0);
       texShader.set("rAmountFader", p.oscFaders[7] * 1.0);
+      texShader.set("modulationFader", p.oscFaders[19] * 1.0);
       frontPg.beginDraw();
       frontPg.filter(texShader);
       frontPg.endDraw();

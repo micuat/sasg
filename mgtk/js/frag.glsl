@@ -16,6 +16,7 @@ uniform float feedbackFader;
 uniform float phaseFader;
 uniform float xFader;
 uniform float rAmountFader;
+uniform float modulationFader;
 
 uniform sampler2D texture;
 uniform sampler2D pgTex;
@@ -43,8 +44,9 @@ void main() {
 	vec4 backCol;
   float dth = rAmountFader * 0.01;
 	backCol = texture(backTex, vec2(0.5) + vec2(lfc*cos(afc + dth), lfc*sin(afc + dth)));
+  backCol.rgb *= 1.0;
 
-	vec4 finalColor = pgCol * 2.0 + fragCol1;
+	vec4 finalColor = pgCol * 2.0 + mix(fragCol0, fragCol1, modulationFader);
   finalColor.rgb = mix(finalColor.rgb, backCol.rgb, feedbackFader);
 	gl_FragColor = finalColor;
 }

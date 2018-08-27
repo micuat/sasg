@@ -28,7 +28,7 @@ void main() {
   // finalColor.r = pow(finalColor.r, 2.0);
   // finalColor.g = pow(finalColor.g, 2.0);
   // finalColor.b = pow(finalColor.b, 2.0);
-  finalColor.rgb *= masterFader;
+  finalColor.rgb *= masterFader * 2.0;
   // if(seq < 2.0)
   // finalColor.rgb = mix(finalColor.rgb, bgColor.rgb, bgColor.a);
   finalColor.rgb += fgColor.rgb;
