@@ -151,8 +151,11 @@ void oscEvent(OscMessage theOscMessage) {
   }
   else if (theOscMessage.checkAddrPattern("/livid/note")==true) {
     int index = theOscMessage.get(0).intValue();
-    if (index < 35 && theOscMessage.get(1).intValue() > 0) {
+    if (index <= 35 && theOscMessage.get(1).intValue() > 0) {
       oscPreset = index;
+    }
+    else if (38 <= index && index <= 41 && theOscMessage.get(1).intValue() > 0) {
+      seqOffset = index - 38;
     }
     else if (index < 57 && theOscMessage.get(1).intValue() > 0) {
       oscButton[index] = theOscMessage.get(1).intValue() > 0 ? 1 : 0;

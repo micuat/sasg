@@ -1133,7 +1133,7 @@ var s = function (p) {
     // let t = p.getCount() / 60.0 * (bpm / 120.0);
     tElapsed = p.millis() * 0.001 + p.oscFaders[1];
     let t = tElapsed * (bpm / 120.0);
-    seq = Math.floor(tElapsed * (bpm / 120.0));
+    seq = Math.floor(tElapsed * (bpm / 120.0)) + p.seqOffset;
 
     if (p.getCount() % 60 == 0) {
       texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
