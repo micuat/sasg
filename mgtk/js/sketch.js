@@ -354,15 +354,15 @@ var SBeesAndBombs = function (p) {
     bgpg.fill(255);
     // p.ortho(-400, 400, 400, -400, 0, 1000);
 
-    bgpg.translate(p.width / 2, p.height / 2, -500);
-    bgpg.rotateX(-p.QUARTER_PI * 0.8);
-    bgpg.rotateY(-p.QUARTER_PI * this.tween)
+    bgpg.translate(p.width / 2, p.height / 2, -650);
     bgpg.directionalLight(90, 95, 226, -1, 0, 0);
     bgpg.pointLight(200, 95, 96, 300, -100, 1000);
-    bgpg.pointLight(200, 200, 200, 0, -1000, 0);
+    // bgpg.pointLight(200, 200, 200, 0, -1000, 0);
+    bgpg.rotateX(-p.QUARTER_PI * 0.8);
+    bgpg.rotateY(-p.QUARTER_PI * tElapsed)
 
     angle = p.millis() * 0.001 * p.TWO_PI;
-    let decay = p.sin(p.millis() * 0.001);
+    let decay = p.sin(p.millis() * 0.0005);
     decay = p.constrain(p.map(decay, -1, 1, -0.02, 1), 0, 1);
     let winh = 560;
     for (let z = 0; z < winh; z += w) {
@@ -966,7 +966,6 @@ var s = function (p) {
   let bPreset = {
     default: {
       globalTransformFunc: ["default"],
-      backdropFunc: ["default"],
       backgroundFunc: ["default"],
       orderFunc: ["default"],
       transformFunc: ["default"],
@@ -974,39 +973,8 @@ var s = function (p) {
       pointFunc: ["default"],
       lineFunc: ["default"]
     },
-    dots: {
-      globalTransformFunc: [],
-      backdropFunc: ["dots"],
-      backgroundFunc: [],
-      orderFunc: [],
-      transformFunc: [],
-      sigFunc: [],
-      pointFunc: [],
-      lineFunc: []
-    },
-    bees: {
-      globalTransformFunc: [],
-      backdropFunc: ["beesAndBombs"],
-      backgroundFunc: [],
-      orderFunc: [],
-      transformFunc: [],
-      sigFunc: [],
-      pointFunc: [],
-      lineFunc: []
-    },
-    ribbons: {
-      globalTransformFunc: [],
-      backdropFunc: ["ribbons"],
-      backgroundFunc: [],
-      orderFunc: [],
-      transformFunc: [],
-      sigFunc: [],
-      pointFunc: [],
-      lineFunc: []
-    },
     toLeft: {
       globalTransformFunc: ["default"],
-      backdropFunc: ["default"],
       backgroundFunc: [],
       orderFunc: ["default"],
       transformFunc: ["bounceLeft"],
@@ -1016,7 +984,6 @@ var s = function (p) {
     },
     toRight: {
       globalTransformFunc: ["default"],
-      backdropFunc: ["default"],
       backgroundFunc: [],
       orderFunc: ["default"],
       transformFunc: ["bounceRight"],
@@ -1026,7 +993,6 @@ var s = function (p) {
     },
     toUp: {
       globalTransformFunc: ["default"],
-      backdropFunc: ["default"],
       backgroundFunc: [],
       orderFunc: ["default"],
       transformFunc: ["bounceUp"],
@@ -1036,7 +1002,6 @@ var s = function (p) {
     },
     toDown: {
       globalTransformFunc: ["default"],
-      backdropFunc: ["default"],
       backgroundFunc: [],
       orderFunc: ["default"],
       transformFunc: ["bounceDown"],
@@ -1044,25 +1009,63 @@ var s = function (p) {
       pointFunc: [],
       lineFunc: []
     },
-    gameOfLife: {
+    toUpFlat: {
       globalTransformFunc: ["default"],
-      backdropFunc: ["gameOfLife"],
+      backgroundFunc: [],
+      orderFunc: ["default"],
+      transformFunc: ["bounceUp"],
+      sigFunc: [],
+      pointFunc: [],
+      lineFunc: ["default", "rect"]
+    },
+    toDownFlat: {
+      globalTransformFunc: ["default"],
+      backgroundFunc: [],
+      orderFunc: ["default"],
+      transformFunc: ["bounceDown"],
+      sigFunc: [],
+      pointFunc: [],
+      lineFunc: ["default", "rect"]
+    },
+    sig: {
+      globalTransformFunc: ["default"],
+      backgroundFunc: [],
+      orderFunc: ["default"],
+      transformFunc: [],
+      sigFunc: ["sineT", "sine", "random"],
+      pointFunc: ["inout"],
+      lineFunc: ["sig", "sigBar"]
+    },
+    toLeftSimple: {
+      globalTransformFunc: ["default"],
+      backgroundFunc: ["default"],
+      orderFunc: ["default"],
+      transformFunc: ["bounceLeft"],
+      sigFunc: ["sineT", "sine", "random"],
+      pointFunc: ["inout"],
+      lineFunc: ["sig", "sigBar"]
+    },
+    justPoint: {
+      globalTransformFunc: ["default"],
       backgroundFunc: ["default"],
       orderFunc: ["default"],
       transformFunc: ["default"],
       sigFunc: ["default"],
-      pointFunc: ["default"],
+      pointFunc: ["inout"],
       lineFunc: ["default"]
     }
   };
   let midiToPreset = [
-    [bPreset.default, bPreset.default, bPreset.default, bPreset.default],
-    [bPreset.dots, bPreset.dots, bPreset.dots, bPreset.dots],
-    [bPreset.bees, bPreset.bees, bPreset.bees, bPreset.bees],
-    [bPreset.ribbons, bPreset.ribbons, bPreset.ribbons, bPreset.ribbons],
-    [bPreset.toLeft, bPreset.toRight, bPreset.toLeft, bPreset.toDown],
-    [bPreset.toLeft, bPreset.toRight, bPreset.toUp, bPreset.toDown],
-    [bPreset.gameOfLife, bPreset.gameOfLife, bPreset.default, bPreset.default]
+    {preset: [bPreset.default, bPreset.default, bPreset.default, bPreset.default], backdrop: "default"},
+    {preset: [bPreset.toUpFlat, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "beesAndBombs"},
+    {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "beesAndBombs"},
+    {preset: [bPreset.toLeftSimple, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "beesAndBombs"},
+    // [bPreset.bees, bPreset.bees, bPreset.bees, bPreset.bees],
+    // [bPreset.ribbons, bPreset.ribbons, bPreset.ribbons, bPreset.ribbons],
+    // [bPreset.toLeft, bPreset.toRight, bPreset.toLeft, bPreset.toDown],
+    // [bPreset.toLeft, bPreset.toRight, bPreset.toUp, bPreset.toDown],
+    // [bPreset.gameOfLife, bPreset.gameOfLife, bPreset.default, bPreset.default],
+    // [bPreset.dots, bPreset.dots, bPreset.dots, bPreset.dots]
   ]
 
   let startFrame;
@@ -1143,8 +1146,14 @@ var s = function (p) {
       targetII = Math.floor(p.random(-1, 2));
       for (let i in functions) {
         let funcTypeName = functions[i];
-        let curPreset = midiToPreset[p.oscPreset][seq % 4];
-        funcAssets[funcTypeName].preset = curPreset[funcTypeName];
+        let curPreset;
+        if(funcTypeName == "backdropFunc") {
+          funcAssets[funcTypeName].preset = midiToPreset[p.oscPreset].backdrop;
+        }
+        else {
+          curPreset = midiToPreset[p.oscPreset].preset[seq % 4];
+          funcAssets[funcTypeName].preset = curPreset[funcTypeName];
+        }
         funcAssets[funcTypeName].update(seq);
       }
     }
