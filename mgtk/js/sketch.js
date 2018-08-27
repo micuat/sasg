@@ -392,10 +392,15 @@ var SDots = function (p) {
   let lastMiniSeq = -1;
   let mc = 20.0;
 
-  for(let i = 0; i < 16; i++) {
-    x = Math.floor(p.random(0, windowWidth) / mc) * mc;
-    y = Math.floor(p.random(0, windowHeight) / mc) * mc;
-    points.push({x: x, y: y});
+  function newPoint () {
+    let x = Math.floor(p.random(0, windowWidth) / mc) * mc;
+    let y = -10;
+    let targetX = x;
+    let targetY = Math.floor(p.random(windowHeight * 0.25, windowHeight) / mc) * mc;
+    return {x: x, y: y, targetX: targetX, targetY: targetY, decay: 0.5};
+  }
+  for(let i = 0; i < 8; i++) {
+    points.push(newPoint());
   }
   this.setup = function () {
   }
@@ -406,11 +411,24 @@ var SDots = function (p) {
 
     if(miniSeq != lastMiniSeq) {
       points.splice(0, 1);
-      x = Math.floor(p.random(0, windowWidth) / mc) * mc;
-      y = Math.floor(p.random(0, windowHeight) / mc) * mc;
-      points.push({x: x, y: y});
+      points.push(newPoint());
     }
     lastMiniSeq = miniSeq;
+
+    fgpg.beginDraw();
+    fgpg.clear();
+    fgpg.noStroke();
+    fgpg.fill(255);
+    for(let i in points) {
+      let pt = points[i];
+      // pt.y = p.lerp(pt.y, pt.targetY, 0.1);
+      pt.y = pt.targetY * (1.0 - Math.pow((Math.sin(fract * Math.PI * 2.0) * pt.decay + 0.5), 2.0));
+      pt.decay *= 0.95;
+      let x = pt.x;
+      let y = pt.y;
+      // fgpg.ellipse(x, y, 20, 20);
+    }
+    fgpg.endDraw();
 
     bgpg.beginDraw();
     bgpg.clear();
@@ -429,6 +447,7 @@ var frontPg;
 var backPg;
 var wavePg;
 var bgpg;
+var fgpg;
 
 var s = function (p) {
   let name;
@@ -1074,6 +1093,12 @@ var s = function (p) {
       bgpg.clear();
       bgpg.endDraw();
     }
+    if (fgpg == undefined) {
+      fgpg = p.createGraphics(windowWidth, windowHeight, p.P3D);
+      fgpg.beginDraw();
+      fgpg.clear();
+      fgpg.endDraw();
+    }
     texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
     levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
 
@@ -1176,6 +1201,7 @@ var s = function (p) {
     // p.image(frontPg, 0, 0);
     levelShader.set("pgTexture", frontPg);
     levelShader.set("backgroundTexture", bgpg);
+    levelShader.set("foregroundTexture", fgpg);
     levelShader.set("masterFader", p.oscFaders[0] * 1.0);
     levelShader.set("seq", seq % 4.0);
     p.filter(levelShader);
