@@ -447,7 +447,7 @@ var frontPg;
 var backPg;
 var bgpg;
 var fgpg;
-var oscPg;
+var oscPgs;
 
 var s = function (p) {
   let name;
@@ -1085,8 +1085,12 @@ var s = function (p) {
       frontPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (backPg == undefined)
       backPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
-    if (oscPg == undefined)
-      oscPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
+    if (oscPgs == undefined) {
+      oscPgs = [];
+      for(let i = 0; i < 3; i++) {
+        oscPgs.push(p.createGraphics(windowWidth, windowHeight, p.P3D));
+      }
+    }
     if (bgpg == undefined) {
       bgpg = p.createGraphics(windowWidth, windowHeight, p.P3D);
       bgpg.beginDraw();
@@ -1156,21 +1160,24 @@ var s = function (p) {
     ]
 
     function drawShader() {
-      oscShader.set("iTime", t);
-      let frontColIdx = Math.floor(t % 3) * 2;
       let backColIdx = Math.floor(t % 3) * 2 + 1;
-      curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
-      curCol[1] = p.lerp(curCol[1], colorSc[frontColIdx][1] / 255.0, 0.05);
-      curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
-      oscShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
-      oscShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
-        colorSc[backColIdx][1] / 255.0,
-        colorSc[backColIdx][2] / 255.0);
-      oscShader.set("phaseFader", p.oscFaders[5]);
-      oscShader.set("xFader", p.oscFaders[6] * 10.0);
-      oscPg.beginDraw();
-      oscPg.filter(oscShader);
-      oscPg.endDraw();
+      for(let i = 0; i < oscPgs.length; i++) {
+        oscShader.set("iTime", t);
+        let frontColIdx = Math.floor(t % 3) * 2;
+        curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
+        curCol[1] = p.lerp(curCol[1], colorSc[frontColIdx][1] / 255.0, 0.05);
+        curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
+        oscShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
+        oscShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
+          colorSc[backColIdx][1] / 255.0,
+          colorSc[backColIdx][2] / 255.0);
+        oscShader.set("phaseFader", p.oscFaders[5]);
+        oscShader.set("xFader", p.oscFaders[6] * 10.0);
+        let oscPg = oscPgs[i];
+        oscPg.beginDraw();
+        oscPg.filter(oscShader);
+        oscPg.endDraw();
+      }
 
       texShader.set("iTime", t);
       texShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
@@ -1179,7 +1186,9 @@ var s = function (p) {
         colorSc[backColIdx][2] / 255.0);
       if(bgpg != undefined)
         texShader.set("pgTex", bgpg);
-      texShader.set("oscTex", oscPg);
+      texShader.set("osc0Tex", oscPgs[0]);
+      texShader.set("osc1Tex", oscPgs[1]);
+      texShader.set("osc2Tex", oscPgs[2]);
       texShader.set("backTex", backPg);
       texShader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
       texShader.set("phaseFader", p.oscFaders[5]);

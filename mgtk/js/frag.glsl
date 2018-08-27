@@ -19,7 +19,9 @@ uniform float rAmountFader;
 
 uniform sampler2D texture;
 uniform sampler2D pgTex;
-uniform sampler2D oscTex;
+uniform sampler2D osc0Tex;
+uniform sampler2D osc1Tex;
+uniform sampler2D osc2Tex;
 uniform sampler2D backTex;
 
 vec2 iRes = vec2(1280, 560);
@@ -33,12 +35,13 @@ void main() {
 	float lfc = length(nFragCoord) - 0.001;
 	float afc = atan(nFragCoord.t, nFragCoord.s);
 
+	vec4 fragCol0 = texture(osc0Tex, vertTexCoord.st);
+
 	vec4 pgCol = texture(pgTex, vertTexCoord.st);
 	vec4 backCol;
   float dth = rAmountFader * 0.01;
 	backCol = texture(backTex, vec2(0.5) + vec2(lfc*cos(afc + dth), lfc*sin(afc + dth)));
 
-	vec4 fragCol0 = texture(oscTex, vertTexCoord.st);
 	vec4 finalColor = pgCol * 2.0 + fragCol0;
   finalColor.rgb = mix(finalColor.rgb, backCol.rgb, feedbackFader);
 	gl_FragColor = finalColor;
