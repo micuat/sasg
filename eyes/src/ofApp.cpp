@@ -1,6 +1,6 @@
 #include "ofApp.h"
 
-bool testMode = true;
+bool testMode = false;
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -73,7 +73,7 @@ void ofApp::update() {
 
 	if (ofGetFrameNum() % 10 == 0 || vcb.isEmpty()) {
 		if (tracker0.getInstances().size() > 0) {
-			auto& points = tracker0.getInstances().at(0).getLandmarks().getImagePoints();
+			auto points = tracker0.getInstances().at(0).getLandmarks().getImagePoints();
 			if (testMode) {
 				vcb.addFrame(input0.getTexture(), points, eyeSlider, mouthSlider);
 			}
@@ -164,16 +164,6 @@ void ofApp::drawMainTexture() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-	if (key == OF_KEY_RIGHT) {
-		curLut = (curLut + 1) % lutList.size();
-		cout << lutList.at(curLut) << endl;
-		setupLut(lutList.at(curLut));
-	}
-	else if (key == OF_KEY_LEFT) {
-		curLut = (curLut - 1 + lutList.size()) % lutList.size();
-		cout << lutList.at(curLut) << endl;
-		setupLut(lutList.at(curLut));
-	}
 }
 
 //--------------------------------------------------------------
