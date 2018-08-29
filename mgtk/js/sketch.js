@@ -531,7 +531,7 @@ var s = function (p) {
       if (seq % this.everyNSeq == 0 || this.execFunc == undefined) {
         let flist = [];
         for (let i in this.funcs) {
-          if (this.preset.length == 0) {
+          if (this.preset == undefined || this.preset.length == 0) {
             flist.push(this.funcs[i]);
           }
           else if (this.preset.indexOf(this.funcs[i].name) >= 0) {
@@ -974,71 +974,44 @@ var s = function (p) {
       lineFunc: ["default"]
     },
     random: {
-      globalTransformFunc: [],
-      backgroundFunc: [],
-      orderFunc: [],
-      transformFunc: [],
-      sigFunc: [],
-      pointFunc: [],
-      lineFunc: []
     },
     toLeft: {
-      parent: "default",
-      backgroundFunc: [],
+      parents: ["default"],
       transformFunc: ["bounceLeft"],
-      sigFunc: [],
-      pointFunc: [],
-      lineFunc: []
     },
     toRight: {
-      parent: "default",
-      backgroundFunc: [],
+      parents: ["default"],
       transformFunc: ["bounceRight"],
-      sigFunc: [],
-      pointFunc: [],
-      lineFunc: []
     },
     toUp: {
-      parent: "default",
-      backgroundFunc: [],
+      parents: ["default"],
       transformFunc: ["bounceUp"],
-      sigFunc: [],
-      pointFunc: [],
-      lineFunc: []
     },
     toDown: {
-      parent: "default",
-      backgroundFunc: [],
+      parents: ["default"],
       transformFunc: ["bounceDown"],
-      sigFunc: [],
-      pointFunc: [],
-      lineFunc: []
+    },
+    flat: {
+      lineFunc: ["default", "rect"]
     },
     toUpFlat: {
-      parent: "toUp",
-      lineFunc: ["default", "rect"]
+      parents: ["toUp", "flat"],
     },
     toDownFlat: {
-      parent: "toDown",
-      lineFunc: ["default", "rect"]
+      parents: ["toDown", "flat"],
     },
     sig: {
-      parent: "default",
-      backgroundFunc: [],
-      transformFunc: [],
+      parents: ["default"],
       sigFunc: ["sineT", "sine", "random"],
       pointFunc: ["inout"],
       lineFunc: ["sig", "sigBar"]
     },
-    toLeftSimple: {
-      parent: "toLeft",
+    toLeftSig: {
+      parents: ["toLeft", "sig"],
       backgroundFunc: ["default"],
-      sigFunc: ["sineT", "sine", "random"],
-      pointFunc: ["inout"],
-      lineFunc: ["sig", "sigBar"]
     },
     justPoint: {
-      parent: "default",
+      parents: ["default"],
       pointFunc: ["inout"]
     }
   };
@@ -1046,7 +1019,7 @@ var s = function (p) {
     {preset: [bPreset.default, bPreset.default, bPreset.default, bPreset.default], backdrop: "default"},
     {preset: [bPreset.toUpFlat, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "beesAndBombs"},
     {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "beesAndBombs"},
-    {preset: [bPreset.toLeftSimple, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "beesAndBombs"},
+    {preset: [bPreset.toLeftSig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "beesAndBombs"},
     {preset: [bPreset.random, bPreset.random, bPreset.random, bPreset.random], backdrop: "ribbons"},
     {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "ribbons"},
     {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "ribbons"},
@@ -1137,9 +1110,10 @@ var s = function (p) {
       let newPreset = {};
       let depthCount = 4;
       function unwrapPreset(newp, libp) {
-        if(libp.parent && depthCount >= 0) {
-          depthCount -= 1;
-          unwrapPreset(newp, bPreset[libp.parent]);
+        if(libp.parents && libp.parents.length > 0 && depthCount >= 0) {
+          for(let i = 0; i < libp.parents.length; i++) {
+            unwrapPreset(newp, bPreset[libp.parents[i]]);
+          }
         }
         for (let key in libp) {
           if(key != "parent") {
