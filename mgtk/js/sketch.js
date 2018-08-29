@@ -1245,14 +1245,15 @@ var s = function (p) {
     p.filter(levelShader);
     p.syphonServer.sendImage(frontPg);
 
+    p.push();
+    p.translate(p.width / 2, p.height / 2);
+
     function drawBeat() {
       beatFader = p.oscFaders[3];
       p.blendMode(p.BLEND);
       // p.background(0);
       p.stroke(255, 255 * beatFader);
       p.strokeWeight(2);
-
-      p.translate(p.width / 2, p.height / 2);
 
       let tween = 0.0;
       if (autoPilot) {
@@ -1284,6 +1285,13 @@ var s = function (p) {
     }
     drawBeat();
     p.syphonServer.sendScreen();
+
+    p.pop();
+    p.translate(p.width / 2, p.height / 2);
+    p.fill(255);
+    p.text(p.str(seq % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 50);
+    p.text(p.str(tElapsed % 1.0), -p.width / 2.0 + 20, p.height / 2.0 - 35);
+    p.text("cur preset: " + p.str(p.oscPreset), -p.width / 2.0 + 20, p.height / 2.0 - 20);
     lastSeq = seq;
   }
 };
