@@ -1145,6 +1145,7 @@ var s = function (p) {
   }
 
   p.draw = function () {
+    let shaderUpdated = false;
     // let t = p.getCount() / 60.0 * (bpm / 120.0);
     tElapsed = p.millis() * 0.001 + p.oscFaders[1];
     let t = tElapsed * (bpm / 120.0);
@@ -1154,6 +1155,7 @@ var s = function (p) {
       texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
       levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
       oscShader = p.loadShader(p.sketchPath(name + "/osc.glsl"));
+      shaderUpdated = true;
     }
 
     if ((seq != lastSeq) || (!autoPilot && doUpdate)) {
@@ -1255,7 +1257,9 @@ var s = function (p) {
     levelShader.set("foregroundTexture", fgpg);
     levelShader.set("masterFader", p.oscFaders[0] * 1.0);
     levelShader.set("seq", seq % 4.0);
-    p.filter(levelShader);
+    if(shaderUpdated == false) {
+      p.filter(levelShader);
+    }
     p.syphonServer.sendImage(frontPg);
 
     p.push();
