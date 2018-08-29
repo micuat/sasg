@@ -1280,7 +1280,7 @@ var s = function (p) {
     p.fill(255);
     p.text(p.str(seq % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 50);
     p.text(p.str(tElapsed % 1.0), -p.width / 2.0 + 20, p.height / 2.0 - 35);
-    p.text("cur preset: " + p.str(p.oscPreset), -p.width / 2.0 + 20, p.height / 2.0 - 20);
+    p.text("cur preset: " + p.str(1 + p.oscPreset), -p.width / 2.0 + 20, p.height / 2.0 - 20);
     lastSeq = seq;
   }
 };
