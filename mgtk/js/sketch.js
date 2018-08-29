@@ -983,85 +983,63 @@ var s = function (p) {
       lineFunc: []
     },
     toLeft: {
-      globalTransformFunc: ["default"],
+      parent: "default",
       backgroundFunc: [],
-      orderFunc: ["default"],
       transformFunc: ["bounceLeft"],
       sigFunc: [],
       pointFunc: [],
       lineFunc: []
     },
     toRight: {
-      globalTransformFunc: ["default"],
+      parent: "default",
       backgroundFunc: [],
-      orderFunc: ["default"],
       transformFunc: ["bounceRight"],
       sigFunc: [],
       pointFunc: [],
       lineFunc: []
     },
     toUp: {
-      globalTransformFunc: ["default"],
+      parent: "default",
       backgroundFunc: [],
-      orderFunc: ["default"],
       transformFunc: ["bounceUp"],
       sigFunc: [],
       pointFunc: [],
       lineFunc: []
     },
     toDown: {
-      globalTransformFunc: ["default"],
+      parent: "default",
       backgroundFunc: [],
-      orderFunc: ["default"],
       transformFunc: ["bounceDown"],
       sigFunc: [],
       pointFunc: [],
       lineFunc: []
     },
     toUpFlat: {
-      globalTransformFunc: ["default"],
-      backgroundFunc: [],
-      orderFunc: ["default"],
-      transformFunc: ["bounceUp"],
-      sigFunc: [],
-      pointFunc: [],
+      parent: "toUp",
       lineFunc: ["default", "rect"]
     },
     toDownFlat: {
-      globalTransformFunc: ["default"],
-      backgroundFunc: [],
-      orderFunc: ["default"],
-      transformFunc: ["bounceDown"],
-      sigFunc: [],
-      pointFunc: [],
+      parent: "toDown",
       lineFunc: ["default", "rect"]
     },
     sig: {
-      globalTransformFunc: ["default"],
+      parent: "default",
       backgroundFunc: [],
-      orderFunc: ["default"],
       transformFunc: [],
       sigFunc: ["sineT", "sine", "random"],
       pointFunc: ["inout"],
       lineFunc: ["sig", "sigBar"]
     },
     toLeftSimple: {
-      globalTransformFunc: ["default"],
+      parent: "toLeft",
       backgroundFunc: ["default"],
-      orderFunc: ["default"],
-      transformFunc: ["bounceLeft"],
       sigFunc: ["sineT", "sine", "random"],
       pointFunc: ["inout"],
       lineFunc: ["sig", "sigBar"]
     },
     justPoint: {
-      globalTransformFunc: ["default"],
-      backgroundFunc: ["default"],
-      orderFunc: ["default"],
-      transformFunc: ["default"],
-      sigFunc: ["default"],
-      pointFunc: ["inout"],
-      lineFunc: ["default"]
+      parent: "default",
+      pointFunc: ["inout"]
     }
   };
   let midiToPreset = [
@@ -1075,12 +1053,6 @@ var s = function (p) {
     {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "ribbons"},
     {preset: [bPreset.sig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "ribbons"},
     {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "ribbons"},
-    // [bPreset.bees, bPreset.bees, bPreset.bees, bPreset.bees],
-    // [bPreset.ribbons, bPreset.ribbons, bPreset.ribbons, bPreset.ribbons],
-    // [bPreset.toLeft, bPreset.toRight, bPreset.toLeft, bPreset.toDown],
-    // [bPreset.toLeft, bPreset.toRight, bPreset.toUp, bPreset.toDown],
-    // [bPreset.gameOfLife, bPreset.gameOfLife, bPreset.default, bPreset.default],
-    // [bPreset.dots, bPreset.dots, bPreset.dots, bPreset.dots]
   ]
 
   let startFrame;
