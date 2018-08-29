@@ -1284,9 +1284,9 @@ var s = function (p) {
       }
     }
     drawBeat();
+    p.pop();
     p.syphonServer.sendScreen();
 
-    p.pop();
     p.translate(p.width / 2, p.height / 2);
     p.fill(255);
     p.text(p.str(seq % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 50);
