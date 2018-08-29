@@ -1159,15 +1159,28 @@ var s = function (p) {
     if ((seq != lastSeq) || (!autoPilot && doUpdate)) {
       doUpdate = false;
       targetII = Math.floor(p.random(-1, 2));
+
+      let newPreset = {};
+      let depthCount = 4;
+      function unwrapPreset(newp, libp) {
+        if(libp.parent && depthCount >= 0) {
+          depthCount -= 1;
+          unwrapPreset(newp, bPreset[libp.parent]);
+        }
+        for (let key in libp) {
+          if(key != "parent") {
+            newp[key] = libp[key];
+          }
+        }
+      }
+      unwrapPreset(newPreset, midiToPreset[p.oscPreset].preset[seq % 4]);
       for (let i in functions) {
         let funcTypeName = functions[i];
-        let curPreset;
         if(funcTypeName == "backdropFunc") {
           funcAssets[funcTypeName].preset = midiToPreset[p.oscPreset].backdrop;
         }
         else {
-          curPreset = midiToPreset[p.oscPreset].preset[seq % 4];
-          funcAssets[funcTypeName].preset = curPreset[funcTypeName];
+          funcAssets[funcTypeName].preset = newPreset[funcTypeName];
         }
         funcAssets[funcTypeName].update(seq);
       }
