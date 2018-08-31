@@ -443,6 +443,25 @@ var SDots = function (p) {
   }
 };
 
+var SFace = function (p) {
+  this.alpha = 1.0;
+  this.tween = 0.0;
+
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    bgpg.beginDraw();
+    bgpg.clear();
+    for(let i = 0; i < p.facePoints.length; i++) {
+      let x = p.facePoints[i][0] * 0.5;
+      let y = p.facePoints[i][1] * 0.5;
+      bgpg.ellipse(x, y, 4, 4)
+    }
+    bgpg.endDraw();
+  };
+};
+
 var frontPg;
 var backPg;
 var bgpg;
@@ -457,6 +476,7 @@ var s = function (p) {
   let sRibbons = new SRibbons(p);
   let sBeesAndBombs = new SBeesAndBombs(p);
   let sDots = new SDots(p);
+  let sFace = new SFace(p);
 
   function Agent(t, tween, ii, jj, isTarget) {
     this.t = t;
@@ -682,6 +702,20 @@ var s = function (p) {
       },
       setup: function () {
         sDots.setup();
+      }
+    },
+    {
+      name: "face",
+      f: function (tween) {
+        let alpha = 1.0 - tween;
+        p.push();
+        sFace.tween = tween;
+        sFace.alpha = alpha * beatFader;
+        sFace.draw();
+        p.pop();
+      },
+      setup: function () {
+        sFace.setup();
       }
     }]);
   funcAssets.backgroundFunc = new FuncList(1, [
@@ -1026,6 +1060,7 @@ var s = function (p) {
     {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "ribbons"},
     {preset: [bPreset.sig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "ribbons"},
     {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "ribbons"},
+    {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "face"},
   ]
 
   let startFrame;
