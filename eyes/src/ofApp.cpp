@@ -33,6 +33,8 @@ void ofApp::setup() {
 
 	shader.load("Shaders/tone");
 	ofEnableAlphaBlending();
+    
+    mainOutputSyphonServer.setName("Face Output");
 }
 
 //--------------------------------------------------------------
@@ -104,6 +106,8 @@ void ofApp::draw() {
     
     mainTexture.draw(0, 0);
 	gui.draw();
+    
+    mainOutputSyphonServer.publishScreen();
 }
 
 //--------------------------------------------------------------
