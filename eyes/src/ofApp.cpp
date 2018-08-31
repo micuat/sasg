@@ -14,8 +14,10 @@ void ofApp::setup() {
     mainTexture.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 
     // ofxSubscribeOsc(8001, "/mm/swapper/eyetween", eyeTween);
+    ofxPublishOsc("localhost", 13000, "/face/points", facePoints);
+    facePoints.resize(68);
 
-	// Setup tracker
+    // Setup tracker
 	tracker0.setup();
 	tracker1.setup();
 
@@ -70,44 +72,54 @@ void ofApp::update() {
 		grabber.update();
 		if (grabber.isFrameNew()) {
 			tracker0.update(grabber);
+            if(tracker0.getInstances().size() > 0) {
+                auto points = tracker0.getInstances().at(0).getLandmarks().getImagePoints();
+                int i = 0;
+                for(auto& p: points) {
+                    facePoints.at(i).x = p.x;
+                    facePoints.at(i).y = p.y;
+                    i++;
+                }
+            }
 		}
 	}
 
-	if (ofGetFrameNum() % 10 == 0 || vcb.isEmpty()) {
-		if (tracker0.getInstances().size() > 0) {
-			auto points = tracker0.getInstances().at(0).getLandmarks().getImagePoints();
-			if (testMode) {
-				vcb.addFrame(input0.getTexture(), points, eyeSlider, mouthSlider);
-			}
-			else {
-				vcb.addFrame(grabber.getTexture(), points, eyeSlider, mouthSlider);
-			}
-		}
-	}
-	vcb.updateLerpFrame((ofGetFrameNum() % 30) / 30.0f);
-	tracker1.update(input1);
+//    if (ofGetFrameNum() % 10 == 0 || vcb.isEmpty()) {
+//        if (tracker0.getInstances().size() > 0) {
+//            auto points = tracker0.getInstances().at(0).getLandmarks().getImagePoints();
+//            if (testMode) {
+//                vcb.addFrame(input0.getTexture(), points, eyeSlider, mouthSlider);
+//            }
+//            else {
+//                vcb.addFrame(grabber.getTexture(), points, eyeSlider, mouthSlider);
+//            }
+//        }
+//    }
+//    vcb.updateLerpFrame((ofGetFrameNum() % 30) / 30.0f);
+//    tracker1.update(input1);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
 	ofBackground(0);
+    tracker0.drawDebug();
 
-	// check if there is a face
-	if (tracker0.getInstances().size() == 0 || tracker1.getInstances().size() == 0) {
-		qualitySlider = qualitySlider - 0.01f;
-		if (qualitySlider < 0.0f) qualitySlider = 0.0f;
-	}
-	else {
-		qualitySlider = qualitySlider + 0.01f;
-		if (qualitySlider > 1.0f) qualitySlider = 1.0f;
-	}
-
-	drawMainTexture();
-    
-    mainTexture.draw(0, 0);
-	gui.draw();
-    
-    mainOutputSyphonServer.publishScreen();
+//    // check if there is a face
+//    if (tracker0.getInstances().size() == 0 || tracker1.getInstances().size() == 0) {
+//        qualitySlider = qualitySlider - 0.01f;
+//        if (qualitySlider < 0.0f) qualitySlider = 0.0f;
+//    }
+//    else {
+//        qualitySlider = qualitySlider + 0.01f;
+//        if (qualitySlider > 1.0f) qualitySlider = 1.0f;
+//    }
+//
+//    drawMainTexture();
+//
+//    mainTexture.draw(0, 0);
+//    gui.draw();
+//
+//    mainOutputSyphonServer.publishScreen();
 }
 
 //--------------------------------------------------------------

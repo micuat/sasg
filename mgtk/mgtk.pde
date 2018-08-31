@@ -36,6 +36,7 @@ public float[] oscFaders = new float[20];
 public int oscPreset = 0;
 public int[] oscButton = new int[57];
 public int seqOffset = 0;
+public float[][] facePoints = new float[68][2];
 
 import oscP5.*;
 import netP5.*;

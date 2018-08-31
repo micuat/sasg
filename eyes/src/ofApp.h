@@ -190,6 +190,8 @@ public:
     ofVideoPlayer input0;
     ofImage input1;
     ofxAutoReloadedShader shader;
+    
+    vector<glm::vec2> facePoints;
 
 	VideoCircleBuffer vcb;
 

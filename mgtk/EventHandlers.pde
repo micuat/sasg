@@ -161,6 +161,12 @@ void oscEvent(OscMessage theOscMessage) {
       oscButton[index] = theOscMessage.get(1).intValue() > 0 ? 1 : 0;
     }
   }
+  else if (theOscMessage.checkAddrPattern("/face/points")==true) {
+    for(int i = 0; i < 68; i++) {
+      facePoints[i][0] = theOscMessage.get(i * 2 + 0).floatValue();
+      facePoints[i][1] = theOscMessage.get(i * 2 + 1).floatValue();
+    }
+  }
   //try {
   //  nashorn.eval("for(var prop in pApplet) {if(!this.isReservedFunction(prop)) {globalSketch[prop] = pApplet[prop]}}");
 
