@@ -53,6 +53,8 @@ var SLines = function (p) {
   let targetII;
   let agents = [];
 
+  let pg = fgpg;
+
   function Agent(t, tween, ii, jj, isTarget) {
     this.t = t;
     this.ii = ii;
@@ -96,24 +98,26 @@ var SLines = function (p) {
     }
 
     this.draw = function () {
-      p.push();
+      pg.pushMatrix();
+      pg.pushStyle();
       if (this.isTarget) {
-        p.stroke(255, 180 * beatFader);
+        pg.stroke(255, 180 * beatFader);
       }
       else {
-        p.stroke(255, 255 * beatFader);
+        pg.stroke(255, 255 * beatFader);
       }
 
-      this.l = p.width / 3.0;
+      this.l = windowWidth / 3.0;
 
-      p.translate(this.ii * p.width / 3, 0);
+      pg.translate(this.ii * windowWidth / 3, 0);
       funcAssets.backgroundFunc.exec(this);
 
-      p.translate(-this.l / 2.0, 0);
+      pg.translate(-this.l / 2.0, 0);
       funcAssets.transformFunc.exec(this);
       funcAssets.lineFunc.exec(this);
 
-      p.pop();
+      pg.popStyle();
+      pg.popMatrix();
     }
   }
 
@@ -135,7 +139,7 @@ var SLines = function (p) {
         else {
           tw = 1.0 - Math.pow(p.map(tw, 0, 1, 1, 0), 4.0) * 0.5;
         }
-        p.translate(tw * p.width / 3.0, 0.0);
+        pg.translate(tw * windowWidth / 3.0, 0.0);
       }
     }
     ,
@@ -149,7 +153,7 @@ var SLines = function (p) {
         else {
           tw = 1.0 - Math.pow(p.map(tw, 0, 1, 1, 0), 4.0) * 0.5;
         }
-        p.translate(-tw * p.width / 3.0, 0.0);
+        pg.translate(-tw * windowWidth / 3.0, 0.0);
       }
     }]);
   funcAssets.backgroundFunc = new FuncList(1, [
@@ -162,30 +166,34 @@ var SLines = function (p) {
       name: "blink",
       f: function (agent) {
         let alpha = agent.tweenPowReturn();
-        p.push();
-        p.fill(255, 255 * alpha * beatFader);
-        p.noStroke();
+        pg.pushMatrix();
+        pg.pushStyle();
+        pg.fill(255, 255 * alpha * beatFader);
+        pg.noStroke();
         let pw = 1280 * 0.5 / 3.0;
         let n = pw / 10.0;
-        p.rect(-pw * 0.5, -p.height * 0.5, pw, p.height);
-        p.pop();
+        pg.rect(-pw * 0.5, -windowHeight * 0.5, pw, windowHeight);
+        pg.popStyle();
+        pg.popMatrix();
       }
     },
     {
       name: "grid",
       f: function (agent) {
         let alpha = agent.tweenPowReturn();
-        p.push();
-        p.stroke(255, 255 * alpha * beatFader);
-        p.strokeWeight(1.0);
+        pg.pushMatrix();
+        pg.pushStyle();
+        pg.stroke(255, 255 * alpha * beatFader);
+        pg.strokeWeight(1.0);
         let pw = 1280 * 0.5 / 3.0;
         let n = pw / 10.0;
         for (let j = -6; j <= 6; j++) {
           if (j >= -5 && j <= 5)
-            p.line(j * n, -p.height * 0.5, j * n, p.height * 0.5);
-          p.line(-pw * 0.5, j * n, pw * 0.5, j * n);
+            pg.line(j * n, -windowHeight * 0.5, j * n, windowHeight * 0.5);
+          pg.line(-pw * 0.5, j * n, pw * 0.5, j * n);
         }
-        p.pop();
+        pg.popStyle();
+        pg.popMatrix();
       }
     }]);
   funcAssets.orderFunc = new FuncList(1, [
@@ -221,13 +229,13 @@ var SLines = function (p) {
     {
       name: "bounceDown",
       f: function (agent) {
-        p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+        pg.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
       }
     },
     {
       name: "bounceUp",
       f: function (agent) {
-        p.translate(0.0, agent.tweenPowReturn() * -150, 0.0);
+        pg.translate(0.0, agent.tweenPowReturn() * -150, 0.0);
       }
     },
     {
@@ -239,9 +247,9 @@ var SLines = function (p) {
     {
       name: "bounceRight",
       f: function (agent) {
-        p.translate(agent.l * 0.5, 0);
-        p.scale(-1, 1);
-        p.translate(-agent.l * 0.5, 0);
+        pg.translate(agent.l * 0.5, 0);
+        pg.scale(-1, 1);
+        pg.translate(-agent.l * 0.5, 0);
         agent.l *= (1.0 - agent.tweenPowReturn());
       }
     },
@@ -249,10 +257,10 @@ var SLines = function (p) {
       name: "toDown",
       f: function (agent) {
         if (agent.tween < 0.5) {
-          p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+          pg.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
         }
         else {
-          p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
+          pg.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
         }
       }
     },
@@ -260,17 +268,17 @@ var SLines = function (p) {
       name: "toUp",
       f: function (agent) {
         if (agent.tween < 0.5) {
-          p.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
+          pg.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
         }
         else {
-          p.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+          pg.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
         }
       }
     },
     {
       name: "rotateY",
       f: function (agent) {
-        p.rotateY(agent.tween * Math.PI);
+        pg.rotateY(agent.tween * Math.PI);
       }
     }]);
   funcAssets.sigFunc = new FuncList(1, [
@@ -302,50 +310,55 @@ var SLines = function (p) {
     {
       name: "default",
       f: function (x, y, tween) {
-        p.ellipse(x, y, 7);
+        pg.ellipse(x, y, 7, 7);
       }
     },
     {
       name: "out",
       f: function (x, y, tween) {
-        p.ellipse(x, y, 7);
-        p.push();
+        pg.ellipse(x, y, 7, 7);
+        pg.pushMatrix();
+        pg.pushStyle();
         let r = 1.0;
         let alpha = 1.0;
         if (tween < 0.5) {
           r *= p.map(tween, 0, 0.5, 1.0, 10.0);
           alpha *= p.map(tween, 0, 0.5, 1.0, 0.0);
-          p.noFill();
-          p.stroke(255, 255 * alpha * beatFader);
-          p.strokeWeight(1.0);
-          p.ellipse(x, y, 7 * r);
+          pg.noFill();
+          pg.stroke(255, 255 * alpha * beatFader);
+          pg.strokeWeight(1.0);
+          pg.ellipse(x, y, 7 * r, 7 * r);
         }
-        p.pop();
+        pg.popStyle();
+        pg.popMatrix();
       }
     },
     {
       name: "in",
       f: function (x, y, tween) {
-        p.ellipse(x, y, 7);
-        p.push();
+        pg.ellipse(x, y, 7, 7);
+        pg.pushMatrix();
+        pg.pushStyle();
         let r = 1.0;
         let alpha = 1.0;
         if (tween > 0.5) {
           r *= p.map(tween, 0.5, 1.0, 10.0, 1.0);
           alpha *= p.map(tween, 0.5, 1.0, 0.0, 1.0);
-          p.noFill();
-          p.stroke(255, 255 * alpha * beatFader);
-          p.strokeWeight(1.0);
-          p.ellipse(x, y, 7 * r);
+          pg.noFill();
+          pg.stroke(255, 255 * alpha * beatFader);
+          pg.strokeWeight(1.0);
+          pg.ellipse(x, y, 7 * r, 7 * r);
         }
-        p.pop();
+        pg.popStyle();
+        pg.popMatrix();
       }
     },
     {
       name: "inout",
       f: function (x, y, tween) {
-        p.ellipse(x, y, 7);
-        p.push();
+        pg.ellipse(x, y, 7, 7);
+        pg.pushMatrix();
+        pg.pushStyle();
         let r = 1.0;
         let alpha = 1.0;
         if (tween < 0.5) {
@@ -356,70 +369,75 @@ var SLines = function (p) {
           r *= p.map(tween, 0.5, 1.0, 10.0, 1.0);
           alpha *= p.map(tween, 0.5, 1.0, 0.0, 1.0);
         }
-        p.noFill();
-        p.stroke(255, 255 * alpha * beatFader);
-        p.strokeWeight(1.0);
-        p.ellipse(x, y, 7 * r);
-        p.pop();
+        pg.noFill();
+        pg.stroke(255, 255 * alpha * beatFader);
+        pg.strokeWeight(1.0);
+        pg.ellipse(x, y, 7 * r, 7 * r);
+        pg.popStyle();
+        pg.popMatrix();
       }
     }]);
   funcAssets.lineFunc = new FuncList(1, [
     {
       name: "default",
       f: function (agent) {
-        p.fill(255, 255 * beatFader);
+        pg.fill(255, 255 * beatFader);
         funcAssets.pointFunc.exec(0, 0, agent.tween);
-        p.line(0, 0, agent.l, 0);
+        pg.line(0, 0, agent.l, 0);
         funcAssets.pointFunc.exec(agent.l, 0, agent.tween);
       }
     },
     {
       name: "sig",
       f: function (agent) {
-        p.fill(255, 255 * beatFader);
+        pg.fill(255, 255 * beatFader);
         funcAssets.pointFunc.exec(0, 0, agent.tween);
         let tw = agent.tweenPowReturn();
-        p.noFill();
-        p.beginShape(p.POINTS);
+        pg.noFill();
+        pg.beginShape(p.POINTS);
         for (let dx = 0.0; dx < agent.l; dx += 1.0) {
           let y = Math.sin(dx / agent.l * Math.PI) * funcAssets.sigFunc.exec(dx, tw, agent.l) * tw;
-          p.vertex(dx, y * 75);
+          pg.vertex(dx, y * 75);
         }
-        p.endShape();
+        pg.endShape();
         funcAssets.pointFunc.exec(agent.l, 0, agent.tween);
       }
     },
     {
       name: "sigBar",
       f: function (agent) {
-        p.fill(255, 255 * beatFader);
+        pg.fill(255, 255 * beatFader);
         funcAssets.pointFunc.exec(0, 0, agent.tween);
         let tw = agent.tweenPowReturn();
-        p.line(0, 0, agent.l, 0);
-        p.push();
-        p.strokeWeight(1.0);
-        p.noFill();
-        p.beginShape(p.LINES);
+        pg.line(0, 0, agent.l, 0);
+        pg.pushMatrix();
+        pg.pushStyle();
+        pg.strokeWeight(1.0);
+        pg.noFill();
+        pg.beginShape(p.LINES);
         for (let dx = 0.0; dx < agent.l; dx += 4.0) {
           let y = Math.sin(dx / agent.l * Math.PI) * funcAssets.sigFunc.exec(dx, tw, agent.l) * tw;
-          p.vertex(dx, y * 75);
-          p.vertex(dx, 0);
+          pg.vertex(dx, y * 75);
+          pg.vertex(dx, 0);
         }
-        p.endShape();
-        p.pop();
+        pg.endShape();
+        pg.popStyle();
+        pg.popMatrix();
         funcAssets.pointFunc.exec(agent.l, 0, agent.tween);
       }
     },
     {
       name: "rect",
       f: function (agent) {
-        p.fill(255, 255 * beatFader);
+        pg.fill(255, 255 * beatFader);
         funcAssets.pointFunc.exec(0, 0, agent.tween);
-        p.push();
-        p.noFill();
-        p.rotateX(Math.PI * 0.5 + agent.tween * Math.PI * 2.0);
-        p.rect(0, -50, agent.l, 100);
-        p.pop();
+        pg.pushMatrix();
+        pg.pushStyle();
+        pg.noFill();
+        pg.rotateX(Math.PI * 0.5 + agent.tween * Math.PI * 2.0);
+        pg.rect(0, -50, agent.l, 100);
+        pg.popStyle();
+        pg.popMatrix();
         funcAssets.pointFunc.exec(agent.l, 0, agent.tween);
       }
     }]);
@@ -500,6 +518,9 @@ var SLines = function (p) {
   }
 
   this.draw = function () {
+    pg = fgpg;
+    pg.beginDraw();
+    pg.clear();
     let t = tElapsed * (bpm / 120.0);
     if (seq != lastSeq) {
       targetII = Math.floor(p.random(-1, 2));
@@ -525,12 +546,13 @@ var SLines = function (p) {
       }
     }
 
-    p.push();
-    p.translate(p.width / 2, p.height / 2);
+    pg.pushMatrix();
+    pg.pushStyle();
+    pg.translate(windowWidth / 2, windowHeight / 2);
     function drawBeat() {
       beatFader = p.oscFaders[3];
-      p.stroke(255, 255 * beatFader);
-      p.strokeWeight(2);
+      pg.stroke(255, 255 * beatFader);
+      pg.strokeWeight(2);
 
       let tween = 0.0;
       tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
@@ -547,7 +569,9 @@ var SLines = function (p) {
       }
     }
     drawBeat();
-    p.pop();
+    pg.popStyle();
+    pg.popMatrix();
+    pg.endDraw();
   };
 };
 
@@ -1190,7 +1214,6 @@ var s = function (p) {
     p.frameRate(60);
     startFrame = p.frameCount;
 
-    pg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (frontPg == undefined)
       frontPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (backPg == undefined)
