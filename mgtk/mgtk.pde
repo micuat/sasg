@@ -47,6 +47,7 @@ import codeanticode.syphon.*;
 
 import processing.video.*;
 public ArrayList<Movie> movies = new ArrayList<Movie>();
+public Capture cam;
 
 OscP5 oscP5;
 NetAddress myRemoteLocation;
@@ -94,7 +95,7 @@ void setup() {
   //gPdf = (PGraphicsPDF)g;
   surface.setResizable(true);
   frameRate(60);
-  
+
 
   libPaths.add(sketchPath("libs/event-loop-nashorn.js"));
   libPaths.add(sketchPath("libs/shader-helper.js"));
@@ -104,7 +105,6 @@ void setup() {
   scriptPaths.add(sketchPath(folderName + "/sketch.js"));
 
   syphonServer = new SyphonServer(this, "mgtk");
-
 }
 
 public void loadVideos(int i) {
@@ -112,7 +112,7 @@ public void loadVideos(int i) {
   File[] files = listFiles(sketchPath() + "/data/videos");
   println(files.length);
   //for (int i = 0; i < files.length; i++)
-  if(i < files.length)
+  if (i < files.length)
   {
     File f = files[i];
     println(f.getName());
@@ -121,6 +121,30 @@ public void loadVideos(int i) {
     myMovie.stop();
     //myMovie.loop();
     movies.add(myMovie);
+  }
+}
+
+void setupCamera() {
+  String[] cameras = Capture.list();
+
+  if (cameras == null) {
+    println("Failed to retrieve the list of available cameras, will try the default...");
+    cam = new Capture(this, 1280, 720);
+  } else if (cameras.length == 0) {
+    println("There are no cameras available for capture.");
+    exit();
+  } else {
+    println("Available cameras:");
+    printArray(cameras);
+
+    // The camera can be initialized directly using an element
+    // from the array returned by list():
+    cam = new Capture(this, cameras[0]);
+    // Or, the settings can be defined based on the text in the list
+    //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
+
+    // Start capturing the images from the camera
+    cam.start();
   }
 }
 // Called every time a new frame is available to read
@@ -273,6 +297,8 @@ void draw() {
   //if(frameCount < 42) loadVideos(frameCount);
 
   if (libInited == false) {
+    setupCamera();
+
     try {
       initNashorn();
       readLibs(libPaths);

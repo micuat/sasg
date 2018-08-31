@@ -451,8 +451,14 @@ var SFace = function (p) {
   }
 
   this.draw = function () {
+    if (p.cam.available() == true) {
+      p.cam.read();
+    }
+
     bgpg.beginDraw();
     bgpg.clear();
+    bgpg.image(p.cam, 0, 0, 1280/2, 720/2);
+
     for(let i = 0; i < p.facePoints.length; i++) {
       let x = p.facePoints[i][0] * 0.5;
       let y = p.facePoints[i][1] * 0.5;
