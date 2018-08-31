@@ -1346,7 +1346,7 @@ var s = function (p) {
     levelShader.set("foregroundTexture", fgpg);
     levelShader.set("masterFader", p.oscFaders[0] * 1.0);
     levelShader.set("seq", seq % 4.0);
-    if(shaderUpdated == false) {
+    if(true || shaderUpdated == false) {
       p.filter(levelShader);
     }
     p.syphonServer.sendImage(frontPg);
