@@ -49,6 +49,7 @@ var SLines = function (p) {
   this.alpha = 1.0;
   this.tween = 0.0;
 
+  let beatFader = 1.0; // TODO: update from parent patch
   let targetII;
   let agents = [];
 
@@ -149,114 +150,6 @@ var SLines = function (p) {
           tw = 1.0 - Math.pow(p.map(tw, 0, 1, 1, 0), 4.0) * 0.5;
         }
         p.translate(-tw * p.width / 3.0, 0.0);
-      }
-    }]);
-  funcAssets.backdropFunc = new FuncList(4, [
-    {
-      name: "default",
-      f: function (tween) {
-        bgpg.beginDraw();
-        bgpg.clear();
-        bgpg.endDraw();
-      }
-    },
-    {
-      name: "circleMorph",
-      f: function (tween) {
-        bgpg.beginDraw();
-        bgpg.clear();
-        bgpg.endDraw();
-        let alpha = 1.0 - tween;
-        p.push();
-        p.stroke(255, beatFader * alpha * 255);
-        sCircleMorph.draw();
-        p.pop();
-      }
-    },
-    {
-      name: "starField",
-      f: function (tween) {
-        bgpg.beginDraw();
-        bgpg.clear();
-        bgpg.endDraw();
-        let alpha = 1.0 - tween;
-        p.push();
-        p.translate(tween * p.width / 3.0, 0);
-        sStarField.alpha = alpha * beatFader;
-        sStarField.draw();
-        p.pop();
-      }
-    },
-    {
-      name: "gameOfLife",
-      f: function (tween) {
-        bgpg.beginDraw();
-        bgpg.clear();
-        bgpg.endDraw();
-        let alpha = 1.0 - tween;
-        p.push();
-        sGameOfLife.alpha = alpha * beatFader;
-        sGameOfLife.draw();
-        p.pop();
-      },
-      setup: function () {
-        sGameOfLife.setup();
-      }
-    },
-    {
-      name: "ribbons",
-      f: function (tween) {
-        let alpha = 1.0 - tween;
-        p.push();
-        sRibbons.tween = tween;
-        sRibbons.alpha = alpha * beatFader;
-        sRibbons.draw();
-        p.pop();
-      },
-      setup: function () {
-        sRibbons.setup();
-      }
-    },
-    {
-      name: "beesAndBombs",
-      f: function (tween) {
-        let alpha = 1.0 - tween;
-        p.push();
-        sBeesAndBombs.tween = tween;
-        sBeesAndBombs.alpha = alpha * beatFader;
-        sBeesAndBombs.draw();
-        p.pop();
-      },
-      setup: function () {
-        sBeesAndBombs.setup();
-      }
-    },
-    {
-      name: "dots",
-      f: function (tween) {
-        let alpha = 1.0 - tween;
-        p.push();
-        sDots.tween = tween;
-        sDots.alpha = alpha * beatFader;
-        sDots.draw();
-        p.pop();
-      },
-      setup: function () {
-        sDots.setup();
-      }
-    },
-    {
-      name: "face",
-      f: function (tween) {
-        let alpha = 1.0 - tween;
-        p.push();
-        sFace.tween = tween;
-        sFace.alpha = alpha * beatFader;
-        sFace.draw();
-        p.pop();
-      },
-      setup: function () {
-        sFace.setup();
       }
     }]);
   funcAssets.backgroundFunc = new FuncList(1, [
@@ -531,7 +424,6 @@ var SLines = function (p) {
       }
     }]);
   let functions = ["globalTransformFunc",
-    "backdropFunc",
     "backgroundFunc",
     "orderFunc",
     "transformFunc",
@@ -591,23 +483,24 @@ var SLines = function (p) {
     }
   };
   let midiToPreset = [
-    {preset: [bPreset.default, bPreset.default, bPreset.default, bPreset.default], backdrop: "default"},
-    {preset: [bPreset.toUpFlat, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "beesAndBombs"},
-    {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "beesAndBombs"},
-    {preset: [bPreset.toLeftSig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "beesAndBombs"},
-    {preset: [bPreset.random, bPreset.random, bPreset.random, bPreset.random], backdrop: "ribbons"},
-    {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "ribbons"},
-    {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "ribbons"},
-    {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat], backdrop: "ribbons"},
-    {preset: [bPreset.sig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "ribbons"},
-    {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "ribbons"},
-    {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "face"},
+    {preset: [bPreset.default, bPreset.default, bPreset.default, bPreset.default]},
+    {preset: [bPreset.toUpFlat, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat]},
+    {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat]},
+    {preset: [bPreset.toLeftSig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint]},
+    {preset: [bPreset.random, bPreset.random, bPreset.random, bPreset.random]},
+    {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat]},
+    {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint]},
+    {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat]},
+    {preset: [bPreset.sig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint]},
+    {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint]},
+    {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint]},
   ]
 
   this.setup = function () {
   }
 
   this.draw = function () {
+    let t = tElapsed * (bpm / 120.0);
     if (seq != lastSeq) {
       targetII = Math.floor(p.random(-1, 2));
       let newPreset = {};
@@ -625,22 +518,22 @@ var SLines = function (p) {
         }
       }
       unwrapPreset(newPreset, midiToPreset[p.oscPreset].preset[seq % 4]);
+      for (let i in functions) {
+        let funcTypeName = functions[i];
+        funcAssets[funcTypeName].preset = newPreset[funcTypeName];
+        funcAssets[funcTypeName].update(seq);
+      }
     }
 
     p.push();
     p.translate(p.width / 2, p.height / 2);
-
     function drawBeat() {
       beatFader = p.oscFaders[3];
-      p.blendMode(p.BLEND);
-      // p.background(0);
       p.stroke(255, 255 * beatFader);
       p.strokeWeight(2);
 
       let tween = 0.0;
       tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
-
-      let tween2 = 0.0;
 
       funcAssets.globalTransformFunc.exec(tween);
 
@@ -1146,20 +1039,6 @@ var s = function (p) {
   let sDots = new SDots(p);
   let sFace = new SFace(p);
 
-  let midiToPreset = [
-    {preset: "default"},
-    {preset: "beesAndBombs"},
-    {preset: "beesAndBombs"},
-    {preset: "beesAndBombs"},
-    {preset: "ribbons"},
-    {preset: "ribbons"},
-    {preset: "ribbons"},
-    {preset: "ribbons"},
-    {preset: "ribbons"},
-    {preset: "ribbons"},
-    {preset: "face"},
-  ]
-
   let startFrame;
   let doUpdate = true;
   let curCol = [0, 0, 0];
@@ -1173,6 +1052,21 @@ var s = function (p) {
         bgpg.beginDraw();
         bgpg.clear();
         bgpg.endDraw();
+      }
+    },
+    {
+      name: "lines",
+      f: function (tween) {
+        bgpg.beginDraw();
+        bgpg.clear();
+        bgpg.endDraw();
+        let alpha = 1.0 - tween;
+        p.push();
+        sLines.draw();
+        p.pop();
+      },
+      setup: function () {
+        sLines.setup();
       }
     },
     {
@@ -1273,7 +1167,22 @@ var s = function (p) {
       setup: function () {
         sFace.setup();
       }
-    }]);
+    }
+  ]);
+
+  let midiToPreset = [
+    {preset: "lines"},//"default"},
+    {preset: "beesAndBombs"},
+    {preset: "beesAndBombs"},
+    {preset: "beesAndBombs"},
+    {preset: "ribbons"},
+    {preset: "ribbons"},
+    {preset: "ribbons"},
+    {preset: "ribbons"},
+    {preset: "ribbons"},
+    {preset: "ribbons"},
+    {preset: "face"},
+  ];
 
   p.setup = function () {
     name = p.folderName;
@@ -1325,6 +1234,7 @@ var s = function (p) {
   }
 
   p.draw = function () {
+    p.background(0);
     let shaderUpdated = false;
     // let t = p.getCount() / 60.0 * (bpm / 120.0);
     tElapsed = p.millis() * 0.001 + p.oscFaders[1];
