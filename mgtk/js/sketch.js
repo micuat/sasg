@@ -520,7 +520,6 @@ var SLines = function (p) {
   this.draw = function () {
     pg = fgpg;
     pg.beginDraw();
-    pg.clear();
     let t = tElapsed * (bpm / 120.0);
     if (seq != lastSeq) {
       targetII = Math.floor(p.random(-1, 2));
@@ -1085,9 +1084,7 @@ var s = function (p) {
         bgpg.clear();
         bgpg.endDraw();
         let alpha = 1.0 - tween;
-        p.push();
         sLines.draw();
-        p.pop();
       },
       setup: function () {
         sLines.setup();
@@ -1140,11 +1137,10 @@ var s = function (p) {
       name: "ribbons",
       f: function (tween) {
         let alpha = 1.0 - tween;
-        p.push();
         sRibbons.tween = tween;
         sRibbons.alpha = alpha * beatFader;
         sRibbons.draw();
-        p.pop();
+        sLines.draw();
       },
       setup: function () {
         sRibbons.setup();
@@ -1154,11 +1150,10 @@ var s = function (p) {
       name: "beesAndBombs",
       f: function (tween) {
         let alpha = 1.0 - tween;
-        p.push();
         sBeesAndBombs.tween = tween;
         sBeesAndBombs.alpha = alpha * beatFader;
         sBeesAndBombs.draw();
-        p.pop();
+        sLines.draw();
       },
       setup: function () {
         sBeesAndBombs.setup();
@@ -1195,7 +1190,7 @@ var s = function (p) {
   ]);
 
   let midiToPreset = [
-    {preset: "lines"},//"default"},
+    {preset: "default"},
     {preset: "beesAndBombs"},
     {preset: "beesAndBombs"},
     {preset: "beesAndBombs"},
@@ -1277,6 +1272,9 @@ var s = function (p) {
     }
 
     let tween2 = (t * 0.5 % 1.0) * 2.0 - 1.0;
+    fgpg.beginDraw();
+    fgpg.clear();
+    fgpg.endDraw();
     funcAssets.exec(tween2);
 
     let colorSc = [
