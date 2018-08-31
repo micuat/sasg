@@ -1080,144 +1080,143 @@ var s = function (p) {
   let beatFader = 1;
   let texShader, levelShader;
 
-  let funcAssets = new FuncList(4, [
-    {
-      name: "default",
-      f: function (tween) {
-        bgpg.beginDraw();
-        bgpg.clear();
-        bgpg.endDraw();
-      }
-    },
-    {
-      name: "lines",
-      f: function (tween) {
-        bgpg.beginDraw();
-        bgpg.clear();
-        bgpg.endDraw();
-        let alpha = 1.0 - tween;
-        sLines.pg = fgpg;
-        sLines.draw();
+  let funcAssets = [];
+  for(let i = 0; i < 16; i++) {
+    funcAssets.push(new FuncList(4, [
+      {
+        name: "default",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+        }
       },
-      setup: function () {
-        sLines.setup();
-      }
-    },
-    {
-      name: "circleMorph",
-      f: function (tween) {
-        bgpg.beginDraw();
-        bgpg.clear();
-        bgpg.endDraw();
-        let alpha = 1.0 - tween;
-        p.push();
-        p.stroke(255, beatFader * alpha * 255);
-        sCircleMorph.draw();
-        p.pop();
-      }
-    },
-    {
-      name: "starField",
-      f: function (tween) {
-        bgpg.beginDraw();
-        bgpg.clear();
-        bgpg.endDraw();
-        let alpha = 1.0 - tween;
-        p.push();
-        p.translate(tween * p.width / 3.0, 0);
-        sStarField.alpha = alpha * beatFader;
-        sStarField.draw();
-        p.pop();
-      }
-    },
-    {
-      name: "gameOfLife",
-      f: function (tween) {
-        bgpg.beginDraw();
-        bgpg.clear();
-        bgpg.endDraw();
-        let alpha = 1.0 - tween;
-        p.push();
-        sGameOfLife.alpha = alpha * beatFader;
-        sGameOfLife.draw();
-        p.pop();
+      {
+        name: "lines",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+          let alpha = 1.0 - tween;
+          sLines.pg = pg;
+          sLines.draw();
+        },
+        setup: function () {
+          sLines.setup();
+        }
       },
-      setup: function () {
-        sGameOfLife.setup();
-      }
-    },
-    {
-      name: "ribbons",
-      f: function (tween) {
-        let alpha = 1.0 - tween;
-        sRibbons.pg = bgpg;
-        sRibbons.tween = tween;
-        sRibbons.alpha = alpha * beatFader;
-        sRibbons.draw();
-        sLines.pg = fgpg;
-        sLines.draw();
+      {
+        name: "circleMorph",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+          let alpha = 1.0 - tween;
+          p.push();
+          p.stroke(255, beatFader * alpha * 255);
+          sCircleMorph.draw();
+          p.pop();
+        }
       },
-      setup: function () {
-        sRibbons.setup();
-      }
-    },
-    {
-      name: "beesAndBombs",
-      f: function (tween) {
-        let alpha = 1.0 - tween;
-        sBeesAndBombs.pg = bgpg;
-        sBeesAndBombs.tween = tween;
-        sBeesAndBombs.alpha = alpha * beatFader;
-        sBeesAndBombs.draw();
-        sLines.pg = fgpg;
-        sLines.draw();
+      {
+        name: "starField",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+          let alpha = 1.0 - tween;
+          p.push();
+          p.translate(tween * p.width / 3.0, 0);
+          sStarField.alpha = alpha * beatFader;
+          sStarField.draw();
+          p.pop();
+        }
       },
-      setup: function () {
-        sBeesAndBombs.setup();
-      }
-    },
-    {
-      name: "dots",
-      f: function (tween) {
-        let alpha = 1.0 - tween;
-        p.push();
-        sDots.tween = tween;
-        sDots.alpha = alpha * beatFader;
-        sDots.draw();
-        p.pop();
+      {
+        name: "gameOfLife",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+          let alpha = 1.0 - tween;
+          p.push();
+          sGameOfLife.alpha = alpha * beatFader;
+          sGameOfLife.draw();
+          p.pop();
+        },
+        setup: function () {
+          sGameOfLife.setup();
+        }
       },
-      setup: function () {
-        sDots.setup();
-      }
-    },
-    {
-      name: "face",
-      f: function (tween) {
-        let alpha = 1.0 - tween;
-        p.push();
-        sFace.tween = tween;
-        sFace.alpha = alpha * beatFader;
-        sFace.draw();
-        p.pop();
+      {
+        name: "ribbons",
+        f: function (tween, pg) {
+          let alpha = 1.0 - tween;
+          sRibbons.pg = pg;
+          sRibbons.tween = tween;
+          sRibbons.alpha = alpha * beatFader;
+          sRibbons.draw();
+        },
+        setup: function () {
+          sRibbons.setup();
+        }
       },
-      setup: function () {
-        sFace.setup();
+      {
+        name: "beesAndBombs",
+        f: function (tween, pg) {
+          let alpha = 1.0 - tween;
+          sBeesAndBombs.pg = pg;
+          sBeesAndBombs.tween = tween;
+          sBeesAndBombs.alpha = alpha * beatFader;
+          sBeesAndBombs.draw();
+        },
+        setup: function () {
+          sBeesAndBombs.setup();
+        }
+      },
+      {
+        name: "dots",
+        f: function (tween, pg) {
+          let alpha = 1.0 - tween;
+          p.push();
+          sDots.tween = tween;
+          sDots.alpha = alpha * beatFader;
+          sDots.draw();
+          p.pop();
+        },
+        setup: function () {
+          sDots.setup();
+        }
+      },
+      {
+        name: "face",
+        f: function (tween, pg) {
+          let alpha = 1.0 - tween;
+          p.push();
+          sFace.tween = tween;
+          sFace.alpha = alpha * beatFader;
+          sFace.draw();
+          p.pop();
+        },
+        setup: function () {
+          sFace.setup();
+        }
       }
-    }
-  ]);
+    ]));
+  }
 
   let midiToPreset = [
-    {preset: "default"},
-    {preset: "beesAndBombs"},
-    {preset: "beesAndBombs"},
-    {preset: "beesAndBombs"},
-    {preset: "ribbons"},
-    {preset: "ribbons"},
-    {preset: "ribbons"},
-    {preset: "ribbons"},
-    {preset: "ribbons"},
-    {preset: "ribbons"},
-    {preset: "face"},
+    {preset: ["default"]},
+    {preset: ["beesAndBombs", "lines"]},
+    {preset: ["beesAndBombs", "lines"]},
+    {preset: ["beesAndBombs", "lines"]},
+    {preset: ["ribbons", "lines"]},
+    {preset: ["ribbons", "lines"]},
+    {preset: ["ribbons", "lines"]},
+    {preset: ["ribbons", "lines"]},
+    {preset: ["ribbons", "lines"]},
+    {preset: ["ribbons", "lines"]},
+    {preset: ["face"]},
   ];
 
   p.setup = function () {
@@ -1261,13 +1260,17 @@ var s = function (p) {
     sBeesAndBombs.setup();
     sDots.setup();
 
-    funcAssets.update();
+    for(let i = 0; i < funcAssets.length; i++) {
+      funcAssets[i].update();
+    }
   }
 
   p.getCount = function () { return p.frameCount - startFrame + Math.floor(p.oscFaders[1] * 60) };
 
   p.keyPressed = function () {
   }
+
+  let activeLayerNum = 2;
 
   p.draw = function () {
     p.background(0);
@@ -1285,15 +1288,25 @@ var s = function (p) {
     }
 
     if (seq != lastSeq) {
-      funcAssets.preset = [midiToPreset[p.oscPreset].preset];
-      funcAssets.update(seq);
+      if(seq % funcAssets[0].everyNSeq == 0)
+        activeLayerNum = midiToPreset[p.oscPreset].preset.length;
+      for(let i = 0; i < funcAssets.length; i++) {
+        if(i < activeLayerNum) {
+          funcAssets[i].preset = midiToPreset[p.oscPreset].preset[i];
+          funcAssets[i].update(seq);
+        }
+      }
     }
 
     let tween2 = (t * 0.5 % 1.0) * 2.0 - 1.0;
     fgpg.beginDraw();
     fgpg.clear();
     fgpg.endDraw();
-    funcAssets.exec(tween2);
+    for(let i = 0; i < funcAssets.length; i++) {
+      if(i < activeLayerNum) {
+        funcAssets[i].exec(tween2, layerPgs[i]);
+      }
+    }
 
     let colorSc = [
       [0, 255, 150],
@@ -1366,6 +1379,13 @@ var s = function (p) {
       p.filter(levelShader);
     }
     p.syphonServer.sendImage(frontPg);
+
+    p.blendMode(p.BLEND);
+    for(let i = 2; i < funcAssets.length; i++) {
+      if(i < activeLayerNum) {
+        p.image(layerPgs[i], 0, 0);
+      }
+    }
 
     p.syphonServer.sendScreen();
 
