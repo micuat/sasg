@@ -54,6 +54,7 @@ var SLines = function (p) {
   let agents = [];
 
   let pg = fgpg;
+  this.pg = fgpg;
 
   function Agent(t, tween, ii, jj, isTarget) {
     this.t = t;
@@ -518,7 +519,9 @@ var SLines = function (p) {
   }
 
   this.draw = function () {
-    pg = fgpg;
+    if(this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
     pg.beginDraw();
     let t = tElapsed * (bpm / 120.0);
     if (seq != lastSeq) {
@@ -852,6 +855,8 @@ var SGameOfLife = function (p) {
 };
 
 var SRibbons = function (p) {
+  let pg = fgpg;
+  this.pg = fgpg;
   let targetRotX = 0;
   let targetRotY = 0;
   let tSpeed = 0;
@@ -868,42 +873,46 @@ var SRibbons = function (p) {
     amplitude = Math.pow(p.random(0.5, 1.0), 2.0) * 100;
   }
   this.draw = function () {
-    bgpg.beginDraw();
-    bgpg.clear();
-    bgpg.pushMatrix();
-    bgpg.translate(bgpg.width / 2, bgpg.height / 2);
+    if(this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
+    pg.beginDraw();
+    pg.clear();
+    pg.pushMatrix();
+    pg.translate(pg.width / 2, pg.height / 2);
     let tw = ((tElapsed * (bpm / 120.0)) % 4.0) * 0.5 - 1.0;
     let l = p.width * 2.0;
     if (isSolid) {
-      bgpg.lights();
-      bgpg.noStroke();
-      bgpg.fill(255, 255);// * this.alpha);
+      pg.lights();
+      pg.noStroke();
+      pg.fill(255, 255);// * this.alpha);
     }
     else {
-      bgpg.noFill();
-      bgpg.stroke(255, 255);// * this.alpha);
+      pg.noFill();
+      pg.stroke(255, 255);// * this.alpha);
     }
     let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, rotPower);
-    bgpg.rotateX(rotw * targetRotX + Math.PI * 0.5);
-    bgpg.rotateY(rotw * targetRotY);
+    pg.rotateX(rotw * targetRotX + Math.PI * 0.5);
+    pg.rotateY(rotw * targetRotY);
     for (let y = -200; y < 200; y += 50) {
-      bgpg.beginShape(p.TRIANGLE_STRIP);
+      pg.beginShape(p.TRIANGLE_STRIP);
       let tSpeedMod = tSpeed;
       if (y == 0) tSpeedMod *= 3;
       for (let dx = -l; dx < l; dx += 5.0) {
         let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * tSpeedMod);
-        bgpg.vertex(dx, y, z * amplitude);
-        bgpg.vertex(dx, y + 10, z * amplitude);
+        pg.vertex(dx, y, z * amplitude);
+        pg.vertex(dx, y + 10, z * amplitude);
       }
-      bgpg.endShape();
+      pg.endShape();
     }
-    bgpg.popMatrix();
-    bgpg.endDraw();
-    // p.image(bgpg, -p.width * 0.5, -p.height * 0.5);
+    pg.popMatrix();
+    pg.endDraw();
   }
 }
 
 var SBeesAndBombs = function (p) {
+  let pg = fgpg;
+  this.pg = fgpg;
   let angle = 0;
   let w = 40;
   let ma;
@@ -917,18 +926,21 @@ var SBeesAndBombs = function (p) {
   }
 
   this.draw = function () {
-    bgpg.beginDraw();
-    bgpg.clear();
-    bgpg.noStroke();
-    bgpg.fill(255);
+    if(this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
+    pg.beginDraw();
+    pg.clear();
+    pg.noStroke();
+    pg.fill(255);
     // p.ortho(-400, 400, 400, -400, 0, 1000);
 
-    bgpg.translate(p.width / 2, p.height / 2, -650);
-    bgpg.directionalLight(90, 95, 226, -1, 0, 0);
-    bgpg.pointLight(200, 95, 96, 300, -100, 1000);
-    // bgpg.pointLight(200, 200, 200, 0, -1000, 0);
-    bgpg.rotateX(-p.QUARTER_PI * 0.8);
-    bgpg.rotateY(-p.QUARTER_PI * tElapsed)
+    pg.translate(p.width / 2, p.height / 2, -650);
+    pg.directionalLight(90, 95, 226, -1, 0, 0);
+    pg.pointLight(200, 95, 96, 300, -100, 1000);
+    // pg.pointLight(200, 200, 200, 0, -1000, 0);
+    pg.rotateX(-p.QUARTER_PI * 0.8);
+    pg.rotateY(-p.QUARTER_PI * tElapsed)
 
     angle = p.millis() * 0.001 * p.TWO_PI;
     let decay = p.sin(p.millis() * 0.0005);
@@ -936,21 +948,20 @@ var SBeesAndBombs = function (p) {
     let winh = 560;
     for (let z = 0; z < winh; z += w) {
       for (let x = 0; x < winh; x += w) {
-        bgpg.pushMatrix();
+        pg.pushMatrix();
         let d = p.dist(x, z, winh / 2, winh / 2);
         let offset = p.map(d, 0, maxD, -p.PI, p.PI);
         let a = angle + -offset;
         let h = p.floor(p.map(p.sin(a), -1, 1, 0.5, 1)*winh);
         h = p.map(decay, 0, 1, winh, h);
-        bgpg.translate(x - winh / 2, 0, z - winh / 2);
+        pg.translate(x - winh / 2, 0, z - winh / 2);
         // p.normalMaterial();
-        bgpg.box(w, h, w);
+        pg.box(w, h, w);
         //rect(x - width / 2 + w / 2, 0, w - 2, h);
-        bgpg.popMatrix();
+        pg.popMatrix();
       }
     }
-    bgpg.endDraw();
-    // p.image(bgpg, -p.width / 2, -p.height / 2);
+    pg.endDraw();
   }
 };
 
@@ -1084,6 +1095,7 @@ var s = function (p) {
         bgpg.clear();
         bgpg.endDraw();
         let alpha = 1.0 - tween;
+        sLines.pg = fgpg;
         sLines.draw();
       },
       setup: function () {
@@ -1137,9 +1149,11 @@ var s = function (p) {
       name: "ribbons",
       f: function (tween) {
         let alpha = 1.0 - tween;
+        sRibbons.pg = bgpg;
         sRibbons.tween = tween;
         sRibbons.alpha = alpha * beatFader;
         sRibbons.draw();
+        sLines.pg = fgpg;
         sLines.draw();
       },
       setup: function () {
@@ -1150,9 +1164,11 @@ var s = function (p) {
       name: "beesAndBombs",
       f: function (tween) {
         let alpha = 1.0 - tween;
+        sBeesAndBombs.pg = bgpg;
         sBeesAndBombs.tween = tween;
         sBeesAndBombs.alpha = alpha * beatFader;
         sBeesAndBombs.draw();
+        sLines.pg = fgpg;
         sLines.draw();
       },
       setup: function () {
