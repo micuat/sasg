@@ -5,498 +5,52 @@ var tElapsed = 0;
 var lastSeq = -1;
 var seq = 0;
 
-var SCircleMorph = function (p) {
-  let cirPath = [];
-  let triPath = [];
-  let spacing = 20;
-  let theta = 0;
-  let seq = 0;
-
-  polarToCartesian = function (r, angle) {
-    return p.createVector(r * p.cos(angle), r * p.sin(angle));
-  }
-
-  this.setup = function () {
-    // p.createCanvas(800, 800);
-    // p.angleMode(p.DEGREES);
-    let radius = 200;
-    let startA = 0;
-    let endA = 120;
-    let start = polarToCartesian(radius, p.radians(startA));
-    let end = polarToCartesian(radius, p.radians(endA));
-    for (let a = startA; a < 360; a += spacing) {
-      let cv = polarToCartesian(radius, p.radians(a));
-      cirPath.push(cv);
-      let amt = (a % 120) / (endA - startA);
-      let tv = p5.Vector.lerp(start, end, amt);
-      triPath.push(tv);
-
-      if ((a + spacing) % 120 === 0) {
-        startA = startA + 120;
-        endA = endA + 120;
-        start = polarToCartesian(radius, p.radians(startA));
-        end = polarToCartesian(radius, p.radians(endA));
-      }
-    }
-  }
-
-  this.draw = function () {
-    t = p.frameCount / 30.0;
-    seq = Math.floor((p.frameCount % 120) / 30);
-    // p.background(255);
-    p.push();
-    p.scale(p.height / 800.0, p.height / 800.0);
-    p.translate(p.width / 2, p.height / 2 + 50);
-
-    let shape = p.createShape();
-    shape.beginShape();
-    shape.noFill();
-    theta = t * p.TWO_PI;
-    let amt = 1 - (p.sin(theta) + 1) / 2 / 2;
-    for (let i = 0; i < cirPath.length; i++) {
-      let th = -p.cos(i / cirPath.length * 6 * p.PI);
-      th = p.map(th, -1, 1, 0, 8);
-      th = p.lerp(8, th, amt);
-      // p.strokeWeight(th);
-      let cv = cirPath[i];
-      let tv = triPath[i];
-      let x = p.lerp(cv.x, tv.x, amt);
-      let y = p.lerp(cv.y, tv.y, amt);
-      shape.vertex(x, y);
-    }
-    shape.endShape(p.CLOSE);
-
-    for (let i = -2; i <= 1; i++) {
-      for (let j = -5; j <= 4; j++) {
-        p.push();
-        p.translate(j * 200 * p.sqrt(3), i * 300);
-        if ((i + 10) % 2 == 1) {
-          p.translate(100 * p.sqrt(3), 0);
-        }
-        p.rotate(p.radians(30));
-
-        if (seq == 0 && t > 0.5) {
-          p.rotate(t * p.TWO_PI * 2 / 3);
-          let sc = p.cos(t * p.TWO_PI * 2);
-          sc = p.map(sc, -1, 1, 0.75, 1);
-          p.scale(sc, sc);
-        }
-        if (seq == 2 && t > 0.5) {
-          p.rotate(-t * p.TWO_PI * 2 / 3);
-          let sc = p.cos(t * p.TWO_PI * 2);
-          sc = p.map(sc, -1, 1, 0.75, 1);
-          p.scale(sc, sc);
-        }
-        p.shape(shape, 0, 0);
-        p.pop();
-      }
-    }
-    p.pop();
-  }
-};
-
-var SStarField = function (p) {
-  let stars = [];
-  let speed = 0;
-  this.alpha = 1.0;
-
-  function Star() {
-    this.x = p.random(-p.width, p.width) / 2;
-    this.y = p.random(-p.height, p.height) / 2;
-    this.z = p.random(p.width);
-    this.pz = this.z;
-    if (p.random(1) > 0.) {
-      this.tail = 10;
-    }
-    else {
-      this.tail = 1;
-    }
-
-    this.update = function (speed) {
-      this.z = this.z - speed;
-      if (this.z < 0.0) {
-        this.z = p.width;
-        this.x = p.random(-p.height, p.height) / 2;
-        this.y = p.random(-p.height, p.height) / 2;
-        this.pz = this.z;
-      }
-    }
-
-    this.show = function (alpha) {
-      let sx = p.map(this.x / this.z, 0, 1, 0, p.width);
-      let sy = p.map(this.y / this.z, 0, 1, 0, p.height);
-
-      for (let i = 0; i < this.tail; i++) {
-        let pz = this.pz + i * 20;
-        let px = p.map(this.x / (this.pz + i * 10), 0, 1, 0, p.width);
-        let py = p.map(this.y / (this.pz + i * 10), 0, 1, 0, p.height);
-
-        p.noStroke();
-        p.fill(255, p.map(i, 0, 10, 255, 0) * alpha);
-        let r = p.map(pz, 0, p.width, 12, 0);
-        p.ellipse(px, py, r, r);
-      }
-      this.pz = this.z;
-    }
-  }
-
-  this.setup = function () {
-    for (let i = 0; i < 50; i++) {
-      stars.push(new Star());
-    }
-  }
-
-  this.draw = function () {
-    if (p.frameCount % 30 == 0) {
-      if (p.frameCount % 60 > 30) {
-        speed = p.random(5, 10);
-      }
-      else {
-        speed = p.random(25, 50);
-      }
-    }
-    // p.translate(p.width / 2, p.height / 2);
-    for (let i = 0; i < stars.length; i++) {
-      stars[i].update(speed);
-      stars[i].show(this.alpha);
-    }
-  };
-};
-
-var SGameOfLife = function (p) {
-
-  function make2DArray(cols, rows) {
-    let arr = new Array(cols);
-    for (let i = 0; i < arr.length; i++) {
-      arr[i] = new Array(rows);
-    }
-    return arr;
-  }
-
-  let grid;
-  let cols;
-  let rows;
-  let resolution = 8;
-  let gap = 16;
-  this.alpha = 1.0;
-
-  this.setup = function () {
-    cols = p.width / resolution;
-    rows = p.height / resolution;
-    grid = make2DArray(cols, rows);
-
-    let doRandom = gap == 16;//p.random(1) < 0.2 ? true : false;
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        //grid[i][j] = p.floor(p.random(2));
-        if (p.random(1) < 0.01) {
-          grid[i][j] = 1;
-          grid[i][j] = 1;
-        }
-        else if (i % 2 == 0 && j > 1 && j < rows - 1 && i > 5 && i < cols - 5) {
-          grid[i][j] = 1;
-        }
-        else {
-          grid[i][j] = 0;
-        }
-
-      }
-    }
-    // let bloc = [[10, 10], [11, 10], [12, 10], [13, 7], [13, 8], [13, 9], [10, 5], [11, 5], [12, 5], [8, 7], [8, 8], [8, 9]];
-    // for (let i in bloc) {
-    //   for (let y = 0; y < 1; y++) {
-    //     for (let x = 0; x < 1; x++) {
-    //       let dx = 10;
-    //       let dy = 0;
-    //       grid[bloc[i][0] + dx][bloc[i][1] + dy] = 1;
-    //       grid[28 - bloc[i][0] + dx][bloc[i][1] + dy] = 1;
-    //       grid[bloc[i][0] + dx][22 - bloc[i][1] + dy] = 1;
-    //       grid[28 - bloc[i][0] + dx][22 - bloc[i][1] + dy] = 1;
-    //     }
-    //   }
-    // }
-  }
-
-  this.draw = function () {
-    p.noStroke();
-    p.translate(-p.width / 2, -p.height / 2);
-    if (p.getCount() % bpm == 0) {
-      gap = gap - 1;
-      if (gap < 12) gap = 16;
-    }
-
-    // if(p.frameCount % 60 < 15) {
-    //   p.background(255);
-    // }
-
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        let x = i * resolution;
-        let y = j * resolution;
-        if (grid[i][j] == 1) {
-          p.fill(255, 255 * this.alpha);
-          // p.stroke(0);
-          p.rect(x, y, resolution - 1, resolution - 1);
-        }
-      }
-    }
-
-    if (p.frameCount % 2 == 0) {
-      let next = make2DArray(cols, rows);
-
-      // Compute next based on grid
-      for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-          let state = grid[i][j];
-          // Count live neighbors!
-          let sum = 0;
-          let neighbors = countNeighbors(grid, i, j);
-
-          if (state == 0 && neighbors == 3) {
-            next[i][j] = 1;
-          } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
-            next[i][j] = 0;
-          } else {
-            next[i][j] = state;
-          }
-
-        }
-      }
-
-      grid = next;
-    }
-  }
-
-
-  function countNeighbors(grid, x, y) {
-    let sum = 0;
-    for (let i = -1; i < 2; i++) {
-      for (let j = -1; j < 2; j++) {
-        let col = (x + i + cols) % cols;
-        let row = (y + j + rows) % rows;
-        sum += grid[col][row];
-      }
-    }
-    sum -= grid[x][y];
-    return sum;
-  }
-};
-
-var SRibbons = function (p) {
-  let targetRotX = 0;
-  let targetRotY = 0;
-  let tSpeed = 0;
-  let rotPower = 0;
-  let isSolid = true;
-  let amplitude = 0.0;
-
-  this.setup = function () {
-    targetRotX = p.random(-Math.PI, Math.PI) * 2.0;
-    targetRotY = p.random(-Math.PI, Math.PI) * 2.0;
-    tSpeed = p.random(2.0, 8.0);
-    rotPower = Math.floor(p.random(2.0, 9.0));
-    isSolid = p.random(1.0) > 0.5 ? true : false;
-    amplitude = Math.pow(p.random(0.5, 1.0), 2.0) * 100;
-  }
-  this.draw = function () {
-    bgpg.beginDraw();
-    bgpg.clear();
-    bgpg.pushMatrix();
-    bgpg.translate(bgpg.width / 2, bgpg.height / 2);
-    let tw = ((tElapsed * (bpm / 120.0)) % 4.0) * 0.5 - 1.0;
-    let l = p.width * 2.0;
-    if (isSolid) {
-      bgpg.lights();
-      bgpg.noStroke();
-      bgpg.fill(255, 255);// * this.alpha);
-    }
-    else {
-      bgpg.noFill();
-      bgpg.stroke(255, 255);// * this.alpha);
-    }
-    let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, rotPower);
-    bgpg.rotateX(rotw * targetRotX + Math.PI * 0.5);
-    bgpg.rotateY(rotw * targetRotY);
-    for (let y = -200; y < 200; y += 50) {
-      bgpg.beginShape(p.TRIANGLE_STRIP);
-      let tSpeedMod = tSpeed;
-      if (y == 0) tSpeedMod *= 3;
-      for (let dx = -l; dx < l; dx += 5.0) {
-        let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * tSpeedMod);
-        bgpg.vertex(dx, y, z * amplitude);
-        bgpg.vertex(dx, y + 10, z * amplitude);
-      }
-      bgpg.endShape();
-    }
-    bgpg.popMatrix();
-    bgpg.endDraw();
-    // p.image(bgpg, -p.width * 0.5, -p.height * 0.5);
-  }
-}
-
-var SBeesAndBombs = function (p) {
-  let angle = 0;
-  let w = 40;
-  let ma;
-  let maxD;
-  this.tween = 0;
-  this.alpha = 0;
-
-  this.setup = function () {
-    ma = p.atan(p.cos(p.QUARTER_PI));
-    maxD = p.dist(0, 0, 300, 300);
-  }
-
-  this.draw = function () {
-    bgpg.beginDraw();
-    bgpg.clear();
-    bgpg.noStroke();
-    bgpg.fill(255);
-    // p.ortho(-400, 400, 400, -400, 0, 1000);
-
-    bgpg.translate(p.width / 2, p.height / 2, -650);
-    bgpg.directionalLight(90, 95, 226, -1, 0, 0);
-    bgpg.pointLight(200, 95, 96, 300, -100, 1000);
-    // bgpg.pointLight(200, 200, 200, 0, -1000, 0);
-    bgpg.rotateX(-p.QUARTER_PI * 0.8);
-    bgpg.rotateY(-p.QUARTER_PI * tElapsed)
-
-    angle = p.millis() * 0.001 * p.TWO_PI;
-    let decay = p.sin(p.millis() * 0.0005);
-    decay = p.constrain(p.map(decay, -1, 1, -0.02, 1), 0, 1);
-    let winh = 560;
-    for (let z = 0; z < winh; z += w) {
-      for (let x = 0; x < winh; x += w) {
-        bgpg.pushMatrix();
-        let d = p.dist(x, z, winh / 2, winh / 2);
-        let offset = p.map(d, 0, maxD, -p.PI, p.PI);
-        let a = angle + -offset;
-        let h = p.floor(p.map(p.sin(a), -1, 1, 0.5, 1)*winh);
-        h = p.map(decay, 0, 1, winh, h);
-        bgpg.translate(x - winh / 2, 0, z - winh / 2);
-        // p.normalMaterial();
-        bgpg.box(w, h, w);
-        //rect(x - width / 2 + w / 2, 0, w - 2, h);
-        bgpg.popMatrix();
-      }
-    }
-    bgpg.endDraw();
-    // p.image(bgpg, -p.width / 2, -p.height / 2);
-  }
-};
-
-var SDots = function (p) {
-  this.tween = 0;
-  this.alpha = 0;
-  let points = [];
-  let lastMiniSeq = -1;
-  let mc = 20.0;
-
-  function newPoint () {
-    let x = Math.floor(p.random(0, windowWidth) / mc) * mc;
-    let y = p.random(1.0) > 0.5 ? -10 : windowHeight + 10;
-    let targetX = x;
-    let targetY = Math.floor(p.random(windowHeight * 0.25, windowHeight) / mc) * mc;
-    return {x: x, y: y, targetX: targetX, targetY: targetY, decay: 0.5};
-  }
-  for(let i = 0; i < 8; i++) {
-    points.push(newPoint());
-  }
-  this.setup = function () {
-  }
-
-  this.draw = function () {
-    let miniSeq = Math.floor(tElapsed * (bpm / 60.0));
-    let fract = tElapsed * (bpm / 60.0) - miniSeq;
-
-    if(miniSeq != lastMiniSeq) {
-      points.splice(0, 1);
-      points.push(newPoint());
-    }
-    lastMiniSeq = miniSeq;
-
-    fgpg.beginDraw();
-    fgpg.clear();
-    fgpg.noStroke();
-    fgpg.fill(255);
-    for(let i in points) {
-      let pt = points[i];
-      // pt.y = p.lerp(pt.y, pt.targetY, 0.1);
-      pt.y = pt.targetY * (1.0 - Math.pow((Math.sin(fract * Math.PI * 2.0) * pt.decay + 0.5), 2.0));
-      pt.decay *= 0.925;
-      let x = pt.x;
-      let y = pt.y;
-      // fgpg.ellipse(x, y, 20, 20);
-    }
-    fgpg.endDraw();
-
-    bgpg.beginDraw();
-    bgpg.clear();
-    bgpg.noStroke();
-    bgpg.fill(255);
-    for(let i in points) {
-      let x = points[i].x;
-      let y = points[i].y;
-      bgpg.ellipse(x, y, 20, 20);
-    }
-    bgpg.endDraw();
-  }
-};
-
-var SFace = function (p) {
-  this.alpha = 1.0;
-  this.tween = 0.0;
-  let faces = [0,17,18,20,23,24,19,20,24,25,26,16,26,45,16,46,14,15,45,46,15,16,45,15,35,13,14,46,35,14,54,12,13,35,54,13,35,53,54,47,35,46,25,45,26,54,11,12,44,45,25,24,44,25,29,35,47,55,10,11,54,55,11,44,46,45,20,21,23,42,29,47,43,44,24,23,43,24,44,47,46,43,47,44,29,30,35,21,22,23,56,9,10,55,56,10,35,52,53,28,29,42,64,55,54,23,22,43,43,42,47,53,64,54,22,42,43,34,52,35,56,8,9,22,27,42,65,55,64,53,63,64,27,28,42,57,8,56,30,34,35,65,56,55,52,63,53,33,52,34,65,66,56,66,57,56,51,63,52,33,51,52,30,33,34,21,27,22,58,7,57,57,7,8,50,51,33,51,62,63,30,32,33,58,57,66,67,58,66,61,62,51,31,30,29,32,50,33,39,29,28,39,28,27,21,39,27,31,32,30,40,31,29,39,40,29,50,61,51,6,7,58,59,6,58,59,58,67,49,61,50,31,49,50,31,50,32,38,39,21,60,59,67,40,41,31,41,2,31,20,38,21,2,3,31,48,49,31,3,48,31,48,60,49,3,4,48,48,5,59,5,6,59,60,48,59,19,38,20,38,40,39,19,37,38,4,5,48,1,2,41,37,41,40,37,40,38,36,1,41,18,37,19,36,41,37,18,36,37,17,0,36,0,1,36,18,17,36,49,60,61 ];
-  this.setup = function () {
-  }
-
-  this.draw = function () {
-    if (p.cam.available() == true) {
-      p.cam.read();
-    }
-
-    bgpg.beginDraw();
-    bgpg.clear();
-    bgpg.image(p.cam, 0, 0, 1280/2, 720/2);
-
-    bgpg.noStroke();
-    bgpg.fill(255,0,0);
-    for(let i = 0; i < p.posePoints.length; i++) {
-      // let x = p.facePoints[i][0] * 0.5;
-      // let y = p.facePoints[i][1] * 0.5;
-      let x = p.map(p.posePoints[i][0], 0, 640, 80, 640-80);
-      let y = p.map(p.posePoints[i][1], 0, 480, 0, 360);
-      bgpg.ellipse(x, y, 14, 14)
-    }
-    bgpg.noFill();
-    bgpg.stroke(255);
-    bgpg.beginShape(p.TRIANGLES);
-    for(let i = 0 ; i < faces.length; i++) {
-      let idx = faces[i];
-      let x = p.facePoints[idx][0] * 0.5;
-      let y = p.facePoints[idx][1] * 0.5;
-      bgpg.vertex(x, y);
-    }
-    bgpg.endShape();
-    bgpg.endDraw();
-  };
-};
-
 var frontPg;
 var backPg;
 var bgpg;
 var fgpg;
 var oscPgs;
 
-var s = function (p) {
-  let name;
-  let sCircleMorph = new SCircleMorph(p);
-  let sStarField = new SStarField(p);
-  let sGameOfLife = new SGameOfLife(p);
-  let sRibbons = new SRibbons(p);
-  let sBeesAndBombs = new SBeesAndBombs(p);
-  let sDots = new SDots(p);
-  let sFace = new SFace(p);
+var FuncList = function (everyNSeq, funcs) {
+  this.everyNSeq = everyNSeq;
+  this.funcs = funcs;
+  this.execFunc;
+  this.preset = [];
+  this.update = function (seq) {
+    if (seq % this.everyNSeq == 0 || this.execFunc == undefined) {
+      let flist = [];
+      for (let i in this.funcs) {
+        if (this.preset == undefined || this.preset.length == 0) {
+          flist.push(this.funcs[i]);
+        }
+        else if (this.preset.indexOf(this.funcs[i].name) >= 0) {
+          flist.push(this.funcs[i]);
+        }
+      }
+      if (flist.length > 0) {
+        let index = Math.floor(Math.random() * flist.length);
+        this.execFunc = flist[index];
+      }
+      else {
+        this.execFunc = this.funcs[0];
+      }
+      if (this.execFunc.setup != undefined) {
+        this.execFunc.setup();
+      }
+    }
+  }
+  this.exec = function (a, b, c, d, e, f, g) {
+    if (this.execFunc != undefined)
+      return this.execFunc.f(a, b, c, d, e, f, g);
+  }
+}
+
+var SLines = function (p) {
+  this.alpha = 1.0;
+  this.tween = 0.0;
+
+  let targetII;
+  let agents = [];
 
   function Agent(t, tween, ii, jj, isTarget) {
     this.t = t;
@@ -559,39 +113,6 @@ var s = function (p) {
       funcAssets.lineFunc.exec(this);
 
       p.pop();
-    }
-  }
-
-  let FuncList = function (everyNSeq, funcs) {
-    this.everyNSeq = everyNSeq;
-    this.funcs = funcs;
-    this.execFunc;
-    this.preset = [];
-    this.update = function (seq) {
-      if (seq % this.everyNSeq == 0 || this.execFunc == undefined) {
-        let flist = [];
-        for (let i in this.funcs) {
-          if (this.preset == undefined || this.preset.length == 0) {
-            flist.push(this.funcs[i]);
-          }
-          else if (this.preset.indexOf(this.funcs[i].name) >= 0) {
-            flist.push(this.funcs[i]);
-          }
-        }
-        if (flist.length > 0) {
-          this.execFunc = p.random(flist);
-        }
-        else {
-          this.execFunc = this.funcs[0];
-        }
-        if (this.execFunc.setup != undefined) {
-          this.execFunc.setup();
-        }
-      }
-    }
-    this.exec = function (a, b, c, d, e, f, g) {
-      if (this.execFunc != undefined)
-        return this.execFunc.f(a, b, c, d, e, f, g);
     }
   }
 
@@ -1083,14 +604,676 @@ var s = function (p) {
     {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint], backdrop: "face"},
   ]
 
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    if (seq != lastSeq) {
+      targetII = Math.floor(p.random(-1, 2));
+      let newPreset = {};
+      let depthCount = 4;
+      function unwrapPreset(newp, libp) {
+        if(libp.parents && libp.parents.length > 0 && depthCount >= 0) {
+          for(let i = 0; i < libp.parents.length; i++) {
+            unwrapPreset(newp, bPreset[libp.parents[i]]);
+          }
+        }
+        for (let key in libp) {
+          if(key != "parent") {
+            newp[key] = libp[key];
+          }
+        }
+      }
+      unwrapPreset(newPreset, midiToPreset[p.oscPreset].preset[seq % 4]);
+    }
+
+    p.push();
+    p.translate(p.width / 2, p.height / 2);
+
+    function drawBeat() {
+      beatFader = p.oscFaders[3];
+      p.blendMode(p.BLEND);
+      // p.background(0);
+      p.stroke(255, 255 * beatFader);
+      p.strokeWeight(2);
+
+      let tween = 0.0;
+      tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
+
+      let tween2 = 0.0;
+
+      funcAssets.globalTransformFunc.exec(tween);
+
+      for (let ii = -2; ii <= 2; ii++) {
+        for (let jj = 0; jj < 2; jj++) {
+          let agent = new Agent(t, tween, ii, jj, ii == targetII && jj == 1);
+          agent.draw();
+
+          if (ii != targetII) break;
+        }
+      }
+    }
+    drawBeat();
+    p.pop();
+  };
+};
+
+var SCircleMorph = function (p) {
+  let cirPath = [];
+  let triPath = [];
+  let spacing = 20;
+  let theta = 0;
+  let seq = 0;
+
+  polarToCartesian = function (r, angle) {
+    return p.createVector(r * p.cos(angle), r * p.sin(angle));
+  }
+
+  this.setup = function () {
+    // p.createCanvas(800, 800);
+    // p.angleMode(p.DEGREES);
+    let radius = 200;
+    let startA = 0;
+    let endA = 120;
+    let start = polarToCartesian(radius, p.radians(startA));
+    let end = polarToCartesian(radius, p.radians(endA));
+    for (let a = startA; a < 360; a += spacing) {
+      let cv = polarToCartesian(radius, p.radians(a));
+      cirPath.push(cv);
+      let amt = (a % 120) / (endA - startA);
+      let tv = p5.Vector.lerp(start, end, amt);
+      triPath.push(tv);
+
+      if ((a + spacing) % 120 === 0) {
+        startA = startA + 120;
+        endA = endA + 120;
+        start = polarToCartesian(radius, p.radians(startA));
+        end = polarToCartesian(radius, p.radians(endA));
+      }
+    }
+  }
+
+  this.draw = function () {
+    t = p.frameCount / 30.0;
+    seq = Math.floor((p.frameCount % 120) / 30);
+    // p.background(255);
+    p.push();
+    p.scale(p.height / 800.0, p.height / 800.0);
+    p.translate(p.width / 2, p.height / 2 + 50);
+
+    let shape = p.createShape();
+    shape.beginShape();
+    shape.noFill();
+    theta = t * p.TWO_PI;
+    let amt = 1 - (p.sin(theta) + 1) / 2 / 2;
+    for (let i = 0; i < cirPath.length; i++) {
+      let th = -p.cos(i / cirPath.length * 6 * p.PI);
+      th = p.map(th, -1, 1, 0, 8);
+      th = p.lerp(8, th, amt);
+      // p.strokeWeight(th);
+      let cv = cirPath[i];
+      let tv = triPath[i];
+      let x = p.lerp(cv.x, tv.x, amt);
+      let y = p.lerp(cv.y, tv.y, amt);
+      shape.vertex(x, y);
+    }
+    shape.endShape(p.CLOSE);
+
+    for (let i = -2; i <= 1; i++) {
+      for (let j = -5; j <= 4; j++) {
+        p.push();
+        p.translate(j * 200 * p.sqrt(3), i * 300);
+        if ((i + 10) % 2 == 1) {
+          p.translate(100 * p.sqrt(3), 0);
+        }
+        p.rotate(p.radians(30));
+
+        if (seq == 0 && t > 0.5) {
+          p.rotate(t * p.TWO_PI * 2 / 3);
+          let sc = p.cos(t * p.TWO_PI * 2);
+          sc = p.map(sc, -1, 1, 0.75, 1);
+          p.scale(sc, sc);
+        }
+        if (seq == 2 && t > 0.5) {
+          p.rotate(-t * p.TWO_PI * 2 / 3);
+          let sc = p.cos(t * p.TWO_PI * 2);
+          sc = p.map(sc, -1, 1, 0.75, 1);
+          p.scale(sc, sc);
+        }
+        p.shape(shape, 0, 0);
+        p.pop();
+      }
+    }
+    p.pop();
+  }
+};
+
+var SStarField = function (p) {
+  let stars = [];
+  let speed = 0;
+  this.alpha = 1.0;
+
+  function Star() {
+    this.x = p.random(-p.width, p.width) / 2;
+    this.y = p.random(-p.height, p.height) / 2;
+    this.z = p.random(p.width);
+    this.pz = this.z;
+    if (p.random(1) > 0.) {
+      this.tail = 10;
+    }
+    else {
+      this.tail = 1;
+    }
+
+    this.update = function (speed) {
+      this.z = this.z - speed;
+      if (this.z < 0.0) {
+        this.z = p.width;
+        this.x = p.random(-p.height, p.height) / 2;
+        this.y = p.random(-p.height, p.height) / 2;
+        this.pz = this.z;
+      }
+    }
+
+    this.show = function (alpha) {
+      let sx = p.map(this.x / this.z, 0, 1, 0, p.width);
+      let sy = p.map(this.y / this.z, 0, 1, 0, p.height);
+
+      for (let i = 0; i < this.tail; i++) {
+        let pz = this.pz + i * 20;
+        let px = p.map(this.x / (this.pz + i * 10), 0, 1, 0, p.width);
+        let py = p.map(this.y / (this.pz + i * 10), 0, 1, 0, p.height);
+
+        p.noStroke();
+        p.fill(255, p.map(i, 0, 10, 255, 0) * alpha);
+        let r = p.map(pz, 0, p.width, 12, 0);
+        p.ellipse(px, py, r, r);
+      }
+      this.pz = this.z;
+    }
+  }
+
+  this.setup = function () {
+    for (let i = 0; i < 50; i++) {
+      stars.push(new Star());
+    }
+  }
+
+  this.draw = function () {
+    if (p.frameCount % 30 == 0) {
+      if (p.frameCount % 60 > 30) {
+        speed = p.random(5, 10);
+      }
+      else {
+        speed = p.random(25, 50);
+      }
+    }
+    // p.translate(p.width / 2, p.height / 2);
+    for (let i = 0; i < stars.length; i++) {
+      stars[i].update(speed);
+      stars[i].show(this.alpha);
+    }
+  };
+};
+
+var SGameOfLife = function (p) {
+
+  function make2DArray(cols, rows) {
+    let arr = new Array(cols);
+    for (let i = 0; i < arr.length; i++) {
+      arr[i] = new Array(rows);
+    }
+    return arr;
+  }
+
+  let grid;
+  let cols;
+  let rows;
+  let resolution = 8;
+  let gap = 16;
+  this.alpha = 1.0;
+
+  this.setup = function () {
+    cols = p.width / resolution;
+    rows = p.height / resolution;
+    grid = make2DArray(cols, rows);
+
+    let doRandom = gap == 16;//p.random(1) < 0.2 ? true : false;
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        //grid[i][j] = p.floor(p.random(2));
+        if (p.random(1) < 0.01) {
+          grid[i][j] = 1;
+          grid[i][j] = 1;
+        }
+        else if (i % 2 == 0 && j > 1 && j < rows - 1 && i > 5 && i < cols - 5) {
+          grid[i][j] = 1;
+        }
+        else {
+          grid[i][j] = 0;
+        }
+
+      }
+    }
+    // let bloc = [[10, 10], [11, 10], [12, 10], [13, 7], [13, 8], [13, 9], [10, 5], [11, 5], [12, 5], [8, 7], [8, 8], [8, 9]];
+    // for (let i in bloc) {
+    //   for (let y = 0; y < 1; y++) {
+    //     for (let x = 0; x < 1; x++) {
+    //       let dx = 10;
+    //       let dy = 0;
+    //       grid[bloc[i][0] + dx][bloc[i][1] + dy] = 1;
+    //       grid[28 - bloc[i][0] + dx][bloc[i][1] + dy] = 1;
+    //       grid[bloc[i][0] + dx][22 - bloc[i][1] + dy] = 1;
+    //       grid[28 - bloc[i][0] + dx][22 - bloc[i][1] + dy] = 1;
+    //     }
+    //   }
+    // }
+  }
+
+  this.draw = function () {
+    p.noStroke();
+    p.translate(-p.width / 2, -p.height / 2);
+    if (p.getCount() % bpm == 0) {
+      gap = gap - 1;
+      if (gap < 12) gap = 16;
+    }
+
+    // if(p.frameCount % 60 < 15) {
+    //   p.background(255);
+    // }
+
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        let x = i * resolution;
+        let y = j * resolution;
+        if (grid[i][j] == 1) {
+          p.fill(255, 255 * this.alpha);
+          // p.stroke(0);
+          p.rect(x, y, resolution - 1, resolution - 1);
+        }
+      }
+    }
+
+    if (p.frameCount % 2 == 0) {
+      let next = make2DArray(cols, rows);
+
+      // Compute next based on grid
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          let state = grid[i][j];
+          // Count live neighbors!
+          let sum = 0;
+          let neighbors = countNeighbors(grid, i, j);
+
+          if (state == 0 && neighbors == 3) {
+            next[i][j] = 1;
+          } else if (state == 1 && (neighbors < 2 || neighbors > 3)) {
+            next[i][j] = 0;
+          } else {
+            next[i][j] = state;
+          }
+
+        }
+      }
+
+      grid = next;
+    }
+  }
+
+
+  function countNeighbors(grid, x, y) {
+    let sum = 0;
+    for (let i = -1; i < 2; i++) {
+      for (let j = -1; j < 2; j++) {
+        let col = (x + i + cols) % cols;
+        let row = (y + j + rows) % rows;
+        sum += grid[col][row];
+      }
+    }
+    sum -= grid[x][y];
+    return sum;
+  }
+};
+
+var SRibbons = function (p) {
+  let targetRotX = 0;
+  let targetRotY = 0;
+  let tSpeed = 0;
+  let rotPower = 0;
+  let isSolid = true;
+  let amplitude = 0.0;
+
+  this.setup = function () {
+    targetRotX = p.random(-Math.PI, Math.PI) * 2.0;
+    targetRotY = p.random(-Math.PI, Math.PI) * 2.0;
+    tSpeed = p.random(2.0, 8.0);
+    rotPower = Math.floor(p.random(2.0, 9.0));
+    isSolid = p.random(1.0) > 0.5 ? true : false;
+    amplitude = Math.pow(p.random(0.5, 1.0), 2.0) * 100;
+  }
+  this.draw = function () {
+    bgpg.beginDraw();
+    bgpg.clear();
+    bgpg.pushMatrix();
+    bgpg.translate(bgpg.width / 2, bgpg.height / 2);
+    let tw = ((tElapsed * (bpm / 120.0)) % 4.0) * 0.5 - 1.0;
+    let l = p.width * 2.0;
+    if (isSolid) {
+      bgpg.lights();
+      bgpg.noStroke();
+      bgpg.fill(255, 255);// * this.alpha);
+    }
+    else {
+      bgpg.noFill();
+      bgpg.stroke(255, 255);// * this.alpha);
+    }
+    let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, rotPower);
+    bgpg.rotateX(rotw * targetRotX + Math.PI * 0.5);
+    bgpg.rotateY(rotw * targetRotY);
+    for (let y = -200; y < 200; y += 50) {
+      bgpg.beginShape(p.TRIANGLE_STRIP);
+      let tSpeedMod = tSpeed;
+      if (y == 0) tSpeedMod *= 3;
+      for (let dx = -l; dx < l; dx += 5.0) {
+        let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * tSpeedMod);
+        bgpg.vertex(dx, y, z * amplitude);
+        bgpg.vertex(dx, y + 10, z * amplitude);
+      }
+      bgpg.endShape();
+    }
+    bgpg.popMatrix();
+    bgpg.endDraw();
+    // p.image(bgpg, -p.width * 0.5, -p.height * 0.5);
+  }
+}
+
+var SBeesAndBombs = function (p) {
+  let angle = 0;
+  let w = 40;
+  let ma;
+  let maxD;
+  this.tween = 0;
+  this.alpha = 0;
+
+  this.setup = function () {
+    ma = p.atan(p.cos(p.QUARTER_PI));
+    maxD = p.dist(0, 0, 300, 300);
+  }
+
+  this.draw = function () {
+    bgpg.beginDraw();
+    bgpg.clear();
+    bgpg.noStroke();
+    bgpg.fill(255);
+    // p.ortho(-400, 400, 400, -400, 0, 1000);
+
+    bgpg.translate(p.width / 2, p.height / 2, -650);
+    bgpg.directionalLight(90, 95, 226, -1, 0, 0);
+    bgpg.pointLight(200, 95, 96, 300, -100, 1000);
+    // bgpg.pointLight(200, 200, 200, 0, -1000, 0);
+    bgpg.rotateX(-p.QUARTER_PI * 0.8);
+    bgpg.rotateY(-p.QUARTER_PI * tElapsed)
+
+    angle = p.millis() * 0.001 * p.TWO_PI;
+    let decay = p.sin(p.millis() * 0.0005);
+    decay = p.constrain(p.map(decay, -1, 1, -0.02, 1), 0, 1);
+    let winh = 560;
+    for (let z = 0; z < winh; z += w) {
+      for (let x = 0; x < winh; x += w) {
+        bgpg.pushMatrix();
+        let d = p.dist(x, z, winh / 2, winh / 2);
+        let offset = p.map(d, 0, maxD, -p.PI, p.PI);
+        let a = angle + -offset;
+        let h = p.floor(p.map(p.sin(a), -1, 1, 0.5, 1)*winh);
+        h = p.map(decay, 0, 1, winh, h);
+        bgpg.translate(x - winh / 2, 0, z - winh / 2);
+        // p.normalMaterial();
+        bgpg.box(w, h, w);
+        //rect(x - width / 2 + w / 2, 0, w - 2, h);
+        bgpg.popMatrix();
+      }
+    }
+    bgpg.endDraw();
+    // p.image(bgpg, -p.width / 2, -p.height / 2);
+  }
+};
+
+var SDots = function (p) {
+  this.tween = 0;
+  this.alpha = 0;
+  let points = [];
+  let lastMiniSeq = -1;
+  let mc = 20.0;
+
+  function newPoint () {
+    let x = Math.floor(p.random(0, windowWidth) / mc) * mc;
+    let y = p.random(1.0) > 0.5 ? -10 : windowHeight + 10;
+    let targetX = x;
+    let targetY = Math.floor(p.random(windowHeight * 0.25, windowHeight) / mc) * mc;
+    return {x: x, y: y, targetX: targetX, targetY: targetY, decay: 0.5};
+  }
+  for(let i = 0; i < 8; i++) {
+    points.push(newPoint());
+  }
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    let miniSeq = Math.floor(tElapsed * (bpm / 60.0));
+    let fract = tElapsed * (bpm / 60.0) - miniSeq;
+
+    if(miniSeq != lastMiniSeq) {
+      points.splice(0, 1);
+      points.push(newPoint());
+    }
+    lastMiniSeq = miniSeq;
+
+    fgpg.beginDraw();
+    fgpg.clear();
+    fgpg.noStroke();
+    fgpg.fill(255);
+    for(let i in points) {
+      let pt = points[i];
+      // pt.y = p.lerp(pt.y, pt.targetY, 0.1);
+      pt.y = pt.targetY * (1.0 - Math.pow((Math.sin(fract * Math.PI * 2.0) * pt.decay + 0.5), 2.0));
+      pt.decay *= 0.925;
+      let x = pt.x;
+      let y = pt.y;
+      // fgpg.ellipse(x, y, 20, 20);
+    }
+    fgpg.endDraw();
+
+    bgpg.beginDraw();
+    bgpg.clear();
+    bgpg.noStroke();
+    bgpg.fill(255);
+    for(let i in points) {
+      let x = points[i].x;
+      let y = points[i].y;
+      bgpg.ellipse(x, y, 20, 20);
+    }
+    bgpg.endDraw();
+  }
+};
+
+var SFace = function (p) {
+  this.alpha = 1.0;
+  this.tween = 0.0;
+  let faces = [0,17,18,20,23,24,19,20,24,25,26,16,26,45,16,46,14,15,45,46,15,16,45,15,35,13,14,46,35,14,54,12,13,35,54,13,35,53,54,47,35,46,25,45,26,54,11,12,44,45,25,24,44,25,29,35,47,55,10,11,54,55,11,44,46,45,20,21,23,42,29,47,43,44,24,23,43,24,44,47,46,43,47,44,29,30,35,21,22,23,56,9,10,55,56,10,35,52,53,28,29,42,64,55,54,23,22,43,43,42,47,53,64,54,22,42,43,34,52,35,56,8,9,22,27,42,65,55,64,53,63,64,27,28,42,57,8,56,30,34,35,65,56,55,52,63,53,33,52,34,65,66,56,66,57,56,51,63,52,33,51,52,30,33,34,21,27,22,58,7,57,57,7,8,50,51,33,51,62,63,30,32,33,58,57,66,67,58,66,61,62,51,31,30,29,32,50,33,39,29,28,39,28,27,21,39,27,31,32,30,40,31,29,39,40,29,50,61,51,6,7,58,59,6,58,59,58,67,49,61,50,31,49,50,31,50,32,38,39,21,60,59,67,40,41,31,41,2,31,20,38,21,2,3,31,48,49,31,3,48,31,48,60,49,3,4,48,48,5,59,5,6,59,60,48,59,19,38,20,38,40,39,19,37,38,4,5,48,1,2,41,37,41,40,37,40,38,36,1,41,18,37,19,36,41,37,18,36,37,17,0,36,0,1,36,18,17,36,49,60,61 ];
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    if (p.cam.available() == true) {
+      p.cam.read();
+    }
+
+    bgpg.beginDraw();
+    bgpg.clear();
+    bgpg.image(p.cam, 0, 0, 1280/2, 720/2);
+
+    bgpg.noStroke();
+    bgpg.fill(255,0,0);
+    for(let i = 0; i < p.posePoints.length; i++) {
+      // let x = p.facePoints[i][0] * 0.5;
+      // let y = p.facePoints[i][1] * 0.5;
+      let x = p.map(p.posePoints[i][0], 0, 640, 80, 640-80);
+      let y = p.map(p.posePoints[i][1], 0, 480, 0, 360);
+      bgpg.ellipse(x, y, 14, 14)
+    }
+    bgpg.noFill();
+    bgpg.stroke(255);
+    bgpg.beginShape(p.TRIANGLES);
+    for(let i = 0 ; i < faces.length; i++) {
+      let idx = faces[i];
+      let x = p.facePoints[idx][0] * 0.5;
+      let y = p.facePoints[idx][1] * 0.5;
+      bgpg.vertex(x, y);
+    }
+    bgpg.endShape();
+    bgpg.endDraw();
+  };
+};
+
+var s = function (p) {
+  let name;
+  let sLines = new SLines(p);
+  let sCircleMorph = new SCircleMorph(p);
+  let sStarField = new SStarField(p);
+  let sGameOfLife = new SGameOfLife(p);
+  let sRibbons = new SRibbons(p);
+  let sBeesAndBombs = new SBeesAndBombs(p);
+  let sDots = new SDots(p);
+  let sFace = new SFace(p);
+
+  let midiToPreset = [
+    {preset: "default"},
+    {preset: "beesAndBombs"},
+    {preset: "beesAndBombs"},
+    {preset: "beesAndBombs"},
+    {preset: "ribbons"},
+    {preset: "ribbons"},
+    {preset: "ribbons"},
+    {preset: "ribbons"},
+    {preset: "ribbons"},
+    {preset: "ribbons"},
+    {preset: "face"},
+  ]
+
   let startFrame;
-  let targetII;
-  let agents = [];
-  let autoPilot = true;
   let doUpdate = true;
   let curCol = [0, 0, 0];
   let beatFader = 1;
   let texShader, levelShader;
+
+  let funcAssets = new FuncList(4, [
+    {
+      name: "default",
+      f: function (tween) {
+        bgpg.beginDraw();
+        bgpg.clear();
+        bgpg.endDraw();
+      }
+    },
+    {
+      name: "circleMorph",
+      f: function (tween) {
+        bgpg.beginDraw();
+        bgpg.clear();
+        bgpg.endDraw();
+        let alpha = 1.0 - tween;
+        p.push();
+        p.stroke(255, beatFader * alpha * 255);
+        sCircleMorph.draw();
+        p.pop();
+      }
+    },
+    {
+      name: "starField",
+      f: function (tween) {
+        bgpg.beginDraw();
+        bgpg.clear();
+        bgpg.endDraw();
+        let alpha = 1.0 - tween;
+        p.push();
+        p.translate(tween * p.width / 3.0, 0);
+        sStarField.alpha = alpha * beatFader;
+        sStarField.draw();
+        p.pop();
+      }
+    },
+    {
+      name: "gameOfLife",
+      f: function (tween) {
+        bgpg.beginDraw();
+        bgpg.clear();
+        bgpg.endDraw();
+        let alpha = 1.0 - tween;
+        p.push();
+        sGameOfLife.alpha = alpha * beatFader;
+        sGameOfLife.draw();
+        p.pop();
+      },
+      setup: function () {
+        sGameOfLife.setup();
+      }
+    },
+    {
+      name: "ribbons",
+      f: function (tween) {
+        let alpha = 1.0 - tween;
+        p.push();
+        sRibbons.tween = tween;
+        sRibbons.alpha = alpha * beatFader;
+        sRibbons.draw();
+        p.pop();
+      },
+      setup: function () {
+        sRibbons.setup();
+      }
+    },
+    {
+      name: "beesAndBombs",
+      f: function (tween) {
+        let alpha = 1.0 - tween;
+        p.push();
+        sBeesAndBombs.tween = tween;
+        sBeesAndBombs.alpha = alpha * beatFader;
+        sBeesAndBombs.draw();
+        p.pop();
+      },
+      setup: function () {
+        sBeesAndBombs.setup();
+      }
+    },
+    {
+      name: "dots",
+      f: function (tween) {
+        let alpha = 1.0 - tween;
+        p.push();
+        sDots.tween = tween;
+        sDots.alpha = alpha * beatFader;
+        sDots.draw();
+        p.pop();
+      },
+      setup: function () {
+        sDots.setup();
+      }
+    },
+    {
+      name: "face",
+      f: function (tween) {
+        let alpha = 1.0 - tween;
+        p.push();
+        sFace.tween = tween;
+        sFace.alpha = alpha * beatFader;
+        sFace.draw();
+        p.pop();
+      },
+      setup: function () {
+        sFace.setup();
+      }
+    }]);
 
   p.setup = function () {
     name = p.folderName;
@@ -1125,6 +1308,7 @@ var s = function (p) {
     levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
     oscShader = p.loadShader(p.sketchPath(name + "/osc.glsl"));
 
+    sLines.setup();
     sCircleMorph.setup();
     sStarField.setup();
     sGameOfLife.setup();
@@ -1132,16 +1316,12 @@ var s = function (p) {
     sBeesAndBombs.setup();
     sDots.setup();
 
-    funcAssets.backdropFunc.update();
+    funcAssets.update();
   }
 
   p.getCount = function () { return p.frameCount - startFrame + Math.floor(p.oscFaders[1] * 60) };
 
   p.keyPressed = function () {
-    if (!autoPilot) {
-      startFrame = p.frameCount;
-      doUpdate = true;
-    }
   }
 
   p.draw = function () {
@@ -1158,36 +1338,13 @@ var s = function (p) {
       shaderUpdated = true;
     }
 
-    if ((seq != lastSeq) || (!autoPilot && doUpdate)) {
-      doUpdate = false;
-      targetII = Math.floor(p.random(-1, 2));
-
-      let newPreset = {};
-      let depthCount = 4;
-      function unwrapPreset(newp, libp) {
-        if(libp.parents && libp.parents.length > 0 && depthCount >= 0) {
-          for(let i = 0; i < libp.parents.length; i++) {
-            unwrapPreset(newp, bPreset[libp.parents[i]]);
-          }
-        }
-        for (let key in libp) {
-          if(key != "parent") {
-            newp[key] = libp[key];
-          }
-        }
-      }
-      unwrapPreset(newPreset, midiToPreset[p.oscPreset].preset[seq % 4]);
-      for (let i in functions) {
-        let funcTypeName = functions[i];
-        if(funcTypeName == "backdropFunc") {
-          funcAssets[funcTypeName].preset = midiToPreset[p.oscPreset].backdrop;
-        }
-        else {
-          funcAssets[funcTypeName].preset = newPreset[funcTypeName];
-        }
-        funcAssets[funcTypeName].update(seq);
-      }
+    if (seq != lastSeq) {
+      funcAssets.preset = [midiToPreset[p.oscPreset].preset];
+      funcAssets.update(seq);
     }
+
+    let tween2 = (t * 0.5 % 1.0) * 2.0 - 1.0;
+    funcAssets.exec(tween2);
 
     let colorSc = [
       [0, 255, 150],
@@ -1251,8 +1408,6 @@ var s = function (p) {
       backPg = intermediatePg;
     }
     drawShader();
-    // p.tint(255 * p.oscFaders[0]);
-    // p.image(frontPg, 0, 0);
     levelShader.set("pgTexture", frontPg);
     levelShader.set("backgroundTexture", bgpg);
     levelShader.set("foregroundTexture", fgpg);
@@ -1263,46 +1418,6 @@ var s = function (p) {
     }
     p.syphonServer.sendImage(frontPg);
 
-    p.push();
-    p.translate(p.width / 2, p.height / 2);
-
-    function drawBeat() {
-      beatFader = p.oscFaders[3];
-      p.blendMode(p.BLEND);
-      // p.background(0);
-      p.stroke(255, 255 * beatFader);
-      p.strokeWeight(2);
-
-      let tween = 0.0;
-      if (autoPilot) {
-        tween = (t * 1.0 % 1.0) * 2.0 - 1.0;
-      }
-      else {
-        tween = p.constrain((t * 1.0) * 2.0 - 1.0, -1.0, 1.0);
-      }
-
-      let tween2 = 0.0;
-      if (autoPilot) {
-        tween2 = (t * 0.5 % 1.0) * 2.0 - 1.0;
-      }
-      else {
-        tween2 = p.constrain((t * 0.5) * 2.0 - 1.0, -1.0, 1.0);
-      }
-      funcAssets.backdropFunc.exec(tween2);
-
-      funcAssets.globalTransformFunc.exec(tween);
-
-      for (let ii = -2; ii <= 2; ii++) {
-        for (let jj = 0; jj < 2; jj++) {
-          let agent = new Agent(t, tween, ii, jj, ii == targetII && jj == 1);
-          agent.draw();
-
-          if (ii != targetII) break;
-        }
-      }
-    }
-    drawBeat();
-    p.pop();
     p.syphonServer.sendScreen();
 
     p.translate(p.width / 2, p.height / 2);
