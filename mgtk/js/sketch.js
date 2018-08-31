@@ -459,10 +459,14 @@ var SFace = function (p) {
     bgpg.clear();
     bgpg.image(p.cam, 0, 0, 1280/2, 720/2);
 
-    for(let i = 0; i < p.facePoints.length; i++) {
-      let x = p.facePoints[i][0] * 0.5;
-      let y = p.facePoints[i][1] * 0.5;
-      bgpg.ellipse(x, y, 4, 4)
+    bgpg.noStroke();
+    bgpg.fill(255,0,0);
+    for(let i = 0; i < p.posePoints.length; i++) {
+      // let x = p.facePoints[i][0] * 0.5;
+      // let y = p.facePoints[i][1] * 0.5;
+      let x = p.map(p.posePoints[i][0], 0, 640, 80, 640-80);
+      let y = p.map(p.posePoints[i][1], 0, 480, 0, 360);
+      bgpg.ellipse(x, y, 14, 14)
     }
     bgpg.noFill();
     bgpg.stroke(255);

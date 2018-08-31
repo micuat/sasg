@@ -25,15 +25,15 @@ http.listen(port_http, function () {
 });
 
 
-let client = new osc.Client('127.0.0.1', 6001);
+let client = new osc.Client('127.0.0.1', 13000);
 
 io.on('connection', function (socket) {
   console.log('a user connected');
   socket.on('disconnect', function () {
     console.log('user disconnected');
   });
-  socket.on('pack', function (msg) {
-    client.send('/pose/blah', 0, function (error) {
+  socket.on('pose', function (msg) {
+    client.send('/pose/points', msg, function (error) {
     });
   });
 });

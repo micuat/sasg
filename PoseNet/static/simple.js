@@ -12,6 +12,8 @@ let video;
 let poseNet;
 let poses = [];
 
+const socket = io();
+
 function setup() {
   createCanvas(640, 480);
   video = createCapture(VIDEO);
@@ -46,6 +48,7 @@ function drawKeypoints()  {
   for (let i = 0; i < poses.length; i++) {
     // For each pose detected, loop through all the keypoints
     let pose = poses[i].pose;
+    let points = [];
     for (let j = 0; j < pose.keypoints.length; j++) {
       // A keypoint is an object describing a body part (like rightArm or leftShoulder)
       let keypoint = pose.keypoints[j];
@@ -55,6 +58,11 @@ function drawKeypoints()  {
         noStroke();
         ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
       }
+      points.push(keypoint.position.x);
+      points.push(keypoint.position.y);
+    }
+    if(i == 0) {
+      socket.emit('pose', points);
     }
   }
 }
