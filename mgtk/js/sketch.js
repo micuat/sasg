@@ -9,6 +9,7 @@ var frontPg;
 var backPg;
 var bgpg;
 var fgpg;
+var layerPgs;
 var oscPgs;
 
 var FuncList = function (everyNSeq, funcs) {
@@ -1229,23 +1230,24 @@ var s = function (p) {
       frontPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (backPg == undefined)
       backPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
+    if (layerPgs == undefined) {
+      layerPgs = [];
+      for(let i = 0; i < 16; i++) {
+        let pg = p.createGraphics(windowWidth, windowHeight, p.P3D);
+        pg.beginDraw();
+        pg.clear();
+        pg.endDraw();
+        layerPgs.push(pg);
+      }
+    }
+    bgpg = layerPgs[0];
+    fgpg = layerPgs[1];
+
     if (oscPgs == undefined) {
       oscPgs = [];
       for(let i = 0; i < 3; i++) {
         oscPgs.push(p.createGraphics(windowWidth, windowHeight, p.P3D));
       }
-    }
-    if (bgpg == undefined) {
-      bgpg = p.createGraphics(windowWidth, windowHeight, p.P3D);
-      bgpg.beginDraw();
-      bgpg.clear();
-      bgpg.endDraw();
-    }
-    if (fgpg == undefined) {
-      fgpg = p.createGraphics(windowWidth, windowHeight, p.P3D);
-      fgpg.beginDraw();
-      fgpg.clear();
-      fgpg.endDraw();
     }
     texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
     levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
