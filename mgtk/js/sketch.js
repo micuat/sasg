@@ -549,7 +549,7 @@ var SLines = function (p) {
     pg.pushStyle();
     pg.translate(windowWidth / 2, windowHeight / 2);
     function drawBeat() {
-      beatFader = p.oscFaders[3];
+      // beatFader = p.oscFaders[3];
       pg.stroke(255, 255 * beatFader);
       pg.strokeWeight(2);
 
