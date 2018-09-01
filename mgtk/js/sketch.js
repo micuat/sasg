@@ -1108,6 +1108,7 @@ var SBrown = function (p) {
 }
 
 var SLangtonAnt = function (p) {
+  let pg;
   let grid;
   let x;
   let y;
@@ -1119,15 +1120,13 @@ var SLangtonAnt = function (p) {
   let ANTLEFT = 3;
 
   let m = 8;
+  let toSetup = true;
 
   x = windowWidth / m / 2;
   y = windowHeight / m / 2;
   dir = ANTUP;
   this.setup = function () {
-    grid = make2DArray(windowWidth / m, windowHeight / m);
-    pg.beginDraw();
-    pg.clear();
-    pg.endDraw();
+    toSetup = true;
   }
 
   function turnRight() {
@@ -1170,6 +1169,15 @@ var SLangtonAnt = function (p) {
   this.draw = function () {
     if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
+
+    if (toSetup) {
+      pg = this.pg;
+      grid = make2DArray(windowWidth / m, windowHeight / m);
+      pg.beginDraw();
+      pg.clear();
+      pg.endDraw();
+      toSetup = false;
+    }
 
     pg.beginDraw();
     pg.pushMatrix();
@@ -1214,6 +1222,110 @@ var SLangtonAnt = function (p) {
   }
 };
 
+var SDoublePendulum = function (p) {
+  function DP() {
+    this.r1 = 200;
+    this.r2 = 400;
+    this.m1 = 40;
+    this.m2 = 5;
+    this.a1 = 0;
+    this.a2 = 0;
+    this.a1_v = 0;
+    this.a2_v = 0;
+    this.g = 1;
+
+    this.a1 = Math.PI / 3;
+    this.a2 = Math.PI / 3;
+    this.cx = windowWidth / 2;
+    this.cy = 50;
+
+    this.px = [];
+    this.py = [];
+  }
+
+  DP.prototype.update = function () {
+    let num1 = -this.g * (2 * this.m1 + this.m2) * Math.sin(this.a1);
+    let num2 = -this.m2 * this.g * Math.sin(this.a1 - 2 * this.a2);
+    let num3 = -2 * Math.sin(this.a1 - this.a2) * this.m2;
+    let num4 = this.a2_v * this.a2_v * this.r2 + this.a1_v * this.a1_v * this.r1 * Math.cos(this.a1 - this.a2);
+    let den = this.r1 * (2 * this.m1 + this.m2 - this.m2 * Math.cos(2 * this.a1 - 2 * this.a2));
+    let a1_a = (num1 + num2 + num3 * num4) / den;
+
+    num1 = 2 * Math.sin(this.a1 - this.a2);
+    num2 = (this.a1_v * this.a1_v * this.r1 * (this.m1 + this.m2));
+    num3 = this.g * (this.m1 + this.m2) * Math.cos(this.a1);
+    num4 = this.a2_v * this.a2_v * this.r2 * this.m2 * Math.cos(this.a1 - this.a2);
+    den = this.r2 * (2 * this.m1 + this.m2 - this.m2 * Math.cos(2 * this.a1 - 2 * this.a2));
+    let a2_a = (num1 * (num2 + num3 + num4)) / den;
+
+    pg.pushMatrix();
+    pg.pushStyle();
+    pg.translate(this.cx, this.cy);
+    pg.stroke(255, 100);
+    pg.strokeWeight(2);
+
+    let x1 = this.r1 * Math.sin(this.a1);
+    let y1 = this.r1 * Math.cos(this.a1);
+
+    let x2 = x1 + this.r2 * Math.sin(this.a2);
+    let y2 = y1 + this.r2 * Math.cos(this.a2);
+
+
+    pg.line(0, 0, x1, y1);
+    pg.line(x1, y1, x2, y2);
+    pg.noStroke();
+    pg.fill(255, 150);
+    pg.ellipse(x2, y2, 15, 15);
+    this.px.push(x2);
+    this.py.push(y2);
+    if (this.px.length > 10) this.px.shift();
+    if (this.py.length > 10) this.py.shift();
+
+    for (let i in this.px) {
+      pg.ellipse(this.px[i], this.py[i], 15, 15);
+    }
+    pg.popStyle();
+    pg.popMatrix();
+
+    this.a1_v += a1_a;
+    this.a2_v += a2_a;
+    this.a1 += this.a1_v;
+    this.a2 += this.a2_v;
+  }
+
+  let dp;
+  this.setup = function () {
+    dp = [];
+    for (let i = 0; i < 3; i++) {
+      let d = new DP();
+      d.r1 = p.random(100, 102);
+      d.r2 = 200 - d.r1;
+      dp.push(d);
+    }
+  }
+
+  this.draw = function () {
+    if (this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
+    pg.beginDraw();
+    pg.pushMatrix();
+    pg.pushStyle();
+
+    for (let i = 0; i < dp.length; i++) {
+      let d = dp[i];
+      pg.pushMatrix();
+      pg.translate((i - 1) * windowWidth / 3.0, 0);
+      d.update();
+      pg.popMatrix();
+    }
+    pg.popStyle();
+    pg.popMatrix();
+    pg.endDraw();
+  }
+
+};
+
 var s = function (p) {
   let name;
   let sLines = new SLines(p);
@@ -1226,6 +1338,7 @@ var s = function (p) {
   let sFace = new SFace(p);
   let sBrown = new SBrown(p);
   let sLangtonAnt = new SLangtonAnt(p);
+  let sDoublePendulum = new SDoublePendulum(p);
 
   let startFrame;
   let doUpdate = true;
@@ -1373,8 +1486,23 @@ var s = function (p) {
           sLangtonAnt.draw();
         },
         setup: function () {
-          sLangtonAnt.pg = pg;
           sLangtonAnt.setup();
+        }
+      },
+      {
+        name: "doublePendulum",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+          let alpha = 1.0 - tween;
+          sDoublePendulum.pg = pg;
+          sDoublePendulum.tween = tween;
+          sDoublePendulum.alpha = alpha * beatFader;
+          sDoublePendulum.draw();
+        },
+        setup: function () {
+          sDoublePendulum.setup();
         }
       }
     ]));
@@ -1394,6 +1522,7 @@ var s = function (p) {
     { preset: ["face"] },
     { preset: ["starField", "ribbons", "brown"] },
     { preset: ["langtonAnt", "ribbons"] },
+    { preset: ["doublePendulum"] },
   ];
 
   p.setup = function () {
