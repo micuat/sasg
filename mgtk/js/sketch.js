@@ -541,7 +541,9 @@ var SLines = function (p) {
           }
         }
       }
-      unwrapPreset(newPreset, midiToPreset[p.oscPreset].preset[seq % 4]);
+      let presetIndex = p.oscPreset;
+      if(presetIndex >= midiToPreset.length) presetIndex = 0;
+      unwrapPreset(newPreset, midiToPreset[presetIndex].preset[seq % 4]);
       for (let i in functions) {
         let funcTypeName = functions[i];
         funcAssets[funcTypeName].preset = newPreset[funcTypeName];
@@ -1217,6 +1219,7 @@ var s = function (p) {
     {preset: ["ribbons", "lines"]},
     {preset: ["ribbons", "lines"]},
     {preset: ["face"]},
+    {preset: ["default", "lines"]},
   ];
 
   p.setup = function () {
