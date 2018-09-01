@@ -57,23 +57,11 @@ var SLines = function (p) {
   let pg = fgpg;
   this.pg = fgpg;
 
-  function Agent(t, tween, ii, jj, isTarget) {
-    this.t = t;
+  function Agent(ii, jj) {
     this.ii = ii;
     this.jj = jj;
-    this.isTarget = isTarget;
-    this.tween = tween;
     funcAssets.orderFunc.exec(this);
-    let tweenp = 4.0;
-    if (this.tween < 0) {
-      this.tween = Math.pow(p.map(this.tween, -1, 0, 0, 1), tweenp) * 0.5;
-    }
-    else {
-      if (this.isTarget) {
-        tweenp = 1.0;
-      }
-      this.tween = 1.0 - Math.pow(p.map(this.tween, 0, 1, 1, 0), tweenp) * 0.5;
-    }
+    this.tweenp = 4.0;
 
     // power, [0, 1]
     this.tweenPowZO = function () { return this.tween; }
@@ -99,10 +87,26 @@ var SLines = function (p) {
       }
     }
 
-    this.draw = function () {
+    this.draw = function (t, tween) {
+      this.t = t;
+      this.tween = tween;
+      let isTarget = ii == targetII && jj == 1;
+      this.tweenp = 4.0;
+
+      if (this.tween < 0) {
+        this.tween = Math.pow(p.map(this.tween, -1, 0, 0, 1), this.tweenp) * 0.5;
+      }
+      else {
+        if (isTarget) {
+          this.tweenp = 1.0;
+        }
+        this.tween = 1.0 - Math.pow(p.map(this.tween, 0, 1, 1, 0), this.tweenp) * 0.5;
+      }
+
+      if(isTarget == false && jj == 1) return;
       pg.pushMatrix();
       pg.pushStyle();
-      if (this.isTarget) {
+      if (isTarget) {
         pg.stroke(255, 180 * beatFader);
       }
       else {
@@ -517,6 +521,13 @@ var SLines = function (p) {
   ]
 
   this.setup = function () {
+    agents = [];
+    for (let ii = -2; ii <= 2; ii++) {
+      for (let jj = 0; jj < 2; jj++) {
+        let agent = new Agent(ii, jj);
+        agents.push(agent);
+      }
+    }
   }
 
   this.draw = function () {
@@ -564,13 +575,8 @@ var SLines = function (p) {
 
       funcAssets.globalTransformFunc.exec(tween);
 
-      for (let ii = -2; ii <= 2; ii++) {
-        for (let jj = 0; jj < 2; jj++) {
-          let agent = new Agent(t, tween, ii, jj, ii == targetII && jj == 1);
-          agent.draw();
-
-          if (ii != targetII) break;
-        }
+      for(let i in agents) {
+        agents[i].draw(t, tween);
       }
     }
     drawBeat();
