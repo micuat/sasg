@@ -143,25 +143,26 @@ void mousePressed(MouseEvent event) {
 }
 
 void oscEvent(OscMessage theOscMessage) {
-  if (theOscMessage.checkAddrPattern("/livid/control")==true) {
-    int index = theOscMessage.get(0).intValue();
-    if (index < 20) {
-      oscFaders[index] = theOscMessage.get(1).intValue() / 127.0;
-    }
-  }
-  else if (theOscMessage.checkAddrPattern("/livid/note")==true) {
-    int index = theOscMessage.get(0).intValue();
-    if (index <= 35 && theOscMessage.get(1).intValue() > 0) {
-      oscPreset = index;
-    }
-    else if (38 <= index && index <= 41 && theOscMessage.get(1).intValue() > 0) {
-      seqOffset = index - 38;
-    }
-    else if (index < 57 && theOscMessage.get(1).intValue() > 0) {
-      oscButton[index] = theOscMessage.get(1).intValue() > 0 ? 1 : 0;
-    }
-  }
-  else if (theOscMessage.checkAddrPattern("/face/points")==true) {
+  //if (theOscMessage.checkAddrPattern("/livid/control")==true) {
+  //  int index = theOscMessage.get(0).intValue();
+  //  if (index < 20) {
+  //    oscFaders[index] = theOscMessage.get(1).intValue() / 127.0;
+  //  }
+  //}
+  //else if (theOscMessage.checkAddrPattern("/livid/note")==true) {
+  //  int index = theOscMessage.get(0).intValue();
+  //  if (index <= 35 && theOscMessage.get(1).intValue() > 0) {
+  //    oscPreset = index;
+  //  }
+  //  else if (38 <= index && index <= 41 && theOscMessage.get(1).intValue() > 0) {
+  //    seqOffset = index - 38;
+  //  }
+  //  else if (index < 57 && theOscMessage.get(1).intValue() > 0) {
+  //    oscButton[index] = theOscMessage.get(1).intValue() > 0 ? 1 : 0;
+  //  }
+  //}
+  //else 
+  if (theOscMessage.checkAddrPattern("/face/points")==true) {
     for(int i = 0; i < 68; i++) {
       facePoints[i][0] = theOscMessage.get(i * 2 + 0).floatValue();
       facePoints[i][1] = theOscMessage.get(i * 2 + 1).floatValue();
@@ -173,6 +174,9 @@ void oscEvent(OscMessage theOscMessage) {
       posePoints[i][1] = theOscMessage.get(i * 2 + 1).floatValue();
     }
   }
+  //else if (theOscMessage.checkAddrPattern("/data")==true) {
+  //  openPose = theOscMessage.get(0).stringValue();
+  //}
   //try {
   //  nashorn.eval("for(var prop in pApplet) {if(!this.isReservedFunction(prop)) {globalSketch[prop] = pApplet[prop]}}");
 

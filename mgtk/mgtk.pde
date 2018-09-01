@@ -30,15 +30,6 @@ import toxi.physics3d.behaviors.*;
 import toxi.physics3d.constraints.*;
 import toxi.geom.*;
 
-// import SimpleOpenNI.*;
-
-public float[] oscFaders = new float[20];
-public int oscPreset = 0;
-public int[] oscButton = new int[57];
-public int seqOffset = 0;
-public float[][] facePoints = new float[68][2];
-public float[][] posePoints = new float[17][2];
-
 import oscP5.*;
 import netP5.*;
 
@@ -47,6 +38,19 @@ import geomerative.*;
 import codeanticode.syphon.*;
 
 import processing.video.*;
+
+import themidibus.*;
+
+public float[] oscFaders = new float[20];
+public int oscPreset = 0;
+public int[] oscButton = new int[57];
+public int seqOffset = 0;
+public float[][] facePoints = new float[68][2];
+public float[][] posePoints = new float[17][2];
+public String openPose = "";
+
+MidiBus myBus;
+
 public ArrayList<Movie> movies = new ArrayList<Movie>();
 public Capture cam;
 
@@ -106,6 +110,8 @@ void setup() {
   scriptPaths.add(sketchPath(folderName + "/sketch.js"));
 
   syphonServer = new SyphonServer(this, "mgtk");
+
+  myBus = new MidiBus(this, "USB MIDI Interface", "USB MIDI Interface"); // Create a new MidiBus using the device names to select the Midi input and output devices respectively.
 }
 
 public void loadVideos(int i) {
@@ -419,5 +425,33 @@ public void readFiles(ArrayList<String> paths) throws IOException {
     catch (Exception e) {
       e.printStackTrace();
     }
+  }
+}
+
+void noteOn(int channel, int pitch, int velocity) {
+  int index = pitch;
+  if (index <= 35) {
+    oscPreset = index;
+  }
+  else if (38 <= index && index <= 41) {
+    seqOffset = index - 38;
+  }
+
+  if (index < 57) {
+    oscButton[index] = 1;
+  }
+}
+
+void noteOff(int channel, int pitch, int velocity) {
+  int index = pitch;
+  if (index < 57) {
+    oscButton[index] = 0;
+  }
+}
+
+void controllerChange(int channel, int number, int value) {
+  int index = number;
+  if (index < 20) {
+    oscFaders[index] = value / 127.0;
   }
 }
