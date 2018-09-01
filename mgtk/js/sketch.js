@@ -1261,7 +1261,7 @@ var SDoublePendulum = function (p) {
     pg.pushMatrix();
     pg.pushStyle();
     pg.translate(this.cx, this.cy);
-    pg.stroke(255, 100);
+    pg.stroke(255, 200);
     pg.strokeWeight(2);
 
     let x1 = this.r1 * Math.sin(this.a1);
@@ -1522,7 +1522,7 @@ var s = function (p) {
     { preset: ["face"] },
     { preset: ["starField", "ribbons", "brown"] },
     { preset: ["langtonAnt", "ribbons"] },
-    { preset: ["doublePendulum"] },
+    { preset: ["brown", "doublePendulum"] },
   ];
 
   p.setup = function () {
