@@ -1261,14 +1261,6 @@ var s = function (p) {
     levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
     oscShader = p.loadShader(p.sketchPath(name + "/osc.glsl"));
 
-    sLines.setup();
-    sCircleMorph.setup();
-    sStarField.setup();
-    sGameOfLife.setup();
-    sRibbons.setup();
-    sBeesAndBombs.setup();
-    sDots.setup();
-
     for(let i = 0; i < funcAssets.length; i++) {
       funcAssets[i].update();
     }
