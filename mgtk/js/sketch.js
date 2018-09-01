@@ -1308,6 +1308,19 @@ var s = function (p) {
       }
     }
 
+    // runwayml test
+    // let human = JSON.parse(p.openPose).results.humans[0];
+    // if(human != undefined) {
+    //   fgpg.beginDraw();
+    //   fgpg.fill(255);
+    //   for(let i = 0; i < human.length; i++) {
+    //     let x = human[i][1] * 640 * 0.5;
+    //     let y = human[i][2] * 480 * 0.5;
+    //     fgpg.ellipse(x, y, 10, 10);
+    //   }
+    //   fgpg.endDraw();
+    // }
+
     let colorSc = [
       [0, 255, 150],
       [0, 155, 50],
