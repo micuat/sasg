@@ -677,14 +677,13 @@ var SCircleMorph = function (p) {
 };
 
 var SStarField = function (p) {
-  let stars = [];
   let speed = 0;
   this.alpha = 1.0;
 
   function Star() {
-    this.x = p.random(-p.width, p.width) / 2;
-    this.y = p.random(-p.height, p.height) / 2;
-    this.z = p.random(p.width);
+    this.x = p.random(-windowWidth, windowWidth) / 2;
+    this.y = p.random(-windowWidth, windowWidth) / 2;
+    this.z = p.random(windowWidth);
     this.pz = this.z;
     if (p.random(1) > 0.) {
       this.tail = 10;
@@ -696,51 +695,56 @@ var SStarField = function (p) {
     this.update = function (speed) {
       this.z = this.z - speed;
       if (this.z < 0.0) {
-        this.z = p.width;
-        this.x = p.random(-p.height, p.height) / 2;
-        this.y = p.random(-p.height, p.height) / 2;
+        this.z = windowWidth;
+        this.x = p.random(-windowWidth, windowWidth) / 2;
+        this.y = p.random(-windowWidth, windowWidth) / 2;
         this.pz = this.z;
       }
     }
 
-    this.show = function (alpha) {
-      let sx = p.map(this.x / this.z, 0, 1, 0, p.width);
-      let sy = p.map(this.y / this.z, 0, 1, 0, p.height);
+    this.show = function (pg, alpha) {
+      let sx = p.map(this.x / this.z, 0, 1, 0, windowWidth);
+      let sy = p.map(this.y / this.z, 0, 1, 0, windowWidth);
 
       for (let i = 0; i < this.tail; i++) {
         let pz = this.pz + i * 20;
-        let px = p.map(this.x / (this.pz + i * 10), 0, 1, 0, p.width);
-        let py = p.map(this.y / (this.pz + i * 10), 0, 1, 0, p.height);
+        let px = p.map(this.x / (this.pz + i * 10), 0, 1, 0, windowWidth);
+        let py = p.map(this.y / (this.pz + i * 10), 0, 1, 0, windowWidth);
 
-        p.noStroke();
-        p.fill(255, p.map(i, 0, 10, 255, 0) * alpha);
-        let r = p.map(pz, 0, p.width, 12, 0);
-        p.ellipse(px, py, r, r);
+        pg.noStroke();
+        pg.fill(255, p.map(i, 0, 10, 255, 0) * alpha);
+        let r = p.map(pz, 0, windowWidth, 12, 0);
+        pg.ellipse(px, py, r, r);
       }
       this.pz = this.z;
     }
   }
 
+  let stars = [];
+  for (let i = 0; i < 200; i++) {
+    stars.push(new Star());
+  }
+  
   this.setup = function () {
-    for (let i = 0; i < 50; i++) {
-      stars.push(new Star());
-    }
   }
 
   this.draw = function () {
-    if (p.frameCount % 30 == 0) {
-      if (p.frameCount % 60 > 30) {
-        speed = p.random(5, 10);
-      }
-      else {
-        speed = p.random(25, 50);
-      }
-    }
+    if(this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+    pg.beginDraw();
+    pg.clear();
+    pg.pushMatrix();
+    pg.translate(this.tween * windowWidth / 3.0, 0);
+    pg.translate(windowWidth * 0.5, windowHeight * 0.5);
+    speed = 20;
+    let alpha = Math.pow(1 - Math.abs(this.tween), 2.0);
     // p.translate(p.width / 2, p.height / 2);
     for (let i = 0; i < stars.length; i++) {
       stars[i].update(speed);
-      stars[i].show(this.alpha);
+      stars[i].show(pg, alpha);
     }
+    pg.popMatrix();
+    pg.endDraw();
   };
 };
 
@@ -920,8 +924,6 @@ var SRibbons = function (p) {
 }
 
 var SBeesAndBombs = function (p) {
-  let pg = fgpg;
-  this.pg = fgpg;
   let angle = 0;
   let w = 40;
   let ma;
@@ -1071,6 +1073,40 @@ var SFace = function (p) {
   };
 };
 
+var SBrown = function (p) {
+  let shape = p.loadShape("data/models/line_brown.obj");
+
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    if(this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
+    pg.beginDraw();
+    pg.clear();
+    pg.pushMatrix();
+    pg.translate(pg.width / 2, pg.height / 2);
+    pg.directionalLight(255, 255, 255, 1.5, 0.5, 1);
+    pg.directionalLight(255, 255, 255, -1.5, -0.5, 1);
+    for(let i = -1; i <= 1; i++) {
+      pg.pushMatrix();
+      pg.translate(windowWidth / 3 * i, 0);
+      pg.scale(5, -5, 5);
+      if(this.tween < 0) {
+        pg.rotateZ(-Math.pow(this.tween, 4.0) * Math.PI);
+      }
+      else {
+        pg.rotateZ(Math.pow(this.tween, 4.0) * Math.PI);
+      }
+      pg.shape(shape, 0, 0);
+      pg.popMatrix();
+    }
+    pg.popMatrix();
+    pg.endDraw();
+  }
+}
+
 var s = function (p) {
   let name;
   let sLines = new SLines(p);
@@ -1081,6 +1117,7 @@ var s = function (p) {
   let sBeesAndBombs = new SBeesAndBombs(p);
   let sDots = new SDots(p);
   let sFace = new SFace(p);
+  let sBrown = new SBrown(p);
 
   let startFrame;
   let doUpdate = true;
@@ -1129,15 +1166,11 @@ var s = function (p) {
       {
         name: "starField",
         f: function (tween, pg) {
-          pg.beginDraw();
-          pg.clear();
-          pg.endDraw();
+          sStarField.pg = pg;
+          sStarField.tween = tween;
           let alpha = 1.0 - tween;
-          p.push();
-          p.translate(tween * p.width / 3.0, 0);
           sStarField.alpha = alpha * beatFader;
           sStarField.draw();
-          p.pop();
         }
       },
       {
@@ -1200,21 +1233,33 @@ var s = function (p) {
         name: "face",
         f: function (tween, pg) {
           let alpha = 1.0 - tween;
-          p.push();
+          sFace.pg = pg;
           sFace.tween = tween;
           sFace.alpha = alpha * beatFader;
           sFace.draw();
-          p.pop();
         },
         setup: function () {
           sFace.setup();
+        }
+      },
+      {
+        name: "brown",
+        f: function (tween, pg) {
+          let alpha = 1.0 - tween;
+          sBrown.pg = pg;
+          sBrown.tween = tween;
+          sBrown.alpha = alpha * beatFader;
+          sBrown.draw();
+        },
+        setup: function () {
+          sBrown.setup();
         }
       }
     ]));
   }
 
   let midiToPreset = [
-    {preset: ["default"]},
+    {preset: ["default"]}, // 1
     {preset: ["beesAndBombs", "lines"]},
     {preset: ["beesAndBombs", "lines"]},
     {preset: ["beesAndBombs", "lines"]},
@@ -1223,9 +1268,9 @@ var s = function (p) {
     {preset: ["ribbons", "lines"]},
     {preset: ["ribbons", "lines"]},
     {preset: ["ribbons", "lines"]},
-    {preset: ["ribbons", "lines"]},
+    {preset: ["ribbons", "lines"]}, // 10
     {preset: ["face"]},
-    {preset: ["default", "lines"]},
+    {preset: ["starField", "ribbons", "brown"]},
   ];
 
   p.setup = function () {

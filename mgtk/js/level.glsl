@@ -31,6 +31,6 @@ void main() {
   finalColor.rgb *= masterFader * 2.0;
   // if(seq < 2.0)
   // finalColor.rgb = mix(finalColor.rgb, bgColor.rgb, bgColor.a);
-  finalColor.rgb += fgColor.rgb;
+  finalColor.rgb = mix(finalColor.rgb, fgColor.rgb, fgColor.a);
 	gl_FragColor = finalColor;
 }
