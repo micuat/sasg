@@ -1107,6 +1107,113 @@ var SBrown = function (p) {
   }
 }
 
+var SLangtonAnt = function (p) {
+  let grid;
+  let x;
+  let y;
+  let dir;
+  
+  let ANTUP = 0;
+  let ANTRIGHT = 1;
+  let ANTDOWN = 2;
+  let ANTLEFT = 3;
+  
+  let m = 8;
+  
+  x = windowWidth / m / 2;
+  y = windowHeight / m / 2;
+  dir = ANTUP;
+  this.setup = function () {
+    grid = make2DArray(windowWidth / m, windowHeight / m);
+    pg.beginDraw();
+    pg.clear();
+    pg.endDraw();
+  }
+
+  function turnRight() {
+    dir++;
+    if (dir > ANTLEFT) {
+      dir = ANTUP;
+    }
+  }
+
+  function turnLeft() {
+    dir--;
+    if (dir < ANTUP) {
+      dir = ANTLEFT;
+    }
+  }
+
+  function moveForward() {
+    if (dir == ANTUP) {
+      y--;
+    } else if (dir == ANTRIGHT) {
+      x++;
+    } else if (dir == ANTDOWN) {
+      y++;
+    } else if (dir == ANTLEFT) {
+      x--;
+    }
+
+    if (x > windowWidth / m - 1) {
+      x = 0;
+    } else if (x < 0) {
+      x = windowWidth / m - 1;
+    }
+    if (y > windowHeight / m - 1) {
+      y = 0;
+    } else if (y < 0) {
+      y = windowHeight / m - 1;
+    }
+  }
+
+  this.draw = function () {
+    if(this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
+    pg.beginDraw();
+    pg.pushMatrix();
+    pg.pushStyle();
+    pg.strokeWeight(m);
+    pg.fill(0);
+
+    for (let n = 0; n < 40; n++) {
+      let state = grid[x][y];
+      if (state == 0) {
+        turnRight();
+        grid[x][y] = 1;
+      } else if (state == 1) {
+        turnLeft();
+        grid[x][y] = 0;
+      }
+
+      if (grid[x][y] == 1) {
+        pg.stroke(0);
+        pg.point(x * m, y * m);
+      }
+      else {
+        pg.stroke(255);
+        pg.point(x * m, y * m);
+      }
+      moveForward();
+    }
+    pg.popStyle();
+    pg.popMatrix();
+    pg.endDraw();
+  }
+
+  function make2DArray(cols, rows, mode) {
+    let arr = new Array(cols);
+    for (let i = 0; i < arr.length; i++) {
+      arr[i] = new Array(rows);
+      for (let j = 0; j < arr[i].length; j++) {
+        arr[i][j] = 0;
+      }
+    }
+    return arr;
+  }
+};
+
 var s = function (p) {
   let name;
   let sLines = new SLines(p);
@@ -1118,6 +1225,7 @@ var s = function (p) {
   let sDots = new SDots(p);
   let sFace = new SFace(p);
   let sBrown = new SBrown(p);
+  let sLangtonAnt = new SLangtonAnt(p);
 
   let startFrame;
   let doUpdate = true;
@@ -1254,6 +1362,20 @@ var s = function (p) {
         setup: function () {
           sBrown.setup();
         }
+      },
+      {
+        name: "langtonAnt",
+        f: function (tween, pg) {
+          let alpha = 1.0 - tween;
+          sLangtonAnt.pg = pg;
+          sLangtonAnt.tween = tween;
+          sLangtonAnt.alpha = alpha * beatFader;
+          sLangtonAnt.draw();
+        },
+        setup: function () {
+          sLangtonAnt.pg = pg;
+          sLangtonAnt.setup();
+        }
       }
     ]));
   }
@@ -1271,6 +1393,7 @@ var s = function (p) {
     {preset: ["ribbons", "lines"]}, // 10
     {preset: ["face"]},
     {preset: ["starField", "ribbons", "brown"]},
+    {preset: ["langtonAnt", "ribbons"]},
   ];
 
   p.setup = function () {
