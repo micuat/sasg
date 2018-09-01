@@ -103,7 +103,7 @@ var SLines = function (p) {
         this.tween = 1.0 - Math.pow(p.map(this.tween, 0, 1, 1, 0), this.tweenp) * 0.5;
       }
 
-      if(isTarget == false && jj == 1) return;
+      if (isTarget == false && jj == 1) return;
       pg.pushMatrix();
       pg.pushStyle();
       if (isTarget) {
@@ -507,17 +507,17 @@ var SLines = function (p) {
     }
   };
   let midiToPreset = [
-    {preset: [bPreset.default, bPreset.default, bPreset.default, bPreset.default]},
-    {preset: [bPreset.toUpFlat, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat]},
-    {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat]},
-    {preset: [bPreset.toLeftSig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint]},
-    {preset: [bPreset.random, bPreset.random, bPreset.random, bPreset.random]},
-    {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat]},
-    {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint]},
-    {preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat]},
-    {preset: [bPreset.sig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint]},
-    {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint]},
-    {preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint]},
+    { preset: [bPreset.default, bPreset.default, bPreset.default, bPreset.default] },
+    { preset: [bPreset.toUpFlat, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat] },
+    { preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat] },
+    { preset: [bPreset.toLeftSig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
+    { preset: [bPreset.random, bPreset.random, bPreset.random, bPreset.random] },
+    { preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat] },
+    { preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
+    { preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat] },
+    { preset: [bPreset.sig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
+    { preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
+    { preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
   ]
 
   this.setup = function () {
@@ -531,7 +531,7 @@ var SLines = function (p) {
   }
 
   this.draw = function () {
-    if(this.pg == undefined || this.pg == null) return;
+    if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
 
     pg.beginDraw();
@@ -541,19 +541,19 @@ var SLines = function (p) {
       let newPreset = {};
       let depthCount = 4;
       function unwrapPreset(newp, libp) {
-        if(libp.parents && libp.parents.length > 0 && depthCount >= 0) {
-          for(let i = 0; i < libp.parents.length; i++) {
+        if (libp.parents && libp.parents.length > 0 && depthCount >= 0) {
+          for (let i = 0; i < libp.parents.length; i++) {
             unwrapPreset(newp, bPreset[libp.parents[i]]);
           }
         }
         for (let key in libp) {
-          if(key != "parent") {
+          if (key != "parent") {
             newp[key] = libp[key];
           }
         }
       }
       let presetIndex = p.oscPreset;
-      if(presetIndex >= midiToPreset.length) presetIndex = 0;
+      if (presetIndex >= midiToPreset.length) presetIndex = 0;
       unwrapPreset(newPreset, midiToPreset[presetIndex].preset[seq % 4]);
       for (let i in functions) {
         let funcTypeName = functions[i];
@@ -575,7 +575,7 @@ var SLines = function (p) {
 
       funcAssets.globalTransformFunc.exec(tween);
 
-      for(let i in agents) {
+      for (let i in agents) {
         agents[i].draw(t, tween);
       }
     }
@@ -724,12 +724,12 @@ var SStarField = function (p) {
   for (let i = 0; i < 200; i++) {
     stars.push(new Star());
   }
-  
+
   this.setup = function () {
   }
 
   this.draw = function () {
-    if(this.pg == undefined || this.pg == null) return;
+    if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
     pg.beginDraw();
     pg.clear();
@@ -886,7 +886,7 @@ var SRibbons = function (p) {
     amplitude = Math.pow(p.random(0.5, 1.0), 2.0) * 100;
   }
   this.draw = function () {
-    if(this.pg == undefined || this.pg == null) return;
+    if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
 
     pg.beginDraw();
@@ -937,7 +937,7 @@ var SBeesAndBombs = function (p) {
   }
 
   this.draw = function () {
-    if(this.pg == undefined || this.pg == null) return;
+    if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
 
     pg.beginDraw();
@@ -963,7 +963,7 @@ var SBeesAndBombs = function (p) {
         let d = p.dist(x, z, winh / 2, winh / 2);
         let offset = p.map(d, 0, maxD, -p.PI, p.PI);
         let a = angle + -offset;
-        let h = p.floor(p.map(p.sin(a), -1, 1, 0.5, 1)*winh);
+        let h = p.floor(p.map(p.sin(a), -1, 1, 0.5, 1) * winh);
         h = p.map(decay, 0, 1, winh, h);
         pg.translate(x - winh / 2, 0, z - winh / 2);
         // p.normalMaterial();
@@ -983,14 +983,14 @@ var SDots = function (p) {
   let lastMiniSeq = -1;
   let mc = 20.0;
 
-  function newPoint () {
+  function newPoint() {
     let x = Math.floor(p.random(0, windowWidth) / mc) * mc;
     let y = p.random(1.0) > 0.5 ? -10 : windowHeight + 10;
     let targetX = x;
     let targetY = Math.floor(p.random(windowHeight * 0.25, windowHeight) / mc) * mc;
-    return {x: x, y: y, targetX: targetX, targetY: targetY, decay: 0.5};
+    return { x: x, y: y, targetX: targetX, targetY: targetY, decay: 0.5 };
   }
-  for(let i = 0; i < 8; i++) {
+  for (let i = 0; i < 8; i++) {
     points.push(newPoint());
   }
   this.setup = function () {
@@ -1000,7 +1000,7 @@ var SDots = function (p) {
     let miniSeq = Math.floor(tElapsed * (bpm / 60.0));
     let fract = tElapsed * (bpm / 60.0) - miniSeq;
 
-    if(miniSeq != lastMiniSeq) {
+    if (miniSeq != lastMiniSeq) {
       points.splice(0, 1);
       points.push(newPoint());
     }
@@ -1010,7 +1010,7 @@ var SDots = function (p) {
     fgpg.clear();
     fgpg.noStroke();
     fgpg.fill(255);
-    for(let i in points) {
+    for (let i in points) {
       let pt = points[i];
       // pt.y = p.lerp(pt.y, pt.targetY, 0.1);
       pt.y = pt.targetY * (1.0 - Math.pow((Math.sin(fract * Math.PI * 2.0) * pt.decay + 0.5), 2.0));
@@ -1025,7 +1025,7 @@ var SDots = function (p) {
     bgpg.clear();
     bgpg.noStroke();
     bgpg.fill(255);
-    for(let i in points) {
+    for (let i in points) {
       let x = points[i].x;
       let y = points[i].y;
       bgpg.ellipse(x, y, 20, 20);
@@ -1037,7 +1037,7 @@ var SDots = function (p) {
 var SFace = function (p) {
   this.alpha = 1.0;
   this.tween = 0.0;
-  let faces = [0,17,18,20,23,24,19,20,24,25,26,16,26,45,16,46,14,15,45,46,15,16,45,15,35,13,14,46,35,14,54,12,13,35,54,13,35,53,54,47,35,46,25,45,26,54,11,12,44,45,25,24,44,25,29,35,47,55,10,11,54,55,11,44,46,45,20,21,23,42,29,47,43,44,24,23,43,24,44,47,46,43,47,44,29,30,35,21,22,23,56,9,10,55,56,10,35,52,53,28,29,42,64,55,54,23,22,43,43,42,47,53,64,54,22,42,43,34,52,35,56,8,9,22,27,42,65,55,64,53,63,64,27,28,42,57,8,56,30,34,35,65,56,55,52,63,53,33,52,34,65,66,56,66,57,56,51,63,52,33,51,52,30,33,34,21,27,22,58,7,57,57,7,8,50,51,33,51,62,63,30,32,33,58,57,66,67,58,66,61,62,51,31,30,29,32,50,33,39,29,28,39,28,27,21,39,27,31,32,30,40,31,29,39,40,29,50,61,51,6,7,58,59,6,58,59,58,67,49,61,50,31,49,50,31,50,32,38,39,21,60,59,67,40,41,31,41,2,31,20,38,21,2,3,31,48,49,31,3,48,31,48,60,49,3,4,48,48,5,59,5,6,59,60,48,59,19,38,20,38,40,39,19,37,38,4,5,48,1,2,41,37,41,40,37,40,38,36,1,41,18,37,19,36,41,37,18,36,37,17,0,36,0,1,36,18,17,36,49,60,61 ];
+  let faces = [0, 17, 18, 20, 23, 24, 19, 20, 24, 25, 26, 16, 26, 45, 16, 46, 14, 15, 45, 46, 15, 16, 45, 15, 35, 13, 14, 46, 35, 14, 54, 12, 13, 35, 54, 13, 35, 53, 54, 47, 35, 46, 25, 45, 26, 54, 11, 12, 44, 45, 25, 24, 44, 25, 29, 35, 47, 55, 10, 11, 54, 55, 11, 44, 46, 45, 20, 21, 23, 42, 29, 47, 43, 44, 24, 23, 43, 24, 44, 47, 46, 43, 47, 44, 29, 30, 35, 21, 22, 23, 56, 9, 10, 55, 56, 10, 35, 52, 53, 28, 29, 42, 64, 55, 54, 23, 22, 43, 43, 42, 47, 53, 64, 54, 22, 42, 43, 34, 52, 35, 56, 8, 9, 22, 27, 42, 65, 55, 64, 53, 63, 64, 27, 28, 42, 57, 8, 56, 30, 34, 35, 65, 56, 55, 52, 63, 53, 33, 52, 34, 65, 66, 56, 66, 57, 56, 51, 63, 52, 33, 51, 52, 30, 33, 34, 21, 27, 22, 58, 7, 57, 57, 7, 8, 50, 51, 33, 51, 62, 63, 30, 32, 33, 58, 57, 66, 67, 58, 66, 61, 62, 51, 31, 30, 29, 32, 50, 33, 39, 29, 28, 39, 28, 27, 21, 39, 27, 31, 32, 30, 40, 31, 29, 39, 40, 29, 50, 61, 51, 6, 7, 58, 59, 6, 58, 59, 58, 67, 49, 61, 50, 31, 49, 50, 31, 50, 32, 38, 39, 21, 60, 59, 67, 40, 41, 31, 41, 2, 31, 20, 38, 21, 2, 3, 31, 48, 49, 31, 3, 48, 31, 48, 60, 49, 3, 4, 48, 48, 5, 59, 5, 6, 59, 60, 48, 59, 19, 38, 20, 38, 40, 39, 19, 37, 38, 4, 5, 48, 1, 2, 41, 37, 41, 40, 37, 40, 38, 36, 1, 41, 18, 37, 19, 36, 41, 37, 18, 36, 37, 17, 0, 36, 0, 1, 36, 18, 17, 36, 49, 60, 61];
   this.setup = function () {
   }
 
@@ -1048,21 +1048,21 @@ var SFace = function (p) {
 
     bgpg.beginDraw();
     bgpg.clear();
-    bgpg.image(p.cam, 0, 0, 1280/2, 720/2);
+    bgpg.image(p.cam, 0, 0, 1280 / 2, 720 / 2);
 
     bgpg.noStroke();
-    bgpg.fill(255,0,0);
-    for(let i = 0; i < p.posePoints.length; i++) {
+    bgpg.fill(255, 0, 0);
+    for (let i = 0; i < p.posePoints.length; i++) {
       // let x = p.facePoints[i][0] * 0.5;
       // let y = p.facePoints[i][1] * 0.5;
-      let x = p.map(p.posePoints[i][0], 0, 640, 80, 640-80);
+      let x = p.map(p.posePoints[i][0], 0, 640, 80, 640 - 80);
       let y = p.map(p.posePoints[i][1], 0, 480, 0, 360);
       bgpg.ellipse(x, y, 14, 14)
     }
     bgpg.noFill();
     bgpg.stroke(255);
     bgpg.beginShape(p.TRIANGLES);
-    for(let i = 0 ; i < faces.length; i++) {
+    for (let i = 0; i < faces.length; i++) {
       let idx = faces[i];
       let x = p.facePoints[idx][0] * 0.5;
       let y = p.facePoints[idx][1] * 0.5;
@@ -1080,7 +1080,7 @@ var SBrown = function (p) {
   }
 
   this.draw = function () {
-    if(this.pg == undefined || this.pg == null) return;
+    if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
 
     pg.beginDraw();
@@ -1089,11 +1089,11 @@ var SBrown = function (p) {
     pg.translate(pg.width / 2, pg.height / 2);
     pg.directionalLight(255, 255, 255, 1.5, 0.5, 1);
     pg.directionalLight(255, 255, 255, -1.5, -0.5, 1);
-    for(let i = -1; i <= 1; i++) {
+    for (let i = -1; i <= 1; i++) {
       pg.pushMatrix();
       pg.translate(windowWidth / 3 * i, 0);
       pg.scale(5, -5, 5);
-      if(this.tween < 0) {
+      if (this.tween < 0) {
         pg.rotateZ(-Math.pow(this.tween, 4.0) * Math.PI);
       }
       else {
@@ -1112,14 +1112,14 @@ var SLangtonAnt = function (p) {
   let x;
   let y;
   let dir;
-  
+
   let ANTUP = 0;
   let ANTRIGHT = 1;
   let ANTDOWN = 2;
   let ANTLEFT = 3;
-  
+
   let m = 8;
-  
+
   x = windowWidth / m / 2;
   y = windowHeight / m / 2;
   dir = ANTUP;
@@ -1168,7 +1168,7 @@ var SLangtonAnt = function (p) {
   }
 
   this.draw = function () {
-    if(this.pg == undefined || this.pg == null) return;
+    if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
 
     pg.beginDraw();
@@ -1234,7 +1234,7 @@ var s = function (p) {
   let texShader, levelShader;
 
   let funcAssets = [];
-  for(let i = 0; i < 16; i++) {
+  for (let i = 0; i < 16; i++) {
     funcAssets.push(new FuncList(4, [
       {
         name: "default",
@@ -1381,19 +1381,19 @@ var s = function (p) {
   }
 
   let midiToPreset = [
-    {preset: ["default"]}, // 1
-    {preset: ["beesAndBombs", "lines"]},
-    {preset: ["beesAndBombs", "lines"]},
-    {preset: ["beesAndBombs", "lines"]},
-    {preset: ["ribbons", "lines"]},
-    {preset: ["ribbons", "lines"]},
-    {preset: ["ribbons", "lines"]},
-    {preset: ["ribbons", "lines"]},
-    {preset: ["ribbons", "lines"]},
-    {preset: ["ribbons", "lines"]}, // 10
-    {preset: ["face"]},
-    {preset: ["starField", "ribbons", "brown"]},
-    {preset: ["langtonAnt", "ribbons"]},
+    { preset: ["default"] }, // 1
+    { preset: ["beesAndBombs", "lines"] },
+    { preset: ["beesAndBombs", "lines"] },
+    { preset: ["beesAndBombs", "lines"] },
+    { preset: ["ribbons", "lines"] },
+    { preset: ["ribbons", "lines"] },
+    { preset: ["ribbons", "lines"] },
+    { preset: ["ribbons", "lines"] },
+    { preset: ["ribbons", "lines"] },
+    { preset: ["ribbons", "lines"] }, // 10
+    { preset: ["face"] },
+    { preset: ["starField", "ribbons", "brown"] },
+    { preset: ["langtonAnt", "ribbons"] },
   ];
 
   p.setup = function () {
@@ -1408,7 +1408,7 @@ var s = function (p) {
       backPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (layerPgs == undefined) {
       layerPgs = [];
-      for(let i = 0; i < 16; i++) {
+      for (let i = 0; i < 16; i++) {
         let pg = p.createGraphics(windowWidth, windowHeight, p.P3D);
         pg.beginDraw();
         pg.clear();
@@ -1421,7 +1421,7 @@ var s = function (p) {
 
     if (oscPgs == undefined) {
       oscPgs = [];
-      for(let i = 0; i < 3; i++) {
+      for (let i = 0; i < 3; i++) {
         oscPgs.push(p.createGraphics(windowWidth, windowHeight, p.P3D));
       }
     }
@@ -1429,7 +1429,7 @@ var s = function (p) {
     levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
     oscShader = p.loadShader(p.sketchPath(name + "/osc.glsl"));
 
-    for(let i = 0; i < funcAssets.length; i++) {
+    for (let i = 0; i < funcAssets.length; i++) {
       funcAssets[i].update();
     }
   }
@@ -1457,10 +1457,10 @@ var s = function (p) {
     }
 
     if (seq != lastSeq) {
-      if(seq % funcAssets[0].everyNSeq == 0)
+      if (seq % funcAssets[0].everyNSeq == 0)
         activeLayerNum = midiToPreset[p.oscPreset].preset.length;
-      for(let i = 0; i < funcAssets.length; i++) {
-        if(i < activeLayerNum) {
+      for (let i = 0; i < funcAssets.length; i++) {
+        if (i < activeLayerNum) {
           funcAssets[i].preset = midiToPreset[p.oscPreset].preset[i];
           funcAssets[i].update(seq);
         }
@@ -1471,8 +1471,8 @@ var s = function (p) {
     fgpg.beginDraw();
     fgpg.clear();
     fgpg.endDraw();
-    for(let i = 0; i < funcAssets.length; i++) {
-      if(i < activeLayerNum) {
+    for (let i = 0; i < funcAssets.length; i++) {
+      if (i < activeLayerNum) {
         funcAssets[i].exec(tween2, layerPgs[i]);
       }
     }
@@ -1507,7 +1507,7 @@ var s = function (p) {
       colorSc[backColIdx][1] / 255.0,
       colorSc[backColIdx][2] / 255.0];
       backCol = [0, 0, 0];
-      for(let i = 0; i < oscPgs.length; i++) {
+      for (let i = 0; i < oscPgs.length; i++) {
         oscShader.set("iTime", t);
         let frontColIdx = Math.floor(t % 2) * 2;
         curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
@@ -1530,7 +1530,7 @@ var s = function (p) {
       texShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
         colorSc[backColIdx][1] / 255.0,
         colorSc[backColIdx][2] / 255.0);
-      if(bgpg != undefined)
+      if (bgpg != undefined)
         texShader.set("pgTex", bgpg);
       texShader.set("osc0Tex", oscPgs[0]);
       texShader.set("osc1Tex", oscPgs[1]);
@@ -1557,14 +1557,14 @@ var s = function (p) {
     levelShader.set("foregroundTexture", fgpg);
     levelShader.set("masterFader", p.oscFaders[0] * 1.0);
     levelShader.set("seq", seq % 4.0);
-    if(true || shaderUpdated == false) {
+    if (true || shaderUpdated == false) {
       p.filter(levelShader);
     }
     p.syphonServer.sendImage(frontPg);
 
     p.blendMode(p.BLEND);
-    for(let i = 2; i < funcAssets.length; i++) {
-      if(i < activeLayerNum) {
+    for (let i = 2; i < funcAssets.length; i++) {
+      if (i < activeLayerNum) {
         p.image(layerPgs[i], 0, 0);
       }
     }
