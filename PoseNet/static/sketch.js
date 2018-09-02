@@ -8,13 +8,18 @@ let envImage;
 let poses = [];
 let sh;
 
+let poseNet;
+
 let videoFrameRate = 59.94;
 let curTime = 0;
 let isSetup = false;
 
-let clipName = "clip180811.mp4";
-let frameNums = frameNumData[clipName];
-let avatars = avatarData[clipName];
+let clipName = "clip4.mp4";
+let frameNums = [];
+let avatars = [];
+
+let mode = "P2D";
+// let mode = "WEBGL";
 
 // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
 function HSVtoRGB(h, s, v) {
@@ -55,29 +60,84 @@ function setup() {
   noLoop();
 }
 
+function onPose(results) {
+  poses = results;
+  // processKeypoints();
+}
+
 function setupPromise() {
   if (isSetup) return;
   isSetup = true;
   let aspectRatio = video.width / video.height;
+  let longSide = 720;
   if(aspectRatio > 1.0) {
-    createCanvas(720, 720 / aspectRatio, WEBGL);
+    createCanvas(longSide, longSide / aspectRatio);
   }
   else {
-    createCanvas(720 * aspectRatio, 720, WEBGL);
+    createCanvas(longSide * aspectRatio, longSide);
   }
   pixelDensity(2.0);
 
   video.loop();
+  video.elt.muted = true;
   video.volume(0);
   video.play();
   video.size(width, height);
   // Hide the video element, and just show the canvas
   video.hide();
 
+  // Create a new poseNet method with a single detection
+  poseNet = ml5.poseNet(video, modelReady);
+  // This sets up an event that fills the global variable "poses"
+  // with an array every time new poses are detected
+  poseNet.on('pose', onPose);
+  video.speed(0.5);
+}
+
+function modelReady() {
   loop();
 }
 
 function draw() {
+  background(0);
+
+  image(video, 0, 0, width, height);
+  // We can call both functions to draw all keypoints and the skeletons
+  drawKeypoints();
+  drawSkeleton();
+}
+function drawKeypoints()  {
+  // Loop through all the poses detected
+  for (let i = 0; i < poses.length; i++) {
+    // For each pose detected, loop through all the keypoints
+    for (let j = 0; j < poses[i].pose.keypoints.length; j++) {
+      // A keypoint is an object describing a body part (like rightArm or leftShoulder)
+      let keypoint = poses[i].pose.keypoints[j];
+      // Only draw an ellipse is the pose probability is bigger than 0.2
+      if (j < 5&&keypoint.score > 0.2) {
+        fill(255, 0, 0);
+        noStroke();
+        ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
+      }
+    }
+  }
+}
+// A function to draw the skeletons
+function drawSkeleton() {
+  // Loop through all the skeletons detected
+  for (let i = 0; i < poses.length; i++) {
+    let skeleton = poses[i].skeleton;
+    // For every skeleton, loop through all body connections
+    for (let j = 0; j < skeleton.length; j++) {
+      let partA = skeleton[j][0];
+      let partB = skeleton[j][1];
+      stroke(255, 0, 0);
+      line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
+    }
+  }
+}
+
+if(0){
   background(0);
   translate(-width / 2, -height / 2);
 
@@ -139,7 +199,7 @@ function drawAvatars()  {
         rotateY(PI * -0.5);
         let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), 0.8, 0.8);
         sh.setUniform('uMaterialColorOverride', [hsv.r, hsv.g, hsv.b]);
-        sphere(point.r * sat / 255.0);
+        sphere(point.r * sat / 255.0 * 2.0);
         pop();
       }
     }
