@@ -54,8 +54,8 @@ function preload() {
 }
 
 function setup() {
-  // mode = P2D;
-  mode = WEBGL;
+  mode = P2D;
+  // mode = WEBGL;
   noLoop();
 }
 
@@ -74,7 +74,7 @@ function onPose(results) {
         hmax = Math.max(hmax, partA.position.y);
         hmax = Math.max(hmax, partB.position.y);
       }
-      if(skeleton.length) {
+      if (skeleton.length) {
         results[i].tall = hmax - hmin;
       }
       else {
@@ -84,7 +84,7 @@ function onPose(results) {
     }
   }
   posesQueue.push(results);
-  if(posesQueue.length > 60) {
+  if (posesQueue.length > 60) {
     posesQueue.shift();
   }
 }
@@ -136,26 +136,32 @@ function draw2D() {
 }
 
 function drawKeypoints() {
-  for (let i = 0; i < poses.length; i++) {
-    for (let j = 0; j < poses[i].pose.keypoints.length; j++) {
-      let keypoint = poses[i].pose.keypoints[j];
-      if (j < 5 && keypoint.score > 0.2) {
-        fill(255, 0, 0);
-        noStroke();
-        ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
+  for (let k = 30; k < posesQueue.length; k++) {
+    let poses = posesQueue[k];
+    for (let i = 0; i < poses.length; i++) {
+      for (let j = 0; j < poses[i].pose.keypoints.length; j++) {
+        let keypoint = poses[i].pose.keypoints[j];
+        if (j < 5 && keypoint.score > 0.2) {
+          fill(255, 0, 0, 100);
+          noStroke();
+          ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
+        }
       }
     }
   }
 }
 
 function drawSkeleton() {
-  for (let i = 0; i < poses.length; i++) {
-    let skeleton = poses[i].skeleton;
-    for (let j = 0; j < skeleton.length; j++) {
-      let partA = skeleton[j][0];
-      let partB = skeleton[j][1];
-      stroke(255, 0, 0);
-      line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
+  for (let k = 30; k < posesQueue.length; k++) {
+    let poses = posesQueue[k];
+    for (let i = 0; i < poses.length; i++) {
+      let skeleton = poses[i].skeleton;
+      for (let j = 0; j < skeleton.length; j++) {
+        let partA = skeleton[j][0];
+        let partB = skeleton[j][1];
+        stroke(255, 0, 0, 100);
+        line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
+      }
     }
   }
 }
@@ -205,7 +211,7 @@ function drawAvatars() {
     for (let i = 0; i < poses.length; i++) {
       push();
       let sat;
-      if(j < 20) {
+      if (j < 20) {
         sat = map(j, 0, 20, 0, 255);
       }
       else {
