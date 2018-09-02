@@ -15,7 +15,6 @@ let curTime = 0;
 let isSetup = false;
 
 let clipName = "clip4.mp4";
-let frameNums = [];
 let avatars = [];
 
 let mode;
@@ -84,15 +83,11 @@ function setupPromise() {
   video.volume(0);
   video.play();
   video.size(width, height);
-  // Hide the video element, and just show the canvas
+  video.speed(0.5);
   video.hide();
 
-  // Create a new poseNet method with a single detection
   poseNet = ml5.poseNet(video, modelReady);
-  // This sets up an event that fills the global variable "poses"
-  // with an array every time new poses are detected
   poseNet.on('pose', onPose);
-  video.speed(0.5);
 }
 
 function modelReady() {
@@ -102,7 +97,6 @@ function modelReady() {
 function draw() {
   background(0);
 
-  // We can call both functions to draw all keypoints and the skeletons
   if (mode == P2D) {
     draw2D();
   }
@@ -118,13 +112,9 @@ function draw2D() {
 }
 
 function drawKeypoints() {
-  // Loop through all the poses detected
   for (let i = 0; i < poses.length; i++) {
-    // For each pose detected, loop through all the keypoints
     for (let j = 0; j < poses[i].pose.keypoints.length; j++) {
-      // A keypoint is an object describing a body part (like rightArm or leftShoulder)
       let keypoint = poses[i].pose.keypoints[j];
-      // Only draw an ellipse is the pose probability is bigger than 0.2
       if (j < 5 && keypoint.score > 0.2) {
         fill(255, 0, 0);
         noStroke();
@@ -134,12 +124,9 @@ function drawKeypoints() {
   }
 }
 
-// A function to draw the skeletons
 function drawSkeleton() {
-  // Loop through all the skeletons detected
   for (let i = 0; i < poses.length; i++) {
     let skeleton = poses[i].skeleton;
-    // For every skeleton, loop through all body connections
     for (let j = 0; j < skeleton.length; j++) {
       let partA = skeleton[j][0];
       let partB = skeleton[j][1];
@@ -201,7 +188,6 @@ function drawAvatars() {
     rotateY(PI * -0.5);
     let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), 0.8, 0.8);
     sh.setUniform('uMaterialColorOverride', [hsv.r, hsv.g, hsv.b]);
-    // sh.setUniform('uMaterialColorOverride', [0.5, 0.5, 0.5]);
     sphere(point.r * sat / 255.0 * 2.0);
     pop();
   }
