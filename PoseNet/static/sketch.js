@@ -5,7 +5,6 @@
 
 let video;
 let envImage;
-let poses = [];
 let sh;
 
 let poseNet;
@@ -15,7 +14,7 @@ let curTime = 0;
 let isSetup = false;
 
 let clipName = "clip4.mp4";
-let avatars = [];
+let posesQueue = [];
 
 let mode;
 
@@ -61,8 +60,33 @@ function setup() {
 }
 
 function onPose(results) {
-  poses = results;
-  // processKeypoints();
+  for (let i = 0; i < results.length; i++) {
+    {
+      let hmax = 0;
+      let hmin = 1000;
+      let skeleton = results[i].skeleton;
+      // For every skeleton, loop through all body connections
+      for (let j = 0; j < skeleton.length; j++) {
+        let partA = skeleton[j][0];
+        let partB = skeleton[j][1];
+        hmin = Math.min(hmin, partA.position.y);
+        hmin = Math.min(hmin, partB.position.y);
+        hmax = Math.max(hmax, partA.position.y);
+        hmax = Math.max(hmax, partB.position.y);
+      }
+      if(skeleton.length) {
+        results[i].tall = hmax - hmin;
+      }
+      else {
+        results[i].tall = 0;
+        continue;
+      }
+    }
+  }
+  posesQueue.push(results);
+  if(posesQueue.length > 60) {
+    posesQueue.shift();
+  }
 }
 
 function setupPromise() {
@@ -176,19 +200,27 @@ function draw3D() {
 }
 
 function drawAvatars() {
-  for (let i = 0; i < poses.length; i++) {
-    push();
-    let sat = 255.0;
-    // let sat = map(index, frameNums[i] + 60, frameNums[i] + 20, 0, 255);
-    // sat = constrain(sat, 0, 255);
-    let point = poses[i].pose.keypoints[0].position;
-    point.r = 10;
-    translate(point.x, point.y);
-    texture(envImage);
-    rotateY(PI * -0.5);
-    let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), 0.8, 0.8);
-    sh.setUniform('uMaterialColorOverride', [hsv.r, hsv.g, hsv.b]);
-    sphere(point.r * sat / 255.0 * 2.0);
-    pop();
+  for (let j = 0; j < posesQueue.length; j++) {
+    let poses = posesQueue[j];
+    for (let i = 0; i < poses.length; i++) {
+      push();
+      let sat;
+      if(j < 20) {
+        sat = map(j, 0, 20, 0, 255);
+      }
+      else {
+        sat = map(j, 50, 60, 255, 0);
+      }
+      sat = constrain(sat, 0, 255);
+      let point = poses[i].pose.keypoints[0].position;
+      point.r = poses[i].tall * 0.1;
+      translate(point.x, point.y);
+      texture(envImage);
+      rotateY(PI * -0.5);
+      let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), 0.8, 0.8);
+      sh.setUniform('uMaterialColorOverride', [hsv.r, hsv.g, hsv.b]);
+      sphere(point.r * sat / 255.0 * 1.5);
+      pop();
+    }
   }
 }
