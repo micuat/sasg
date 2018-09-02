@@ -18,14 +18,13 @@ let clipName = "clip4.mp4";
 let frameNums = [];
 let avatars = [];
 
-let mode = "P2D";
-// let mode = "WEBGL";
+let mode;
 
 // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
 function HSVtoRGB(h, s, v) {
   var r, g, b, i, f, p, q, t;
   if (arguments.length === 1) {
-      s = h.s, v = h.v, h = h.h;
+    s = h.s, v = h.v, h = h.h;
   }
   i = Math.floor(h * 6);
   f = h * 6 - i;
@@ -33,17 +32,17 @@ function HSVtoRGB(h, s, v) {
   q = v * (1 - f * s);
   t = v * (1 - (1 - f) * s);
   switch (i % 6) {
-      case 0: r = v, g = t, b = p; break;
-      case 1: r = q, g = v, b = p; break;
-      case 2: r = p, g = v, b = t; break;
-      case 3: r = p, g = q, b = v; break;
-      case 4: r = t, g = p, b = v; break;
-      case 5: r = v, g = p, b = q; break;
+    case 0: r = v, g = t, b = p; break;
+    case 1: r = q, g = v, b = p; break;
+    case 2: r = p, g = v, b = t; break;
+    case 3: r = p, g = q, b = v; break;
+    case 4: r = t, g = p, b = v; break;
+    case 5: r = v, g = p, b = q; break;
   }
   return {
-      r: r,
-      g: g,
-      b: b
+    r: r,
+    g: g,
+    b: b
   };
 }
 
@@ -57,6 +56,8 @@ function preload() {
 }
 
 function setup() {
+  // mode = P2D;
+  mode = WEBGL;
   noLoop();
 }
 
@@ -70,11 +71,11 @@ function setupPromise() {
   isSetup = true;
   let aspectRatio = video.width / video.height;
   let longSide = 720;
-  if(aspectRatio > 1.0) {
-    createCanvas(longSide, longSide / aspectRatio);
+  if (aspectRatio > 1.0) {
+    createCanvas(longSide, longSide / aspectRatio, mode);
   }
   else {
-    createCanvas(longSide * aspectRatio, longSide);
+    createCanvas(longSide * aspectRatio, longSide, mode);
   }
   pixelDensity(2.0);
 
@@ -101,12 +102,22 @@ function modelReady() {
 function draw() {
   background(0);
 
-  image(video, 0, 0, width, height);
   // We can call both functions to draw all keypoints and the skeletons
+  if (mode == P2D) {
+    draw2D();
+  }
+  else if (mode == WEBGL) {
+    draw3D();
+  }
+}
+
+function draw2D() {
+  image(video, 0, 0, width, height);
   drawKeypoints();
   drawSkeleton();
 }
-function drawKeypoints()  {
+
+function drawKeypoints() {
   // Loop through all the poses detected
   for (let i = 0; i < poses.length; i++) {
     // For each pose detected, loop through all the keypoints
@@ -114,7 +125,7 @@ function drawKeypoints()  {
       // A keypoint is an object describing a body part (like rightArm or leftShoulder)
       let keypoint = poses[i].pose.keypoints[j];
       // Only draw an ellipse is the pose probability is bigger than 0.2
-      if (j < 5&&keypoint.score > 0.2) {
+      if (j < 5 && keypoint.score > 0.2) {
         fill(255, 0, 0);
         noStroke();
         ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
@@ -122,6 +133,7 @@ function drawKeypoints()  {
     }
   }
 }
+
 // A function to draw the skeletons
 function drawSkeleton() {
   // Loop through all the skeletons detected
@@ -137,7 +149,10 @@ function drawSkeleton() {
   }
 }
 
-if(0){
+function draw3D() {
+  if (_renderer.name != "p5.RendererGL") {
+    return;
+  }
   background(0);
   translate(-width / 2, -height / 2);
 
@@ -162,46 +177,32 @@ if(0){
   shader(sh);
   sh.setUniform('uSampler', video);
   sh.setUniform('uBrighter', 1.0);
-  // We can call both functions to draw all keypoints and the skeletons
   drawAvatars();
 
   // push();
   // translate(width/2,height/3*2);
   // texture(envImage);
-  // // specularMaterial(255);
+  // sh.setUniform('uMaterialColorOverride', [0.5, 0.5, 0.5]);
   // rotateY(PI * -0.5);
   // sphere(155.0);
   // pop();
 }
 
-function drawAvatars()  {
-  let index = parseInt(video.time() * videoFrameRate);
-
-  for(let i = 0; i < frameNums.length; i++) {
-    let frame;
-    if(index - 60 > frameNums[i]) {
-      continue;
-    }
-    if(index <= frameNums[i]) {
-      continue;
-    }
-    frame = avatars[i];
-
-    if(frame == undefined || frame.length == undefined) continue;
-    for (let avatar of frame) {
-      for (let point of avatar) {
-        push();
-        let sat = map(index, frameNums[i] + 60, frameNums[i] + 20, 0, 255);
-        sat = constrain(sat, 0, 255);
-        translate(point.x, point.y);
-        texture(envImage);
-        // specularMaterial(255);
-        rotateY(PI * -0.5);
-        let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), 0.8, 0.8);
-        sh.setUniform('uMaterialColorOverride', [hsv.r, hsv.g, hsv.b]);
-        sphere(point.r * sat / 255.0 * 2.0);
-        pop();
-      }
-    }
+function drawAvatars() {
+  for (let i = 0; i < poses.length; i++) {
+    push();
+    let sat = 255.0;
+    // let sat = map(index, frameNums[i] + 60, frameNums[i] + 20, 0, 255);
+    // sat = constrain(sat, 0, 255);
+    let point = poses[i].pose.keypoints[0].position;
+    point.r = 10;
+    translate(point.x, point.y);
+    texture(envImage);
+    rotateY(PI * -0.5);
+    let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), 0.8, 0.8);
+    sh.setUniform('uMaterialColorOverride', [hsv.r, hsv.g, hsv.b]);
+    // sh.setUniform('uMaterialColorOverride', [0.5, 0.5, 0.5]);
+    sphere(point.r * sat / 255.0 * 2.0);
+    pop();
   }
 }
