@@ -19,6 +19,7 @@ let posesQueue = [];
 let mode;
 
 let pg2d;
+let pgBack;
 
 // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
 function HSVtoRGB(h, s, v) {
@@ -116,6 +117,7 @@ function setupPromise() {
   poseNet.on('pose', onPose);
 
   pg2d = createGraphics(width, height, P2D);
+  pgBack = createGraphics(width, height, P2D);
 }
 
 function modelReady() {
@@ -155,19 +157,16 @@ function drawKeypoints() {
   }
 }
 
-function drawSkeleton() {
-  for (let k = 29; k < posesQueue.length; k++) {
+function drawSkeleton(alpha) {
+  pg2d.strokeWeight(1);
+  for (let k = 20; k < posesQueue.length; k++) {
+    pg2d.stroke(255, 255, 255, alpha * map(k, 0, posesQueue.length, 10, 155));
     let poses = posesQueue[k];
     for (let i = 0; i < poses.length; i++) {
       let skeleton = poses[i].skeleton;
       for (let j = 0; j < skeleton.length; j++) {
         let partA = skeleton[j][0];
         let partB = skeleton[j][1];
-        pg2d.stroke(255, 255, 255, 100);
-        // beginShape(LINES);
-        // vertex(partA.position.x, partA.position.y, 100);
-        // vertex(partB.position.x, partB.position.y, 100);
-        // endShape();
         pg2d.line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
       }
     }
@@ -181,14 +180,18 @@ function draw3D() {
   background(0);
   translate(-width / 2, -height / 2);
 
+  let geomFader = map(sin(millis() * 0.001), -1, 1, 0, 1)
   stroke(255,255,255)
   colorMode(RGB, 255);
   pg2d.clear();
-  drawSkeleton();
+  drawSkeleton(geomFader);
 
   sh.setUniform('uBrighter', 0.0);
 
-  texture(video);
+  pgBack.clear();
+  pgBack.tint((1 - geomFader) * 255);
+  pgBack.image(video, 0, 0, width, height);
+  texture(pgBack);
   beginShape();
   vertex(0, 0, 0, 0, 0);
   vertex(width, 0, 0, 1, 0);
