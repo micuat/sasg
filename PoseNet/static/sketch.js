@@ -18,6 +18,8 @@ let posesQueue = [];
 
 let mode;
 
+let pg2d;
+
 // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
 function HSVtoRGB(h, s, v) {
   var r, g, b, i, f, p, q, t;
@@ -54,8 +56,8 @@ function preload() {
 }
 
 function setup() {
-  mode = P2D;
-  // mode = WEBGL;
+  // mode = P2D;
+  mode = WEBGL;
   noLoop();
 }
 
@@ -84,7 +86,7 @@ function onPose(results) {
     }
   }
   posesQueue.push(results);
-  if (posesQueue.length > 60) {
+  if (posesQueue.length > 30) {
     posesQueue.shift();
   }
 }
@@ -112,6 +114,8 @@ function setupPromise() {
 
   poseNet = ml5.poseNet(video, modelReady);
   poseNet.on('pose', onPose);
+
+  pg2d = createGraphics(width, height, P2D);
 }
 
 function modelReady() {
@@ -152,15 +156,19 @@ function drawKeypoints() {
 }
 
 function drawSkeleton() {
-  for (let k = 30; k < posesQueue.length; k++) {
+  for (let k = 29; k < posesQueue.length; k++) {
     let poses = posesQueue[k];
     for (let i = 0; i < poses.length; i++) {
       let skeleton = poses[i].skeleton;
       for (let j = 0; j < skeleton.length; j++) {
         let partA = skeleton[j][0];
         let partB = skeleton[j][1];
-        stroke(255, 0, 0, 100);
-        line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
+        pg2d.stroke(255, 255, 255, 100);
+        // beginShape(LINES);
+        // vertex(partA.position.x, partA.position.y, 100);
+        // vertex(partB.position.x, partB.position.y, 100);
+        // endShape();
+        pg2d.line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
       }
     }
   }
@@ -173,11 +181,22 @@ function draw3D() {
   background(0);
   translate(-width / 2, -height / 2);
 
+  stroke(255,255,255)
   colorMode(RGB, 255);
+  pg2d.clear();
+  drawSkeleton();
 
   sh.setUniform('uBrighter', 0.0);
 
   texture(video);
+  beginShape();
+  vertex(0, 0, 0, 0, 0);
+  vertex(width, 0, 0, 1, 0);
+  vertex(width, height, 0, 1, 1);
+  vertex(0, height, 0, 0, 1);
+  endShape(CLOSE);
+
+  texture(pg2d);
   beginShape();
   vertex(0, 0, 0, 0, 0);
   vertex(width, 0, 0, 1, 0);
