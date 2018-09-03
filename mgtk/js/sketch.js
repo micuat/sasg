@@ -1326,6 +1326,37 @@ var SDoublePendulum = function (p) {
 
 };
 
+var SShader = function (p) {
+  let pg;
+  let shader;
+  shader = p.loadShader(p.sketchPath("shaders/hydra0.glsl"));
+
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    if (this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
+    if(p.frameCount % 60 == 0) {
+      shader = p.loadShader(p.sketchPath("shaders/hydra0.glsl"));
+    }
+    pg.beginDraw();
+    pg.pushMatrix();
+    pg.pushStyle();
+
+    shader.set("time", tElapsed);
+    pg.beginDraw();
+    pg.filter(shader);
+    pg.endDraw();
+
+    pg.popStyle();
+    pg.popMatrix();
+    pg.endDraw();
+  }
+};
+
+
 var s = function (p) {
   let name;
   let sLines = new SLines(p);
@@ -1339,6 +1370,7 @@ var s = function (p) {
   let sBrown = new SBrown(p);
   let sLangtonAnt = new SLangtonAnt(p);
   let sDoublePendulum = new SDoublePendulum(p);
+  let sShader = new SShader(p);
 
   let startFrame;
   let doUpdate = true;
@@ -1504,6 +1536,22 @@ var s = function (p) {
         setup: function () {
           sDoublePendulum.setup();
         }
+      },
+      {
+        name: "shader",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+          let alpha = 1.0 - tween;
+          sShader.pg = pg;
+          sShader.tween = tween;
+          sShader.alpha = alpha * beatFader;
+          sShader.draw();
+        },
+        setup: function () {
+          sShader.setup();
+        }
       }
     ]));
   }
@@ -1523,6 +1571,7 @@ var s = function (p) {
     { preset: ["starField", "ribbons", "brown"] },
     { preset: ["langtonAnt", "ribbons"] },
     { preset: ["brown", "doublePendulum"] },
+    { preset: ["default", "shader"] },
   ];
 
   p.setup = function () {
@@ -1554,9 +1603,9 @@ var s = function (p) {
         oscPgs.push(p.createGraphics(windowWidth, windowHeight, p.P3D));
       }
     }
-    texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
-    levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
-    oscShader = p.loadShader(p.sketchPath(name + "/osc.glsl"));
+    texShader = p.loadShader(p.sketchPath("shaders/frag.glsl"));
+    levelShader = p.loadShader(p.sketchPath("shaders/level.glsl"));
+    oscShader = p.loadShader(p.sketchPath("shaders/osc.glsl"));
 
     for (let i = 0; i < funcAssets.length; i++) {
       funcAssets[i].update();
@@ -1579,9 +1628,9 @@ var s = function (p) {
     seq = Math.floor(tElapsed * (bpm / 120.0)) + p.seqOffset;
 
     if (p.getCount() % 60 == 0) {
-      texShader = p.loadShader(p.sketchPath(name + "/frag.glsl"));
-      levelShader = p.loadShader(p.sketchPath(name + "/level.glsl"));
-      oscShader = p.loadShader(p.sketchPath(name + "/osc.glsl"));
+      texShader = p.loadShader(p.sketchPath("shaders/frag.glsl"));
+      levelShader = p.loadShader(p.sketchPath("shaders/level.glsl"));
+      oscShader = p.loadShader(p.sketchPath("shaders/osc.glsl"));
       shaderUpdated = true;
     }
 
