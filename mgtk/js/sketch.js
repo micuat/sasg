@@ -1369,7 +1369,7 @@ var SWarehouse = function (p) {
     pg.pushStyle();
 
     pg.translate(windowWidth / 2, windowHeight / 2);
-    pg.translate(0, 50, 200)
+    pg.translate(0, 50, 400 * this.tween + 200)
     pg.scale(-50, -50, -50);
     pg.shape(p.warehouseShape);
 
