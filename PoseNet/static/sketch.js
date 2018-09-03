@@ -19,6 +19,7 @@ let posesQueue = [];
 let mode;
 
 let pg2d;
+let pg3d;
 let pgBack;
 
 // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
@@ -95,6 +96,7 @@ function onPose(results) {
 function setupPromise() {
   if (isSetup) return;
   isSetup = true;
+  pixelDensity(2.0);
   let aspectRatio = video.width / video.height;
   let longSide = 720;
   if (aspectRatio > 1.0) {
@@ -103,7 +105,6 @@ function setupPromise() {
   else {
     createCanvas(longSide * aspectRatio, longSide, mode);
   }
-  pixelDensity(2.0);
 
   video.loop();
   video.elt.muted = true;
@@ -117,6 +118,7 @@ function setupPromise() {
   poseNet.on('pose', onPose);
 
   pg2d = createGraphics(width, height, P2D);
+  pg3d = createGraphics(width, height, WEBGL);
   pgBack = createGraphics(width, height, P2D);
 }
 
@@ -159,6 +161,9 @@ function drawKeypoints() {
 
 function drawSkeleton(alpha) {
   pg2d.strokeWeight(1);
+  pg2d.stroke(255, 255, 255, alpha * 155);
+  pg2d.line(width / 2, height / 2 + 50, width, height - 150);
+  pg2d.line(width / 2, height / 2 + 50, 0, height - 150);
   for (let k = 20; k < posesQueue.length; k++) {
     pg2d.stroke(255, 255, 255, alpha * map(k, 0, posesQueue.length, 10, 155));
     let poses = posesQueue[k];
@@ -181,7 +186,7 @@ function draw3D() {
   translate(-width / 2, -height / 2);
 
   let geomFader = map(sin(millis() * 0.001), -1, 1, 0, 1)
-  stroke(255,255,255)
+  stroke(255, 255, 255)
   colorMode(RGB, 255);
   pg2d.clear();
   drawSkeleton(geomFader);
@@ -218,13 +223,24 @@ function draw3D() {
   sh.setUniform('uBrighter', 1.0);
   drawAvatars();
 
-  // push();
-  // translate(width/2,height/3*2);
-  // texture(envImage);
-  // sh.setUniform('uMaterialColorOverride', [0.5, 0.5, 0.5]);
-  // rotateY(PI * -0.5);
-  // sphere(155.0);
-  // pop();
+  // pg3d.clear();
+  // pg3d.push();
+  // pg3d.translate(-width / 2, -height / 2);
+  // pg3d.translate(width/2,height/3*2);
+  // pg3d.texture(envImage);
+  // pg3d.shader(sh);
+  // // sh.setUniform('uMaterialColorOverride', [0.5, 0.5, 0.5]);
+  // pg3d.rotateY(PI * -0.5);
+  // pg3d.sphere(155.0);
+  // pg3d.pop();
+  // texture(pg3d);
+  // translate(0,0,1)
+  // beginShape();
+  // vertex(0, 0, 0, 0, 0);
+  // vertex(width, 0, 0, 0.5, 0);
+  // vertex(width, height, 0, 0.5, 1);
+  // vertex(0, height, 0, 0, 1);
+  // endShape(CLOSE);
 }
 
 function drawAvatars() {
