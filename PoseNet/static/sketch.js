@@ -162,8 +162,13 @@ function drawKeypoints() {
 function drawSkeleton(alpha) {
   pg2d.strokeWeight(1);
   pg2d.stroke(255, 255, 255, alpha * 155);
-  pg2d.line(width / 2, height / 2 + 50, width, height - 150);
-  pg2d.line(width / 2, height / 2 + 50, 0, height - 150);
+  pg2d.noFill();
+  pg2d.beginShape(LINE_STRIP);
+  pg2d.vertex(0, height - 200);
+  pg2d.vertex(width / 2 - 50, height / 2 + 50);
+  pg2d.vertex(width / 2 + 50, height / 2 + 50);
+  pg2d.vertex(width, height - 200);
+  pg2d.endShape();
   for (let k = 20; k < posesQueue.length; k++) {
     pg2d.stroke(255, 255, 255, alpha * map(k, 0, posesQueue.length, 10, 155));
     let poses = posesQueue[k];
@@ -185,7 +190,7 @@ function draw3D() {
   background(0);
   translate(-width / 2, -height / 2);
 
-  let geomFader = map(sin(millis() * 0.001), -1, 1, 0, 1)
+  let geomFader = map(sin(millis() * 0.001 * 0.25 * Math.PI), -1, 1, 0, 1)
   stroke(255, 255, 255)
   colorMode(RGB, 255);
   pg2d.clear();
