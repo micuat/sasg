@@ -1571,7 +1571,7 @@ var s = function (p) {
     { preset: ["starField", "ribbons", "brown"] },
     { preset: ["langtonAnt", "ribbons"] },
     { preset: ["brown", "doublePendulum"] },
-    { preset: ["default", "shader"] },
+    { preset: ["default", "shader", "ribbons"] },
   ];
 
   p.setup = function () {

@@ -411,7 +411,7 @@ void main() {
   vec4 c = vec4(1, 0, 0, 1);
   //vec2 st = uv;
   //vec2 st = gl_FragCoord.xy / resolution;
-  vec2 st = (vertTexCoord.st - vec2(0.5)) * vec2(1.0, 560.0 / 1280.0) + vec2(0.5);
+  vec2 st = (vertTexCoord.st - vec2(0.5)) * vec2(1.0, -560.0 / 1280.0) + vec2(0.5);
   // gl_FragColor = osc(st, 10, 1, 0);
   gl_FragColor = color(osc(rotate(pixelate(scrollY(modulateRotate(st, osc(st, 2, 0.2, 0), 0.5, 0.1), 0.1, 0.2), 100, 16), 0.1, 0), 100, 0.01, 1.4), 1.83, 0.91, 0.99);
 }
