@@ -77,6 +77,8 @@ public String folderName = "js";
 
 public SyphonServer syphonServer;
 
+public PShape warehouseShape;
+
 boolean libInited = false;
 
 float frameRate() {
@@ -154,6 +156,26 @@ void setupCamera() {
     cam.start();
   }
 }
+
+void setupModel() {
+  PShape sOrg = loadShape("models/warehouse.obj");
+  PShape s = createShape(GROUP);
+  s.beginShape();
+  for (int i = 0; i < sOrg.getChildCount(); i++) {
+    //println(s.getChild(i).getChildCount());
+    PShape sc = createShape();
+    sc.beginShape(LINE_STRIP);
+    sc.stroke(255);
+    for (int j = 0; j < sOrg.getChild(i).getVertexCount(); j++) {
+      PVector v = sOrg.getChild(i).getVertex(j);
+      sc.vertex(v.x, v.y, v.z);
+    }
+    sc.endShape();
+    s.addChild(sc);
+  }
+  warehouseShape = s;
+}
+
 // Called every time a new frame is available to read
 void movieEvent(Movie m) {
   m.read();
@@ -305,6 +327,7 @@ void draw() {
 
   if (libInited == false) {
     setupCamera();
+    setupModel();
 
     try {
       initNashorn();

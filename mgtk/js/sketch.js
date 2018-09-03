@@ -1354,6 +1354,31 @@ var SShader = function (p) {
   }
 };
 
+var SWarehouse = function (p) {
+  let pg;
+
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    if (this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
+    pg.beginDraw();
+    pg.pushMatrix();
+    pg.pushStyle();
+
+    pg.translate(windowWidth / 2, windowHeight / 2);
+    pg.translate(0, 50, 200)
+    pg.scale(-50, -50, -50);
+    pg.shape(p.warehouseShape);
+
+    pg.popStyle();
+    pg.popMatrix();
+    pg.endDraw();
+  }
+};
+
 var s = function (p) {
   let name;
   let sLines = new SLines(p);
@@ -1368,6 +1393,7 @@ var s = function (p) {
   let sLangtonAnt = new SLangtonAnt(p);
   let sDoublePendulum = new SDoublePendulum(p);
   let sShader = new SShader(p);
+  let sWarehouse = new SWarehouse(p);
 
   let startFrame;
   let doUpdate = true;
@@ -1549,6 +1575,22 @@ var s = function (p) {
         setup: function () {
           sShader.setup();
         }
+      },
+      {
+        name: "warehouse",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+          let alpha = 1.0 - tween;
+          sWarehouse.pg = pg;
+          sWarehouse.tween = tween;
+          sWarehouse.alpha = alpha * beatFader;
+          sWarehouse.draw();
+        },
+        setup: function () {
+          sWarehouse.setup();
+        }
       }
     ]));
   }
@@ -1569,6 +1611,7 @@ var s = function (p) {
     { preset: ["langtonAnt", "ribbons"] },
     { preset: ["brown", "doublePendulum"] },
     { preset: ["default", "shader", "ribbons"] },
+    { preset: ["default", "warehouse", "brown"] },
   ];
 
   p.setup = function () {
