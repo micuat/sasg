@@ -1346,16 +1346,13 @@ var SShader = function (p) {
     pg.pushStyle();
 
     shader.set("time", tElapsed);
-    pg.beginDraw();
     pg.filter(shader);
-    pg.endDraw();
 
     pg.popStyle();
     pg.popMatrix();
     pg.endDraw();
   }
 };
-
 
 var s = function (p) {
   let name;
