@@ -1271,18 +1271,19 @@ var SDoublePendulum = function (p) {
 
 var SShader = function (p) {
   let pg;
-  let shaders = [];
+  let shaders = {};
   let fpgs = [];
   let bpgs = [];
   let npgs = 2;
-  let params = [];
+  let params = {};
   let name = "spread";
   this.fader = 0.0;
 
   function loadShaders() {
     // shader = p.loadShader(p.sketchPath("shaders/hydra0.glsl"));
+    shaders[name] = [];
     for (let i = 0; i < npgs; i++) {
-      shaders[i] = p.loadShader(p.sketchPath("shaders/" + name + "/frag" + i + ".glsl"));
+      shaders[name][i] = p.loadShader(p.sketchPath("shaders/" + name + "/frag" + i + ".glsl"));
     }
   }
   loadShaders();
@@ -1297,7 +1298,9 @@ var SShader = function (p) {
     bpgs[i].background(0);
     bpgs[i].endDraw();
   }
-  params[0] = {
+  params["spread"] = [];
+  params["spread"][0] = {
+    "tex17": "bpgs[1]",
     "sides1": 10,
     "radius2": 0.3,
     "smoothing3": 0.01,
@@ -1310,11 +1313,12 @@ var SShader = function (p) {
     "xMult11": 1,
     "yMult12": 1,
     "amount18": 0.975,
-    "r13": "t",//need fader
-    "g14": "t", 
-    "b15": "t"
+    "r13": "this.fader",
+    "g14": "this.fader",
+    "b15": "this.fader"
   }
-  params[1] = {
+  params["spread"][1] = {
+    "tex19": "bpgs[0]",
     "amount20": 1.05,
     "xMult21": 1,
     "yMult22": 1,
@@ -1346,18 +1350,16 @@ var SShader = function (p) {
 
     for (let i = 0; i < npgs; i++) {
       fpgs[i].beginDraw();
-      shaders[i].set("tex19", bpgs[0]);
-      shaders[i].set("tex17", bpgs[1]);
-      shaders[i].set("time", tElapsed);
-      for (let key in params[i]) {
-        if(typeof params[i][key] == "string") {
-          shaders[i].set(key, this.fader);
+      shaders[name][i].set("time", tElapsed);
+      for (let key in params[name][i]) {
+        if(typeof params[name][i][key] == "string") {
+          shaders[name][i].set(key, eval(params[name][i][key]));
         }
         else {
-          shaders[i].set(key, parseFloat(params[i][key]));
+          shaders[name][i].set(key, parseFloat(params[name][i][key]));
         }
       }
-      fpgs[i].filter(shaders[i]);
+      fpgs[i].filter(shaders[name][i]);
       fpgs[i].endDraw();
     }
   
