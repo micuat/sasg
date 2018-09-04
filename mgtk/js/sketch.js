@@ -508,6 +508,7 @@ var SLines = function (p) {
   };
   let midiToPreset = [
     { preset: [bPreset.default, bPreset.default, bPreset.default, bPreset.default] },
+    { preset: [bPreset.default, bPreset.default, bPreset.default, bPreset.default] },
     { preset: [bPreset.toUpFlat, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat] },
     { preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat] },
     { preset: [bPreset.toLeftSig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
@@ -1352,12 +1353,14 @@ var SShader = function (p) {
     if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
     
-    if (p.oscPreset == 0) {
-      this.curName = "spread";
-    }
-    else {
-      this.curName = "pixelwave";
-    }
+    this.curName = "spread";
+    // if (curPreset == 0) {
+    //   this.curName = "spread";
+    // }
+    // else {
+    //   this.curName = "pixelwave";
+    // }
+
     if (p.frameCount % 60 == 0) {
       // loadShaders();
     }
@@ -1823,15 +1826,16 @@ var s = function (p) {
   }
   let midiToPreset = [
     { preset: [{ a: "shader", p: "slide" }] }, // 1
-    { preset: [{ a: "beesAndBombs", p: "slide" }, { a: "lines", p: "rgbshift" }] },
+    { preset: [{ a: "beesAndBombs", p: "bloom" }] },
+    { preset: [{ a: "beesAndBombs", p: "bloom" }, "lines"] },
     { preset: [{ a: "beesAndBombs", p: "bloom" }, "lines"] },
     { preset: ["beesAndBombs", "lines"] },
-    { preset: [{ a: "ribbons", p: "bloom" }, "lines"] },
-    { preset: ["ribbons", "lines"] },
-    { preset: ["ribbons", "lines"] },
-    { preset: ["ribbons", "lines"] },
-    { preset: ["ribbons", "lines"] },
-    { preset: ["ribbons", "lines"] }, // 10
+    { preset: [{ a: "ribbons", p: "slide" }, "lines"] }, //add drum effect
+    { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid"] }, "lines"] },
+    { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid"] }, "lines"] },
+    { preset: [{ a: "shader", p: "kaleid" }, "ribbons", "lines"] },
+    { preset: [{ a: "shader", p: "kaleid" }, "ribbons", "lines"] }, // 10
+    { preset: [{ a: "shader", p: "kaleid" }, "ribbons", "lines"] },
     { preset: ["face"] },
     { preset: ["starField", "ribbons", "brown"] },
     { preset: ["langtonAnt", "ribbons"] },
