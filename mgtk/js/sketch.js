@@ -6,6 +6,7 @@ var lastSeq = -1;
 var seq = 0;
 
 var layerPgs;
+var postPgs;
 var mainPg;
 
 var curPreset = 0;
@@ -1532,6 +1533,7 @@ var s = function (p) {
 
   let startFrame;
   let beatFader = 1;
+  let postShaders = {};
 
   let funcAssets = [];
   for (let i = 0; i < 16; i++) {
@@ -1765,10 +1767,18 @@ var s = function (p) {
         layerPgs.push(pg);
       }
     }
-
+    if (postPgs == undefined) {
+      postPgs = [];
+      for (let i = 0; i < 16; i++) {
+        let pg = p.createGraphics(windowWidth, windowHeight, p.P3D);
+        postPgs.push(pg);
+      }
+    }
     for (let i = 0; i < funcAssets.length; i++) {
       funcAssets[i].update();
     }
+
+    postShaders["kaleid"] = p.loadShader(p.sketchPath("shaders/post/" + "kaleid" + ".glsl"));
   }
 
   p.getCount = function () { return p.frameCount - startFrame + Math.floor(p.oscFaders[1] * 60) };
@@ -1804,13 +1814,22 @@ var s = function (p) {
       }
     }
 
+    for (let i = 0; i < funcAssets.length; i++) {
+      if (i < activeLayerNum) {
+        postPgs[i].beginDraw();
+        postPgs[i].image(layerPgs[i], 0, 0);
+        postPgs[i].filter(postShaders["kaleid"]);
+        postPgs[i].endDraw();
+      }
+    }
+
     mainPg.beginDraw();
     mainPg.background(0);
 
     mainPg.blendMode(p.BLEND);
     for (let i = 0; i < funcAssets.length; i++) {
       if (i < activeLayerNum) {
-        mainPg.image(layerPgs[i], 0, 0);
+        mainPg.image(postPgs[i], 0, 0);
       }
     }
     mainPg.endDraw();
