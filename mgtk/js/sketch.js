@@ -1841,12 +1841,13 @@ var s = function (p) {
     { preset: [{ a: "beesAndBombs", p: "bloom" }, "lines"] },
     { preset: [{ a: "beesAndBombs", p: "bloom" }, "lines"] },
     { preset: ["beesAndBombs", "lines"] },
-    { preset: [{ a: "ribbons", p: "slide" }, "lines"] }, //add drum effect
+    { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid", "invert"] }, "lines"] }, //add drum effect
+    { preset: [{ a: "ribbons", p: ["slide"] }, "lines"] },
     { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid", "invert"] }, "lines"] },
-    { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid", "invert"] }, "lines"] },
-    { preset: [{ a: "shader", p: "kaleid" }, "ribbons", "lines"] },
-    { preset: [{ a: "shader", p: "kaleid" }, "ribbons", "lines"] }, // 10
-    { preset: [{ a: "shader", p: "kaleid" }, "ribbons", "lines"] },
+    { preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "slide" }, "lines"] },
+    { preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "slide" }, "lines"] }, // 10
+    { preset: [{ a: "shader", p: "kaleid" }, "lines"] },
+    { preset: [{ a: "shader", p: "kaleid" }] },
     { preset: ["face"] },
     { preset: ["starField", "ribbons", "brown"] },
     { preset: ["langtonAnt", "ribbons"] },
