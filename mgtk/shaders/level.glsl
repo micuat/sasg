@@ -20,11 +20,11 @@ uniform sampler2D backgroundTexture;
 uniform sampler2D foregroundTexture;
 
 void main() {
-  vec2 fragCoord = vertTexCoord.st;
+  vec2 fragCoord = (vertTexCoord.st - vec2(0.5)) * vec2(1, -1) + vec2(0.5);
 
-	vec4 finalColor = texture(pgTexture, vertTexCoord.st);
-	vec4 bgColor = texture(backgroundTexture, vertTexCoord.st);
-	vec4 fgColor = texture(foregroundTexture, vertTexCoord.st);
+	vec4 finalColor = texture(pgTexture, fragCoord.st);
+	vec4 bgColor = texture(backgroundTexture, fragCoord.st);
+	vec4 fgColor = texture(foregroundTexture, fragCoord.st);
   // finalColor.r = pow(finalColor.r, 2.0);
   // finalColor.g = pow(finalColor.g, 2.0);
   // finalColor.b = pow(finalColor.b, 2.0);

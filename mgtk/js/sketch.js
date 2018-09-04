@@ -11,6 +11,7 @@ var bgpg;
 var fgpg;
 var layerPgs;
 var oscPgs;
+var mainPg;
 
 var FuncList = function (everyNSeq, funcs) {
   this.everyNSeq = everyNSeq;
@@ -1620,6 +1621,8 @@ var s = function (p) {
     p.frameRate(60);
     startFrame = p.frameCount;
 
+    if (mainPg == undefined)
+      mainPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (frontPg == undefined)
       frontPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (backPg == undefined)
@@ -1763,37 +1766,45 @@ var s = function (p) {
       frontPg.filter(texShader);
       frontPg.endDraw();
 
-      p.resetShader();
+      // mainPg.resetShader();
 
       let intermediatePg = frontPg;
       frontPg = backPg;
       backPg = intermediatePg;
     }
     drawShader();
+
+    mainPg.beginDraw();
+    mainPg.background(0);
+
     levelShader.set("pgTexture", frontPg);
     levelShader.set("backgroundTexture", bgpg);
-    levelShader.set("foregroundTexture", fgpg);
+    // levelShader.set("foregroundTexture", fgpg);
     levelShader.set("masterFader", p.oscFaders[0] * 1.0);
     levelShader.set("seq", seq % 4.0);
     if (true || shaderUpdated == false) {
-      p.filter(levelShader);
+      mainPg.shader(levelShader);
+      mainPg.rect(0, 0, windowWidth, windowHeight);
+      mainPg.resetShader();
     }
-    p.syphonServer.sendImage(frontPg);
-
-    p.blendMode(p.BLEND);
-    for (let i = 2; i < funcAssets.length; i++) {
+    mainPg.blendMode(p.BLEND);
+    for (let i = 1; i < funcAssets.length; i++) {
       if (i < activeLayerNum) {
-        p.image(layerPgs[i], 0, 0);
+        mainPg.image(layerPgs[i], 0, 0);
       }
     }
+    mainPg.endDraw();
+    p.image(mainPg, 0, 0);
 
-    p.syphonServer.sendScreen();
+    p.syphonServer.sendImage(mainPg);
 
     p.translate(p.width / 2, p.height / 2);
     p.fill(255);
     p.text(p.str(seq % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 50);
     p.text(p.str(tElapsed % 1.0), -p.width / 2.0 + 20, p.height / 2.0 - 35);
     p.text("cur preset: " + p.str(1 + p.oscPreset), -p.width / 2.0 + 20, p.height / 2.0 - 20);
+
+    // p.syphonServer.sendScreen();
     lastSeq = seq;
   }
 };
