@@ -17,8 +17,8 @@ public class LFORotation : BaseLFO {
     // Update is called once per frame
 	void Update () {
         base.UpdateTime();
-        tr.eulerAngles = new Vector3(orgRotation.x + 30 * Easing.Bounce.InOut(t0),
-                                     orgRotation.y + 30 * Easing.Bounce.InOut(t1),
-                                     orgRotation.z + 30 * Easing.Bounce.InOut(t2));
+        tr.eulerAngles = new Vector3(orgRotation.x + lfoAmp0 * (Easing.Bounce.InOut(t0) * 2 - 1),
+                                     orgRotation.y + lfoAmp1 * (Easing.Bounce.InOut(t1) * 2 - 1),
+                                     orgRotation.z + lfoAmp2 * (Easing.Bounce.InOut(t2) * 2 - 1));
 	}
 }

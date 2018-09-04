@@ -18,8 +18,8 @@ public class LFOPosition : BaseLFO
     // Update is called once per frame
     void Update()
     {
-        tr.position = new Vector3(orgPosition.x + lfo0,
-                                  orgPosition.y + lfo1,
-                                  orgPosition.z + lfo2);
+        tr.position = new Vector3(orgPosition.x + lfoAmp0 * (Easing.Bounce.InOut(t0) * 2 - 1),
+                                  orgPosition.y + lfoAmp1 * (Easing.Bounce.InOut(t1) * 2 - 1),
+                                  orgPosition.z + lfoAmp2 * (Easing.Bounce.InOut(t2) * 2 - 1));
     }
 }

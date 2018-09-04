@@ -235,10 +235,15 @@ public class BaseLFO : MonoBehaviour {
     protected float lfo2;
     protected float lfo3;
 
-    public float lfoSpeed0 = 1;
-    public float lfoSpeed1 = 1;
-    public float lfoSpeed2 = 1;
-    public float lfoSpeed3 = 1;
+    public float lfoSpeed0 = 0;
+    public float lfoSpeed1 = 0;
+    public float lfoSpeed2 = 0;
+    public float lfoSpeed3 = 0;
+
+    public float lfoAmp0 = 0;
+    public float lfoAmp1 = 0;
+    public float lfoAmp2 = 0;
+    public float lfoAmp3 = 0;
 
     //public LFOManager manager; 
     protected float t0;
@@ -280,5 +285,5 @@ public class BaseLFO : MonoBehaviour {
         {
             t3 = 1.0f - t3;
         }
-}
+    }
 }
