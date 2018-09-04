@@ -328,6 +328,7 @@ void draw() {
   if (libInited == false) {
     setupCamera();
     setupModel();
+    surface.setLocation(100, 100);
 
     try {
       initNashorn();
