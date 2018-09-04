@@ -13,6 +13,8 @@ var layerPgs;
 var oscPgs;
 var mainPg;
 
+var curPreset = 0;
+
 var FuncList = function (everyNSeq, funcs) {
   this.everyNSeq = everyNSeq;
   this.funcs = funcs;
@@ -553,7 +555,7 @@ var SLines = function (p) {
           }
         }
       }
-      let presetIndex = p.oscPreset;
+      let presetIndex = curPreset;
       if (presetIndex >= midiToPreset.length) presetIndex = 0;
       unwrapPreset(newPreset, midiToPreset[presetIndex].preset[seq % 4]);
       for (let i in functions) {
@@ -1460,8 +1462,7 @@ var SFeedbackShader = function (p) {
     levelShader.set("masterFader", p.oscFaders[0] * 1.0);
     levelShader.set("seq", seq % 4.0);
     if (true || shaderUpdated == false) {
-      pg.shader(levelShader);
-      pg.rect(0, 0, windowWidth, windowHeight);
+      pg.filter(levelShader);
       pg.resetShader();
     }
 
@@ -1785,11 +1786,13 @@ var s = function (p) {
     seq = Math.floor(tElapsed * (bpm / 120.0)) + p.seqOffset;
 
     if (seq != lastSeq) {
-      if (seq % funcAssets[0].everyNSeq == 0)
-        activeLayerNum = midiToPreset[p.oscPreset].preset.length;
+      if (seq % funcAssets[0].everyNSeq == 0) {
+        curPreset = p.oscPreset;
+        activeLayerNum = midiToPreset[curPreset].preset.length;
+      }
       for (let i = 0; i < funcAssets.length; i++) {
         if (i < activeLayerNum) {
-          funcAssets[i].preset = midiToPreset[p.oscPreset].preset[i];
+          funcAssets[i].preset = midiToPreset[curPreset].preset[i];
           funcAssets[i].update(seq);
         }
       }
@@ -1824,7 +1827,8 @@ var s = function (p) {
     p.fill(255);
     p.text(p.str(seq % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 50);
     p.text(p.str(tElapsed % 1.0), -p.width / 2.0 + 20, p.height / 2.0 - 35);
-    p.text("cur preset: " + p.str(1 + p.oscPreset), -p.width / 2.0 + 20, p.height / 2.0 - 20);
+    p.text("cur  preset: " + p.str(1 + curPreset), -p.width / 2.0 + 20, p.height / 2.0 - 20);
+    p.text("next preset: " + p.str(1 + p.oscPreset), -p.width / 2.0 + 20, p.height / 2.0 - 5);
 
     // p.syphonServer.sendScreen();
     lastSeq = seq;
