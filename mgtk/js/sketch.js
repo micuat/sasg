@@ -5,12 +5,7 @@ var tElapsed = 0;
 var lastSeq = -1;
 var seq = 0;
 
-var frontPg;
-var backPg;
-var bgpg;
-var fgpg;
 var layerPgs;
-var oscPgs;
 var mainPg;
 
 var curPreset = 0;
@@ -56,9 +51,6 @@ var SLines = function (p) {
   let beatFader = 1.0; // TODO: update from parent patch
   let targetII;
   let agents = [];
-
-  let pg = fgpg;
-  this.pg = fgpg;
 
   function Agent(ii, jj) {
     this.ii = ii;
@@ -871,8 +863,6 @@ var SGameOfLife = function (p) {
 };
 
 var SRibbons = function (p) {
-  let pg = fgpg;
-  this.pg = fgpg;
   let targetRotX = 0;
   let targetRotY = 0;
   let tSpeed = 0;
@@ -979,64 +969,6 @@ var SBeesAndBombs = function (p) {
   }
 };
 
-var SDots = function (p) {
-  this.tween = 0;
-  this.alpha = 0;
-  let points = [];
-  let lastMiniSeq = -1;
-  let mc = 20.0;
-
-  function newPoint() {
-    let x = Math.floor(p.random(0, windowWidth) / mc) * mc;
-    let y = p.random(1.0) > 0.5 ? -10 : windowHeight + 10;
-    let targetX = x;
-    let targetY = Math.floor(p.random(windowHeight * 0.25, windowHeight) / mc) * mc;
-    return { x: x, y: y, targetX: targetX, targetY: targetY, decay: 0.5 };
-  }
-  for (let i = 0; i < 8; i++) {
-    points.push(newPoint());
-  }
-  this.setup = function () {
-  }
-
-  this.draw = function () {
-    let miniSeq = Math.floor(tElapsed * (bpm / 60.0));
-    let fract = tElapsed * (bpm / 60.0) - miniSeq;
-
-    if (miniSeq != lastMiniSeq) {
-      points.splice(0, 1);
-      points.push(newPoint());
-    }
-    lastMiniSeq = miniSeq;
-
-    fgpg.beginDraw();
-    fgpg.clear();
-    fgpg.noStroke();
-    fgpg.fill(255);
-    for (let i in points) {
-      let pt = points[i];
-      // pt.y = p.lerp(pt.y, pt.targetY, 0.1);
-      pt.y = pt.targetY * (1.0 - Math.pow((Math.sin(fract * Math.PI * 2.0) * pt.decay + 0.5), 2.0));
-      pt.decay *= 0.925;
-      let x = pt.x;
-      let y = pt.y;
-      // fgpg.ellipse(x, y, 20, 20);
-    }
-    fgpg.endDraw();
-
-    bgpg.beginDraw();
-    bgpg.clear();
-    bgpg.noStroke();
-    bgpg.fill(255);
-    for (let i in points) {
-      let x = points[i].x;
-      let y = points[i].y;
-      bgpg.ellipse(x, y, 20, 20);
-    }
-    bgpg.endDraw();
-  }
-};
-
 var SFace = function (p) {
   this.alpha = 1.0;
   this.tween = 0.0;
@@ -1045,34 +977,37 @@ var SFace = function (p) {
   }
 
   this.draw = function () {
+    if (this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
     if (p.cam.available() == true) {
       p.cam.read();
     }
 
-    bgpg.beginDraw();
-    bgpg.clear();
-    bgpg.image(p.cam, 0, 0, 1280 / 2, 720 / 2);
+    pg.beginDraw();
+    pg.clear();
+    pg.image(p.cam, 0, 0, 1280 / 2, 720 / 2);
 
-    bgpg.noStroke();
-    bgpg.fill(255, 0, 0);
+    pg.noStroke();
+    pg.fill(255, 0, 0);
     for (let i = 0; i < p.posePoints.length; i++) {
       // let x = p.facePoints[i][0] * 0.5;
       // let y = p.facePoints[i][1] * 0.5;
       let x = p.map(p.posePoints[i][0], 0, 640, 80, 640 - 80);
       let y = p.map(p.posePoints[i][1], 0, 480, 0, 360);
-      bgpg.ellipse(x, y, 14, 14)
+      pg.ellipse(x, y, 14, 14)
     }
-    bgpg.noFill();
-    bgpg.stroke(255);
-    bgpg.beginShape(p.TRIANGLES);
+    pg.noFill();
+    pg.stroke(255);
+    pg.beginShape(p.TRIANGLES);
     for (let i = 0; i < faces.length; i++) {
       let idx = faces[i];
       let x = p.facePoints[idx][0] * 0.5;
       let y = p.facePoints[idx][1] * 0.5;
-      bgpg.vertex(x, y);
+      pg.vertex(x, y);
     }
-    bgpg.endShape();
-    bgpg.endDraw();
+    pg.endShape();
+    pg.endDraw();
   };
 };
 
@@ -1359,6 +1294,9 @@ var SShader = function (p) {
 
 var SFeedbackShader = function (p) {
   let pg;
+  let frontPg;
+  let backPg;
+  var oscPgs;
   let texShader, levelShader, oscShader;
   let curCol = [0, 0, 0];
 
@@ -1431,8 +1369,6 @@ var SFeedbackShader = function (p) {
       texShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
         colorSc[backColIdx][1] / 255.0,
         colorSc[backColIdx][2] / 255.0);
-      if (bgpg != undefined)
-        texShader.set("pgTex", bgpg);
       texShader.set("osc0Tex", oscPgs[0]);
       texShader.set("osc1Tex", oscPgs[1]);
       texShader.set("osc2Tex", oscPgs[2]);
@@ -1457,8 +1393,6 @@ var SFeedbackShader = function (p) {
     pg.pushStyle();
 
     levelShader.set("pgTexture", frontPg);
-    // levelShader.set("backgroundTexture", bgpg);
-    // levelShader.set("foregroundTexture", fgpg);
     levelShader.set("masterFader", p.oscFaders[0] * 1.0);
     levelShader.set("seq", seq % 4.0);
     if (true || shaderUpdated == false) {
@@ -1505,7 +1439,6 @@ var s = function (p) {
   let sGameOfLife = new SGameOfLife(p);
   let sRibbons = new SRibbons(p);
   let sBeesAndBombs = new SBeesAndBombs(p);
-  let sDots = new SDots(p);
   let sFace = new SFace(p);
   let sBrown = new SBrown(p);
   let sLangtonAnt = new SLangtonAnt(p);
@@ -1605,20 +1538,6 @@ var s = function (p) {
         },
         setup: function () {
           sBeesAndBombs.setup();
-        }
-      },
-      {
-        name: "dots",
-        f: function (tween, pg) {
-          let alpha = 1.0 - tween;
-          p.push();
-          sDots.tween = tween;
-          sDots.alpha = alpha * beatFader;
-          sDots.draw();
-          p.pop();
-        },
-        setup: function () {
-          sDots.setup();
         }
       },
       {
@@ -1764,8 +1683,6 @@ var s = function (p) {
         layerPgs.push(pg);
       }
     }
-    bgpg = layerPgs[0];
-    fgpg = layerPgs[1];
 
     for (let i = 0; i < funcAssets.length; i++) {
       funcAssets[i].update();
@@ -1799,10 +1716,6 @@ var s = function (p) {
     }
 
     let tween2 = (t * 0.5 % 1.0) * 2.0 - 1.0;
-    // TODO: delete this??
-    // fgpg.beginDraw();
-    // fgpg.clear();
-    // fgpg.endDraw();
     for (let i = 0; i < funcAssets.length; i++) {
       if (i < activeLayerNum) {
         funcAssets[i].exec(tween2, layerPgs[i]);
