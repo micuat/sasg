@@ -451,7 +451,10 @@ public void readFiles(ArrayList<String> paths) throws IOException {
   }
 }
 
+boolean midiDebugOut = true;
+
 void noteOn(int channel, int pitch, int velocity) {
+  if (midiDebugOut) println(str(pitch) + " pressed");
   int index = pitch;
   if (index <= 35) {
     oscPreset = index;
@@ -473,6 +476,7 @@ void noteOff(int channel, int pitch, int velocity) {
 }
 
 void controllerChange(int channel, int number, int value) {
+  if (midiDebugOut) println(str(number) + " changed to " + str(value));
   int index = number;
   if (index < 20) {
     oscFaders[index] = value / 127.0;
