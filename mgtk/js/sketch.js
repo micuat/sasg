@@ -1266,9 +1266,68 @@ var SDoublePendulum = function (p) {
 
 var SShader = function (p) {
   let pg;
-  let shader;
-  shader = p.loadShader(p.sketchPath("shaders/hydra0.glsl"));
+  let shaders = [];
+  let fpgs = [];
+  let bpgs = [];
+  let npgs = 2;
+  let params = [];
+  let name = "spread";
+  this.fader = 0.0;
 
+  function loadShaders() {
+    // shader = p.loadShader(p.sketchPath("shaders/hydra0.glsl"));
+    for (let i = 0; i < npgs; i++) {
+      shaders[i] = p.loadShader(p.sketchPath("shaders/" + name + "/frag" + i + ".glsl"));
+    }
+  }
+  loadShaders();
+
+  for (let i = 0; i < npgs; i++) {
+    fpgs[i] = p.createGraphics(windowWidth, windowWidth, p.P3D);
+    bpgs[i] = p.createGraphics(windowWidth, windowWidth, p.P3D);
+    fpgs[i].beginDraw();
+    fpgs[i].background(0);
+    fpgs[i].endDraw();
+    bpgs[i].beginDraw();
+    bpgs[i].background(0);
+    bpgs[i].endDraw();
+  }
+  params[0] = {
+    "sides1": 10,
+    "radius2": 0.3,
+    "smoothing3": 0.01,
+    "frequency4": 2,
+    "sync5": 0.3,
+    "offset6": 1,
+    "amount7": 0.1,
+    "amount9": 1,
+    "amount10": 0.5,
+    "xMult11": 1,
+    "yMult12": 1,
+    "amount18": 0.975,
+    "r13": "t",//need fader
+    "g14": "t", 
+    "b15": "t"
+  }
+  params[1] = {
+    "amount20": 1.05,
+    "xMult21": 1,
+    "yMult22": 1,
+    "scale23": 20,
+    "offset24": 0.5,
+    "scale25": 3,
+    "offset26": 0.1,
+    "amount28": 0.5,
+    "amount30": 0.05,
+    "angle31": 0.15,
+    "speed32": 0,
+    "r33": 0.995,
+    "g34": 0.995,
+    "b35": 0.995,
+    "a36": 1,
+    "amount38": 1
+  }
+  
   this.setup = function () {
   }
 
@@ -1277,18 +1336,42 @@ var SShader = function (p) {
     pg = this.pg;
 
     if(p.frameCount % 60 == 0) {
-      shader = p.loadShader(p.sketchPath("shaders/hydra0.glsl"));
+      // loadShaders();
     }
+
+    for (let i = 0; i < npgs; i++) {
+      fpgs[i].beginDraw();
+      shaders[i].set("tex19", bpgs[0]);
+      shaders[i].set("tex17", bpgs[1]);
+      shaders[i].set("time", tElapsed);
+      for (let key in params[i]) {
+        if(typeof params[i][key] == "string") {
+          shaders[i].set(key, this.fader);
+        }
+        else {
+          shaders[i].set(key, parseFloat(params[i][key]));
+        }
+      }
+      fpgs[i].filter(shaders[i]);
+      fpgs[i].endDraw();
+    }
+  
     pg.beginDraw();
     pg.pushMatrix();
     pg.pushStyle();
 
-    shader.set("time", tElapsed);
-    pg.filter(shader);
+    pg.image(fpgs[0], 0, -(windowWidth - windowHeight) * 0.5);
 
     pg.popStyle();
     pg.popMatrix();
     pg.endDraw();
+
+    // swap pgs
+    for (let i = 0; i < npgs; i++) {
+      let temppg = fpgs[i];
+      fpgs[i] = bpgs[i];
+      bpgs[i] = temppg;
+    }
   }
 };
 
@@ -1603,8 +1686,7 @@ var s = function (p) {
           pg.endDraw();
           let alpha = 1.0 - tween;
           sShader.pg = pg;
-          sShader.tween = tween;
-          sShader.alpha = alpha * beatFader;
+          sShader.fader = p.oscFaders[3];
           sShader.draw();
         },
         setup: function () {
@@ -1647,7 +1729,7 @@ var s = function (p) {
   }
 
   let midiToPreset = [
-    { preset: ["feedbackShader"] }, // 1
+    { preset: ["shader"] }, // 1
     { preset: ["beesAndBombs", "lines"] },
     { preset: ["beesAndBombs", "lines"] },
     { preset: ["beesAndBombs", "lines"] },

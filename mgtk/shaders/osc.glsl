@@ -53,7 +53,7 @@ void main() {
 
     vec4 backCol = texture(backTex, vertTexCoord.st);
 
-    finalColor = fragCol0;
+    finalColor = fragCol0 * 0;
   }
 	gl_FragColor = finalColor;
 }
