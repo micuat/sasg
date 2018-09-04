@@ -1822,6 +1822,17 @@ var s = function (p) {
           ppg.endDraw();
         }
       },
+      {
+        name: "invert",
+        f: function (lpg, ppg) {
+          ppg.beginDraw();
+          ppg.clear();
+          postShaders["invert"].set("delta", p.oscFaders[2]);
+          ppg.image(lpg, 0, 0);
+          ppg.filter(postShaders["invert"]);
+          ppg.endDraw();
+        }
+      },
     ]))
   }
   let midiToPreset = [
@@ -1831,8 +1842,8 @@ var s = function (p) {
     { preset: [{ a: "beesAndBombs", p: "bloom" }, "lines"] },
     { preset: ["beesAndBombs", "lines"] },
     { preset: [{ a: "ribbons", p: "slide" }, "lines"] }, //add drum effect
-    { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid"] }, "lines"] },
-    { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid"] }, "lines"] },
+    { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid", "invert"] }, "lines"] },
+    { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid", "invert"] }, "lines"] },
     { preset: [{ a: "shader", p: "kaleid" }, "ribbons", "lines"] },
     { preset: [{ a: "shader", p: "kaleid" }, "ribbons", "lines"] }, // 10
     { preset: [{ a: "shader", p: "kaleid" }, "ribbons", "lines"] },
@@ -1878,7 +1889,7 @@ var s = function (p) {
       postAssets[i].update();
     }
 
-    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom"];
+    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert"];
     for (let i in shaderTypes) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }
