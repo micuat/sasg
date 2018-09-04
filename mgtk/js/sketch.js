@@ -1355,6 +1355,122 @@ var SShader = function (p) {
   }
 };
 
+var SFeedbackShader = function (p) {
+  let pg;
+  let texShader, levelShader, oscShader;
+  let curCol = [0, 0, 0];
+
+  if (frontPg == undefined)
+    frontPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
+  if (backPg == undefined)
+    backPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
+  if (oscPgs == undefined) {
+    oscPgs = [];
+    for (let i = 0; i < 3; i++) {
+      oscPgs.push(p.createGraphics(windowWidth, windowHeight, p.P3D));
+    }
+  }
+  
+  function loadShaders() {
+    texShader = p.loadShader(p.sketchPath("shaders/frag.glsl"));
+    levelShader = p.loadShader(p.sketchPath("shaders/level.glsl"));
+    oscShader = p.loadShader(p.sketchPath("shaders/osc.glsl"));
+  }
+  loadShaders();
+
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    if (this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
+    if(p.frameCount % 60 == 0) {
+      loadShaders();
+    }
+
+    let colorSc = [
+      [0, 255, 150],
+      [0, 155, 50],
+      [230, 230, 100],
+      [205, 70, 0],
+      [50, 100, 255],
+      [0, 70, 155],
+      [20, 205, 200],
+      [135, 30, 0]
+    ]
+
+    function drawShader() {
+      let backColIdx = Math.floor(tElapsed % 2) * 2 + 1;
+      let backCol = [colorSc[backColIdx][0] / 255.0,
+      colorSc[backColIdx][1] / 255.0,
+      colorSc[backColIdx][2] / 255.0];
+      backCol = [0, 0, 0];
+      for (let i = 0; i < oscPgs.length; i++) {
+        oscShader.set("iTime", tElapsed);
+        let frontColIdx = Math.floor(tElapsed % 2) * 2;
+        curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
+        curCol[1] = p.lerp(curCol[1], colorSc[frontColIdx][1] / 255.0, 0.05);
+        curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
+        oscShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
+        oscShader.set("bgColor1", backCol[0], backCol[1], backCol[2]);
+        oscShader.set("phaseFader", p.oscFaders[5]);
+        oscShader.set("xFader", p.oscFaders[6] * 10.0);
+        oscShader.set("oscNum", i * 1.0);
+        oscShader.set("backTex", backPg);
+        let oscPg = oscPgs[i];
+        oscPg.beginDraw();
+        oscPg.filter(oscShader);
+        oscPg.endDraw();
+      }
+
+      texShader.set("iTime", tElapsed);
+      texShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
+      texShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
+        colorSc[backColIdx][1] / 255.0,
+        colorSc[backColIdx][2] / 255.0);
+      if (bgpg != undefined)
+        texShader.set("pgTex", bgpg);
+      texShader.set("osc0Tex", oscPgs[0]);
+      texShader.set("osc1Tex", oscPgs[1]);
+      texShader.set("osc2Tex", oscPgs[2]);
+      texShader.set("backTex", backPg);
+      texShader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
+      texShader.set("phaseFader", p.oscFaders[5]);
+      texShader.set("xFader", p.oscFaders[6] * 10.0);
+      texShader.set("rAmountFader", p.oscFaders[7] * 1.0);
+      texShader.set("modulationFader", p.oscFaders[19] * 1.0);
+      frontPg.beginDraw();
+      frontPg.filter(texShader);
+      frontPg.endDraw();
+
+      let intermediatePg = frontPg;
+      frontPg = backPg;
+      backPg = intermediatePg;
+    }
+    drawShader();
+
+    pg.beginDraw();
+    pg.pushMatrix();
+    pg.pushStyle();
+
+    levelShader.set("pgTexture", frontPg);
+    // levelShader.set("backgroundTexture", bgpg);
+    // levelShader.set("foregroundTexture", fgpg);
+    levelShader.set("masterFader", p.oscFaders[0] * 1.0);
+    levelShader.set("seq", seq % 4.0);
+    if (true || shaderUpdated == false) {
+      pg.shader(levelShader);
+      pg.rect(0, 0, windowWidth, windowHeight);
+      pg.resetShader();
+    }
+
+    pg.popStyle();
+    pg.popMatrix();
+    pg.endDraw();
+  }
+};
+
 var SWarehouse = function (p) {
   let pg;
 
@@ -1394,13 +1510,11 @@ var s = function (p) {
   let sLangtonAnt = new SLangtonAnt(p);
   let sDoublePendulum = new SDoublePendulum(p);
   let sShader = new SShader(p);
+  let sFeedbackShader = new SFeedbackShader(p);
   let sWarehouse = new SWarehouse(p);
 
   let startFrame;
-  let doUpdate = true;
-  let curCol = [0, 0, 0];
   let beatFader = 1;
-  let texShader, levelShader;
 
   let funcAssets = [];
   for (let i = 0; i < 16; i++) {
@@ -1578,6 +1692,22 @@ var s = function (p) {
         }
       },
       {
+        name: "feedbackShader",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+          let alpha = 1.0 - tween;
+          sFeedbackShader.pg = pg;
+          sFeedbackShader.tween = tween;
+          sFeedbackShader.alpha = alpha * beatFader;
+          sFeedbackShader.draw();
+        },
+        setup: function () {
+          sFeedbackShader.setup();
+        }
+      },
+      {
         name: "warehouse",
         f: function (tween, pg) {
           pg.beginDraw();
@@ -1597,7 +1727,7 @@ var s = function (p) {
   }
 
   let midiToPreset = [
-    { preset: ["default"] }, // 1
+    { preset: ["feedbackShader"] }, // 1
     { preset: ["beesAndBombs", "lines"] },
     { preset: ["beesAndBombs", "lines"] },
     { preset: ["beesAndBombs", "lines"] },
@@ -1623,10 +1753,6 @@ var s = function (p) {
 
     if (mainPg == undefined)
       mainPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
-    if (frontPg == undefined)
-      frontPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
-    if (backPg == undefined)
-      backPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (layerPgs == undefined) {
       layerPgs = [];
       for (let i = 0; i < 16; i++) {
@@ -1639,16 +1765,6 @@ var s = function (p) {
     }
     bgpg = layerPgs[0];
     fgpg = layerPgs[1];
-
-    if (oscPgs == undefined) {
-      oscPgs = [];
-      for (let i = 0; i < 3; i++) {
-        oscPgs.push(p.createGraphics(windowWidth, windowHeight, p.P3D));
-      }
-    }
-    texShader = p.loadShader(p.sketchPath("shaders/frag.glsl"));
-    levelShader = p.loadShader(p.sketchPath("shaders/level.glsl"));
-    oscShader = p.loadShader(p.sketchPath("shaders/osc.glsl"));
 
     for (let i = 0; i < funcAssets.length; i++) {
       funcAssets[i].update();
@@ -1664,18 +1780,9 @@ var s = function (p) {
 
   p.draw = function () {
     p.background(0);
-    let shaderUpdated = false;
-    // let t = p.getCount() / 60.0 * (bpm / 120.0);
     tElapsed = p.millis() * 0.001 + p.oscFaders[1];
     let t = tElapsed * (bpm / 120.0);
     seq = Math.floor(tElapsed * (bpm / 120.0)) + p.seqOffset;
-
-    if (p.getCount() % 60 == 0) {
-      texShader = p.loadShader(p.sketchPath("shaders/frag.glsl"));
-      levelShader = p.loadShader(p.sketchPath("shaders/level.glsl"));
-      oscShader = p.loadShader(p.sketchPath("shaders/osc.glsl"));
-      shaderUpdated = true;
-    }
 
     if (seq != lastSeq) {
       if (seq % funcAssets[0].everyNSeq == 0)
@@ -1689,106 +1796,21 @@ var s = function (p) {
     }
 
     let tween2 = (t * 0.5 % 1.0) * 2.0 - 1.0;
-    fgpg.beginDraw();
-    fgpg.clear();
-    fgpg.endDraw();
+    // TODO: delete this??
+    // fgpg.beginDraw();
+    // fgpg.clear();
+    // fgpg.endDraw();
     for (let i = 0; i < funcAssets.length; i++) {
       if (i < activeLayerNum) {
         funcAssets[i].exec(tween2, layerPgs[i]);
       }
     }
 
-    // runwayml test
-    // let human = JSON.parse(p.openPose).results.humans[0];
-    // if(human != undefined) {
-    //   fgpg.beginDraw();
-    //   fgpg.fill(255);
-    //   for(let i = 0; i < human.length; i++) {
-    //     let x = human[i][1] * 640 * 0.5;
-    //     let y = human[i][2] * 480 * 0.5;
-    //     fgpg.ellipse(x, y, 10, 10);
-    //   }
-    //   fgpg.endDraw();
-    // }
-
-    let colorSc = [
-      [0, 255, 150],
-      [0, 155, 50],
-      [230, 230, 100],
-      [205, 70, 0],
-      [50, 100, 255],
-      [0, 70, 155],
-      [20, 205, 200],
-      [135, 30, 0]
-    ]
-
-    function drawShader() {
-      let backColIdx = Math.floor(t % 2) * 2 + 1;
-      let backCol = [colorSc[backColIdx][0] / 255.0,
-      colorSc[backColIdx][1] / 255.0,
-      colorSc[backColIdx][2] / 255.0];
-      backCol = [0, 0, 0];
-      for (let i = 0; i < oscPgs.length; i++) {
-        oscShader.set("iTime", t);
-        let frontColIdx = Math.floor(t % 2) * 2;
-        curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
-        curCol[1] = p.lerp(curCol[1], colorSc[frontColIdx][1] / 255.0, 0.05);
-        curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
-        oscShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
-        oscShader.set("bgColor1", backCol[0], backCol[1], backCol[2]);
-        oscShader.set("phaseFader", p.oscFaders[5]);
-        oscShader.set("xFader", p.oscFaders[6] * 10.0);
-        oscShader.set("oscNum", i * 1.0);
-        oscShader.set("backTex", backPg);
-        let oscPg = oscPgs[i];
-        oscPg.beginDraw();
-        oscPg.filter(oscShader);
-        oscPg.endDraw();
-      }
-
-      texShader.set("iTime", t);
-      texShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
-      texShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
-        colorSc[backColIdx][1] / 255.0,
-        colorSc[backColIdx][2] / 255.0);
-      if (bgpg != undefined)
-        texShader.set("pgTex", bgpg);
-      texShader.set("osc0Tex", oscPgs[0]);
-      texShader.set("osc1Tex", oscPgs[1]);
-      texShader.set("osc2Tex", oscPgs[2]);
-      texShader.set("backTex", backPg);
-      texShader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
-      texShader.set("phaseFader", p.oscFaders[5]);
-      texShader.set("xFader", p.oscFaders[6] * 10.0);
-      texShader.set("rAmountFader", p.oscFaders[7] * 1.0);
-      texShader.set("modulationFader", p.oscFaders[19] * 1.0);
-      frontPg.beginDraw();
-      frontPg.filter(texShader);
-      frontPg.endDraw();
-
-      // mainPg.resetShader();
-
-      let intermediatePg = frontPg;
-      frontPg = backPg;
-      backPg = intermediatePg;
-    }
-    drawShader();
-
     mainPg.beginDraw();
     mainPg.background(0);
 
-    levelShader.set("pgTexture", frontPg);
-    levelShader.set("backgroundTexture", bgpg);
-    // levelShader.set("foregroundTexture", fgpg);
-    levelShader.set("masterFader", p.oscFaders[0] * 1.0);
-    levelShader.set("seq", seq % 4.0);
-    if (true || shaderUpdated == false) {
-      mainPg.shader(levelShader);
-      mainPg.rect(0, 0, windowWidth, windowHeight);
-      mainPg.resetShader();
-    }
     mainPg.blendMode(p.BLEND);
-    for (let i = 1; i < funcAssets.length; i++) {
+    for (let i = 0; i < funcAssets.length; i++) {
       if (i < activeLayerNum) {
         mainPg.image(layerPgs[i], 0, 0);
       }
