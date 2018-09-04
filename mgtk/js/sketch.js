@@ -20,7 +20,7 @@ var FuncList = function (everyNSeq, funcs) {
   this.update = function (seq) {
     if (seq % this.everyNSeq == 0 || this.execFunc == undefined) {
       let flist = [];
-      if(this.preset != undefined && typeof this.preset == "string") {
+      if (this.preset != undefined && typeof this.preset == "string") {
         this.preset = [this.preset];
       }
       for (let i in this.funcs) {
@@ -1276,17 +1276,9 @@ var SShader = function (p) {
   let bpgs = [];
   let npgs = 2;
   let params = {};
-  let name = "spread";
+  this.curName = "spread";
+  let names = ["spread", "pixelwave"];
   this.fader = 0.0;
-
-  function loadShaders() {
-    // shader = p.loadShader(p.sketchPath("shaders/hydra0.glsl"));
-    shaders[name] = [];
-    for (let i = 0; i < npgs; i++) {
-      shaders[name][i] = p.loadShader(p.sketchPath("shaders/" + name + "/frag" + i + ".glsl"));
-    }
-  }
-  loadShaders();
 
   for (let i = 0; i < npgs; i++) {
     fpgs[i] = p.createGraphics(windowWidth, windowWidth, p.P3D);
@@ -1298,71 +1290,93 @@ var SShader = function (p) {
     bpgs[i].background(0);
     bpgs[i].endDraw();
   }
-  params["spread"] = [];
-  params["spread"][0] = {
-    "tex17": "bpgs[1]",
-    "sides1": 10,
-    "radius2": 0.3,
-    "smoothing3": 0.01,
-    "frequency4": 2,
-    "sync5": 0.3,
-    "offset6": 1,
-    "amount7": 0.1,
-    "amount9": 1,
-    "amount10": 0.5,
-    "xMult11": 1,
-    "yMult12": 1,
-    "amount18": 0.975,
-    "r13": "this.fader",
-    "g14": "this.fader",
-    "b15": "this.fader"
+  params["spread"] = [
+    {
+      "tex17": "bpgs[1]",
+      "sides1": 10,
+      "radius2": 0.3,
+      "smoothing3": 0.01,
+      "frequency4": 2,
+      "sync5": 0.3,
+      "offset6": 1,
+      "amount7": 0.1,
+      "amount9": 1,
+      "amount10": 0.5,
+      "xMult11": 1,
+      "yMult12": 1,
+      "amount18": 0.975,
+      "r13": "this.fader",
+      "g14": "this.fader",
+      "b15": "this.fader"
+    },
+    {
+      "tex19": "bpgs[0]",
+      "amount20": 1.05,
+      "xMult21": 1,
+      "yMult22": 1,
+      "scale23": 20,
+      "offset24": 0.5,
+      "scale25": 3,
+      "offset26": 0.1,
+      "amount28": 0.5,
+      "amount30": 0.05,
+      "angle31": 0.15,
+      "speed32": 0,
+      "r33": 0.995,
+      "g34": 0.995,
+      "b35": 0.995,
+      "a36": 1,
+      "amount38": 1
+    }
+  ];
+  params["pixelwave"] = [
+    {
+    }
+  ];
+
+  function loadShaders() {
+    for(let i in names) {
+      let name = names[i];
+      shaders[name] = [];
+      for (let i = 0; i < npgs && i < params[name].length; i++) {
+        shaders[name][i] = p.loadShader(p.sketchPath("shaders/" + name + "/frag" + i + ".glsl"));
+      }
+    }
   }
-  params["spread"][1] = {
-    "tex19": "bpgs[0]",
-    "amount20": 1.05,
-    "xMult21": 1,
-    "yMult22": 1,
-    "scale23": 20,
-    "offset24": 0.5,
-    "scale25": 3,
-    "offset26": 0.1,
-    "amount28": 0.5,
-    "amount30": 0.05,
-    "angle31": 0.15,
-    "speed32": 0,
-    "r33": 0.995,
-    "g34": 0.995,
-    "b35": 0.995,
-    "a36": 1,
-    "amount38": 1
-  }
-  
+  loadShaders();
+
   this.setup = function () {
   }
 
   this.draw = function () {
     if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
-
-    if(p.frameCount % 60 == 0) {
+    
+    if (p.oscPreset == 0) {
+      this.curName = "spread";
+    }
+    else {
+      this.curName = "pixelwave";
+    }
+    if (p.frameCount % 60 == 0) {
       // loadShaders();
     }
 
-    for (let i = 0; i < npgs; i++) {
+    for (let i = 0; i < npgs && i < params[this.curName].length; i++) {
       fpgs[i].beginDraw();
-      shaders[name][i].set("time", tElapsed);
-      for (let key in params[name][i]) {
-        if(typeof params[name][i][key] == "string") {
-          shaders[name][i].set(key, eval(params[name][i][key]));
+      shaders[this.curName][i].set("time", tElapsed);
+      for (let key in params[this.curName][i]) {
+        if (typeof params[this.curName][i][key] == "string") {
+          shaders[this.curName][i].set(key, eval(params[this.curName][i][key]));
         }
         else {
-          shaders[name][i].set(key, parseFloat(params[name][i][key]));
+          shaders[this.curName][i].set(key, parseFloat(params[this.curName][i][key]));
         }
       }
-      fpgs[i].filter(shaders[name][i]);
+      fpgs[i].filter(shaders[this.curName][i]);
       fpgs[i].endDraw();
     }
-  
+
     pg.beginDraw();
     pg.pushMatrix();
     pg.pushStyle();
@@ -1400,7 +1414,7 @@ var SFeedbackShader = function (p) {
       oscPgs.push(p.createGraphics(windowWidth, windowHeight, p.P3D));
     }
   }
-  
+
   function loadShaders() {
     texShader = p.loadShader(p.sketchPath("shaders/frag.glsl"));
     levelShader = p.loadShader(p.sketchPath("shaders/level.glsl"));
@@ -1415,7 +1429,7 @@ var SFeedbackShader = function (p) {
     if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
 
-    if(p.frameCount % 60 == 0) {
+    if (p.frameCount % 60 == 0) {
       loadShaders();
     }
 
@@ -1788,7 +1802,7 @@ var s = function (p) {
           passPg.clear();
           passPg.image(lpg, 0, 0);
           passPg.endDraw();
-          for(let i = 0; i < 10; i++) {
+          for (let i = 0; i < 10; i++) {
             ppg.beginDraw();
             ppg.clear();
             postShaders["bloom"].set("delta", 0.01 * p.oscFaders[2]);
@@ -1808,11 +1822,11 @@ var s = function (p) {
     ]))
   }
   let midiToPreset = [
-    { preset: [{a: "shader", p: "slide"}] }, // 1
-    { preset: [{a: "beesAndBombs", p: "slide"}, {a: "lines", p: "rgbshift"}] },
-    { preset: [{a: "beesAndBombs", p: "bloom"}, "lines"] },
+    { preset: [{ a: "shader", p: "slide" }] }, // 1
+    { preset: [{ a: "beesAndBombs", p: "slide" }, { a: "lines", p: "rgbshift" }] },
+    { preset: [{ a: "beesAndBombs", p: "bloom" }, "lines"] },
     { preset: ["beesAndBombs", "lines"] },
-    { preset: [{a: "ribbons", p: "bloom"}, "lines"] },
+    { preset: [{ a: "ribbons", p: "bloom" }, "lines"] },
     { preset: ["ribbons", "lines"] },
     { preset: ["ribbons", "lines"] },
     { preset: ["ribbons", "lines"] },
@@ -1822,7 +1836,7 @@ var s = function (p) {
     { preset: ["starField", "ribbons", "brown"] },
     { preset: ["langtonAnt", "ribbons"] },
     { preset: ["brown", "doublePendulum"] },
-    { preset: [{a: "shader", p: "kaleid"}, {a: "ribbons", p: "rgbshift"}] },
+    { preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "rgbshift" }] },
     { preset: ["warehouse", "brown"] },
   ];
 
@@ -1861,7 +1875,7 @@ var s = function (p) {
     }
 
     let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom"];
-    for(let i in shaderTypes) {
+    for (let i in shaderTypes) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }
   }
@@ -1887,8 +1901,8 @@ var s = function (p) {
       for (let i = 0; i < funcAssets.length; i++) {
         if (i < activeLayerNum) {
           let lp = midiToPreset[curPreset].preset[i];
-          if(lp == undefined) continue;
-          if(lp.a != undefined) {
+          if (lp == undefined) continue;
+          if (lp.a != undefined) {
             funcAssets[i].preset = lp.a;
             postAssets[i].preset = lp.p;
           }
