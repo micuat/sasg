@@ -155,6 +155,12 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    if(ofGetFrameNum() == 60) {
+        updateClients();
+        ofSetWindowPosition(4000, 100);
+        ofSetFullscreen(true);
+    }
+
     ofBackground(0, 0, 0);
     ofColor(255, 255, 255, 255);
 //    ofEnableAlphaBlending();
