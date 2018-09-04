@@ -19,6 +19,9 @@ var FuncList = function (everyNSeq, funcs) {
   this.update = function (seq) {
     if (seq % this.everyNSeq == 0 || this.execFunc == undefined) {
       let flist = [];
+      if(this.preset != undefined && typeof this.preset == "string") {
+        this.preset = [this.preset];
+      }
       for (let i in this.funcs) {
         if (this.preset == undefined || this.preset.length == 0) {
           flist.push(this.funcs[i]);
@@ -1729,7 +1732,33 @@ var s = function (p) {
       }
     ]));
   }
-
+  let postAssets = [];
+  for (let i = 0; i < 16; i++) {
+    postAssets.push(new FuncList(4, [
+      {
+        name: "default",
+        f: function (lpg, ppg) {
+          ppg.beginDraw();
+          ppg.background(0);
+          ppg.clear();
+          ppg.resetShader();
+          ppg.image(lpg, 0, 0);
+          ppg.endDraw();
+        }
+      },
+      {
+        name: "kaleid",
+        f: function (lpg, ppg) {
+          ppg.beginDraw();
+          ppg.background(0);
+          ppg.clear();
+          ppg.image(lpg, 0, 0);
+          ppg.filter(postShaders["kaleid"]);
+          ppg.endDraw();
+        }
+      },
+    ]))
+  }
   let midiToPreset = [
     { preset: ["shader"] }, // 1
     { preset: ["beesAndBombs", "lines"] },
@@ -1745,8 +1774,8 @@ var s = function (p) {
     { preset: ["starField", "ribbons", "brown"] },
     { preset: ["langtonAnt", "ribbons"] },
     { preset: ["brown", "doublePendulum"] },
-    { preset: ["default", "shader", "ribbons"] },
-    { preset: ["default", "warehouse", "brown"] },
+    { preset: [{a: "shader", p: "kaleid"}, "ribbons"] },
+    { preset: ["warehouse", "brown"] },
   ];
 
   p.setup = function () {
@@ -1777,6 +1806,9 @@ var s = function (p) {
     for (let i = 0; i < funcAssets.length; i++) {
       funcAssets[i].update();
     }
+    for (let i = 0; i < postAssets.length; i++) {
+      postAssets[i].update();
+    }
 
     postShaders["kaleid"] = p.loadShader(p.sketchPath("shaders/post/" + "kaleid" + ".glsl"));
   }
@@ -1801,8 +1833,18 @@ var s = function (p) {
       }
       for (let i = 0; i < funcAssets.length; i++) {
         if (i < activeLayerNum) {
-          funcAssets[i].preset = midiToPreset[curPreset].preset[i];
+          let lp = midiToPreset[curPreset].preset[i];
+          if(lp == undefined) continue;
+          if(lp.a != undefined) {
+            funcAssets[i].preset = lp.a;
+            postAssets[i].preset = lp.p;
+          }
+          else {
+            funcAssets[i].preset = lp;
+            postAssets[i].preset = "default";
+          }
           funcAssets[i].update(seq);
+          postAssets[i].update(seq);
         }
       }
     }
@@ -1811,15 +1853,7 @@ var s = function (p) {
     for (let i = 0; i < funcAssets.length; i++) {
       if (i < activeLayerNum) {
         funcAssets[i].exec(tween2, layerPgs[i]);
-      }
-    }
-
-    for (let i = 0; i < funcAssets.length; i++) {
-      if (i < activeLayerNum) {
-        postPgs[i].beginDraw();
-        postPgs[i].image(layerPgs[i], 0, 0);
-        postPgs[i].filter(postShaders["kaleid"]);
-        postPgs[i].endDraw();
+        postAssets[i].exec(layerPgs[i], postPgs[i]);
       }
     }
 
