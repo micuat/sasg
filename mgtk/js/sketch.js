@@ -7,6 +7,7 @@ var seq = 0;
 
 var layerPgs;
 var postPgs;
+var passPg;
 var mainPg;
 
 var curPreset = 0;
@@ -1778,14 +1779,38 @@ var s = function (p) {
           ppg.endDraw();
         }
       },
+      {
+        name: "bloom",
+        f: function (lpg, ppg) {
+          passPg.beginDraw();
+          passPg.clear();
+          passPg.image(lpg, 0, 0);
+          passPg.endDraw();
+          for(let i = 0; i < 10; i++) {
+            ppg.beginDraw();
+            ppg.clear();
+            postShaders["bloom"].set("delta", 0.01 * p.oscFaders[2]);
+            ppg.image(lpg, 0, 0);
+            ppg.filter(postShaders["bloom"]);
+            ppg.endDraw();
+            let temppg = ppg;
+            ppg = lpg;
+            lpg = temppg;
+          }
+          ppg.beginDraw();
+          ppg.blendMode(p.ADD);
+          ppg.image(passPg, 0, 0);
+          ppg.endDraw();
+        }
+      },
     ]))
   }
   let midiToPreset = [
     { preset: [{a: "shader", p: "slide"}] }, // 1
     { preset: [{a: "beesAndBombs", p: "slide"}, {a: "lines", p: "rgbshift"}] },
+    { preset: [{a: "beesAndBombs", p: "bloom"}, "lines"] },
     { preset: ["beesAndBombs", "lines"] },
-    { preset: ["beesAndBombs", "lines"] },
-    { preset: ["ribbons", "lines"] },
+    { preset: [{a: "ribbons", p: "bloom"}, "lines"] },
     { preset: ["ribbons", "lines"] },
     { preset: ["ribbons", "lines"] },
     { preset: ["ribbons", "lines"] },
@@ -1807,6 +1832,8 @@ var s = function (p) {
 
     if (mainPg == undefined)
       mainPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
+    if (passPg == undefined)
+      passPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
     if (layerPgs == undefined) {
       layerPgs = [];
       for (let i = 0; i < 16; i++) {
@@ -1831,7 +1858,7 @@ var s = function (p) {
       postAssets[i].update();
     }
 
-    let shaderTypes = ["kaleid", "rgbshift", "slide"];
+    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom"];
     for(let i in shaderTypes) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }
