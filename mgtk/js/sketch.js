@@ -1739,7 +1739,6 @@ var s = function (p) {
         name: "default",
         f: function (lpg, ppg) {
           ppg.beginDraw();
-          ppg.background(0);
           ppg.clear();
           ppg.resetShader();
           ppg.image(lpg, 0, 0);
@@ -1750,17 +1749,27 @@ var s = function (p) {
         name: "kaleid",
         f: function (lpg, ppg) {
           ppg.beginDraw();
-          ppg.background(0);
           ppg.clear();
           ppg.image(lpg, 0, 0);
           ppg.filter(postShaders["kaleid"]);
           ppg.endDraw();
         }
       },
+      {
+        name: "rgbshift",
+        f: function (lpg, ppg) {
+          ppg.beginDraw();
+          ppg.clear();
+          postShaders["rgbshift"].set("delta", 300.0 * p.oscFaders[2]);
+          ppg.image(lpg, 0, 0);
+          ppg.filter(postShaders["rgbshift"]);
+          ppg.endDraw();
+        }
+      },
     ]))
   }
   let midiToPreset = [
-    { preset: ["shader"] }, // 1
+    { preset: [{a: "shader", p: "rgbshift"}] }, // 1
     { preset: ["beesAndBombs", "lines"] },
     { preset: ["beesAndBombs", "lines"] },
     { preset: ["beesAndBombs", "lines"] },
@@ -1774,7 +1783,7 @@ var s = function (p) {
     { preset: ["starField", "ribbons", "brown"] },
     { preset: ["langtonAnt", "ribbons"] },
     { preset: ["brown", "doublePendulum"] },
-    { preset: [{a: "shader", p: "kaleid"}, "ribbons"] },
+    { preset: [{a: "shader", p: "kaleid"}, {a: "ribbons", p: "rgbshift"}] },
     { preset: ["warehouse", "brown"] },
   ];
 
@@ -1810,7 +1819,10 @@ var s = function (p) {
       postAssets[i].update();
     }
 
-    postShaders["kaleid"] = p.loadShader(p.sketchPath("shaders/post/" + "kaleid" + ".glsl"));
+    let shaderTypes = ["kaleid", "rgbshift"];
+    for(let i in shaderTypes) {
+      postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
+    }
   }
 
   p.getCount = function () { return p.frameCount - startFrame + Math.floor(p.oscFaders[1] * 60) };
