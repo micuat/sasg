@@ -1766,11 +1766,23 @@ var s = function (p) {
           ppg.endDraw();
         }
       },
+      {
+        name: "slide",
+        f: function (lpg, ppg) {
+          ppg.beginDraw();
+          ppg.clear();
+          postShaders["slide"].set("time", tElapsed);
+          postShaders["slide"].set("delta", 0.1 * p.oscFaders[2]);
+          ppg.image(lpg, 0, 0);
+          ppg.filter(postShaders["slide"]);
+          ppg.endDraw();
+        }
+      },
     ]))
   }
   let midiToPreset = [
-    { preset: [{a: "shader", p: "rgbshift"}] }, // 1
-    { preset: ["beesAndBombs", "lines"] },
+    { preset: [{a: "shader", p: "slide"}] }, // 1
+    { preset: [{a: "beesAndBombs", p: "slide"}, {a: "lines", p: "rgbshift"}] },
     { preset: ["beesAndBombs", "lines"] },
     { preset: ["beesAndBombs", "lines"] },
     { preset: ["ribbons", "lines"] },
@@ -1819,7 +1831,7 @@ var s = function (p) {
       postAssets[i].update();
     }
 
-    let shaderTypes = ["kaleid", "rgbshift"];
+    let shaderTypes = ["kaleid", "rgbshift", "slide"];
     for(let i in shaderTypes) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }
