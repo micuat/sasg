@@ -979,6 +979,12 @@ var SFace = function (p) {
   this.alpha = 1.0;
   this.tween = 0.0;
   let faces = [0, 17, 18, 20, 23, 24, 19, 20, 24, 25, 26, 16, 26, 45, 16, 46, 14, 15, 45, 46, 15, 16, 45, 15, 35, 13, 14, 46, 35, 14, 54, 12, 13, 35, 54, 13, 35, 53, 54, 47, 35, 46, 25, 45, 26, 54, 11, 12, 44, 45, 25, 24, 44, 25, 29, 35, 47, 55, 10, 11, 54, 55, 11, 44, 46, 45, 20, 21, 23, 42, 29, 47, 43, 44, 24, 23, 43, 24, 44, 47, 46, 43, 47, 44, 29, 30, 35, 21, 22, 23, 56, 9, 10, 55, 56, 10, 35, 52, 53, 28, 29, 42, 64, 55, 54, 23, 22, 43, 43, 42, 47, 53, 64, 54, 22, 42, 43, 34, 52, 35, 56, 8, 9, 22, 27, 42, 65, 55, 64, 53, 63, 64, 27, 28, 42, 57, 8, 56, 30, 34, 35, 65, 56, 55, 52, 63, 53, 33, 52, 34, 65, 66, 56, 66, 57, 56, 51, 63, 52, 33, 51, 52, 30, 33, 34, 21, 27, 22, 58, 7, 57, 57, 7, 8, 50, 51, 33, 51, 62, 63, 30, 32, 33, 58, 57, 66, 67, 58, 66, 61, 62, 51, 31, 30, 29, 32, 50, 33, 39, 29, 28, 39, 28, 27, 21, 39, 27, 31, 32, 30, 40, 31, 29, 39, 40, 29, 50, 61, 51, 6, 7, 58, 59, 6, 58, 59, 58, 67, 49, 61, 50, 31, 49, 50, 31, 50, 32, 38, 39, 21, 60, 59, 67, 40, 41, 31, 41, 2, 31, 20, 38, 21, 2, 3, 31, 48, 49, 31, 3, 48, 31, 48, 60, 49, 3, 4, 48, 48, 5, 59, 5, 6, 59, 60, 48, 59, 19, 38, 20, 38, 40, 39, 19, 37, 38, 4, 5, 48, 1, 2, 41, 37, 41, 40, 37, 40, 38, 36, 1, 41, 18, 37, 19, 36, 41, 37, 18, 36, 37, 17, 0, 36, 0, 1, 36, 18, 17, 36, 49, 60, 61];
+  let points = [[487, 298], [489, 345], [497, 392], [507, 437], [521, 481], [543, 521], [573, 555], [609, 584], [650, 591], [689, 585], [722, 555], [751, 520], [775, 479], [788, 432], [794, 385], [800, 337], [800, 290], [510, 279], [533, 259], [565, 254], [597, 258], [626, 271], [672, 273], [700, 259], [732, 254], [762, 256], [782, 277], [652, 302], [652, 332], [651, 361], [651, 392], [617, 414], [634, 419], [652, 425], [668, 421], [684, 417], [545, 307], [563, 300], [583, 301], [600, 313], [581, 317], [561, 316], [694, 313], [710, 300], [731, 300], [748, 306], [734, 316], [713, 317], [592, 484], [612, 468], [634, 458], [650, 465], [666, 461], [687, 473], [705, 489], [686, 513], [666, 522], [647, 523], [630, 520], [609, 508], [602, 485], [634, 480], [650, 482], [666, 482], [695, 490], [664, 492], [648, 492], [631, 489], [487, 298], [489, 345], [497, 392], [507, 437], [521, 481], [543, 521], [573, 555], [609, 584], [650, 591], [689, 585], [722, 555], [751, 520], [775, 479], [788, 432], [794, 385], [800, 337], [800, 290], [510, 279], [533, 259], [565, 254], [597, 258], [626, 271], [672, 273], [700, 259], [732, 254], [762, 256], [782, 277], [652, 302], [652, 332], [651, 361], [651, 392], [617, 414], [634, 419], [652, 425], [668, 421], [684, 417], [545, 307], [563, 300], [583, 301], [600, 313], [581, 317], [561, 316], [694, 313], [710, 300], [731, 300], [748, 306], [734, 316], [713, 317], [592, 484], [612, 468], [634, 458], [650, 465], [666, 461], [687, 473], [705, 489], [686, 513], [666, 522], [647, 523], [630, 520], [609, 508], [602, 485], [634, 480], [650, 482], [666, 482], [695, 490], [664, 492], [648, 492], [631, 489]];
+  for(let i in points) {
+    points[i][1] -= 100;
+  }
+  let facePg = p.createGraphics(windowWidth, windowHeight, p.P3D);
+
   this.setup = function () {
   }
 
@@ -990,29 +996,65 @@ var SFace = function (p) {
       p.cam.read();
     }
 
+    facePg.beginDraw();
+    // face
+    if(p.frameCount % 15 == 0)
+    {
+      facePg.clear();
+      facePg.fill(255);
+      facePg.noStroke();
+      facePg.beginShape(p.TRIANGLES);
+      facePg.texture(p.cam);
+      for (let i = 0; i < faces.length; i++) {
+        let idx = faces[i];
+        let x = points[idx][0] * 0.5;
+        let y = points[idx][1] * 0.5;
+        facePg.vertex(x, y, 0, p.facePoints[idx][0] / 1280 * 1920, p.facePoints[idx][1] / 1280 * 1920);
+      }
+      facePg.endShape();
+    }
+    facePg.endDraw();
+
     pg.beginDraw();
     pg.clear();
-    pg.image(p.cam, 0, 0, 1280 / 2, 720 / 2);
+    pg.pushMatrix();
+    pg.pushStyle();
+    let camH = 1200.0 / 1920.0 * 640.0;
+    pg.translate(0, (windowHeight - camH) * 0.5);
+    pg.image(p.cam, 0, 0, 640, camH);
+    // pg.image(p.cam, 0, 0, 1280 / 2, 720 / 2);
 
-    pg.noStroke();
-    pg.fill(255, 0, 0);
-    for (let i = 0; i < p.posePoints.length; i++) {
-      // let x = p.facePoints[i][0] * 0.5;
-      // let y = p.facePoints[i][1] * 0.5;
-      let x = p.map(p.posePoints[i][0], 0, 640, 80, 640 - 80);
-      let y = p.map(p.posePoints[i][1], 0, 480, 0, 360);
-      pg.ellipse(x, y, 14, 14)
+    // body
+    {
+      pg.noStroke();
+      pg.fill(255, 0, 0);
+      for (let i = 0; i < p.posePoints.length; i++) {
+        // let x = p.facePoints[i][0] * 0.5;
+        // let y = p.facePoints[i][1] * 0.5;
+        let x = p.map(p.posePoints[i][0], 0, 640, 80, 640 - 80);
+        let y = p.map(p.posePoints[i][1], 0, 480, 0, 360);
+        pg.ellipse(x, y, 14, 14)
+      }
     }
-    pg.noFill();
-    pg.stroke(255);
-    pg.beginShape(p.TRIANGLES);
-    for (let i = 0; i < faces.length; i++) {
-      let idx = faces[i];
-      let x = p.facePoints[idx][0] * 0.5;
-      let y = p.facePoints[idx][1] * 0.5;
-      pg.vertex(x, y);
+
+    // face
+    {
+      pg.fill(255);
+      pg.noStroke();
+      pg.beginShape(p.TRIANGLES);
+      pg.texture(facePg)
+      for (let i = 0; i < faces.length; i++) {
+        let idx = faces[i];
+        let x = p.facePoints[idx][0] * 0.5;
+        let y = p.facePoints[idx][1] * 0.5;
+        pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
+      }
+      pg.endShape();
     }
-    pg.endShape();
+    // pg.blendMode(p.BLEND);
+    // pg.image(facePg, 0, 0);
+    pg.popStyle();
+    pg.popMatrix();
     pg.endDraw();
   };
 };
@@ -1336,7 +1378,7 @@ var SShader = function (p) {
   ];
 
   function loadShaders() {
-    for(let i in names) {
+    for (let i in names) {
       let name = names[i];
       shaders[name] = [];
       for (let i = 0; i < npgs && i < params[name].length; i++) {
@@ -1352,7 +1394,7 @@ var SShader = function (p) {
   this.draw = function () {
     if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
-    
+
     this.curName = "spread";
     // if (curPreset == 0) {
     //   this.curName = "spread";
@@ -1848,7 +1890,7 @@ var s = function (p) {
     { preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "slide" }, "lines"] }, // 10
     { preset: [{ a: "shader", p: "kaleid" }, "lines"] },
     { preset: [{ a: "shader", p: "kaleid" }] },
-    { preset: ["face"] },
+    { preset: [{ a: "face", p: ["slide", "rgbshift"] }] },
     { preset: ["starField", "ribbons", "brown"] },
     { preset: ["langtonAnt", "ribbons"] },
     { preset: ["brown", "doublePendulum"] },
