@@ -1005,11 +1005,12 @@ var SFace = function (p) {
       facePg.noStroke();
       facePg.beginShape(p.TRIANGLES);
       facePg.texture(p.cam);
+      let ratio = p.cam.width / 1280.0; // face tracker always 1280 width
       for (let i = 0; i < faces.length; i++) {
         let idx = faces[i];
         let x = points[idx][0] * 0.5;
         let y = points[idx][1] * 0.5;
-        facePg.vertex(x, y, 0, p.facePoints[idx][0] / 1280 * 1920, p.facePoints[idx][1] / 1280 * 1920);
+        facePg.vertex(x, y, 0, p.facePoints[idx][0] * ratio, p.facePoints[idx][1] * ratio);
       }
       facePg.endShape();
     }
@@ -1019,7 +1020,7 @@ var SFace = function (p) {
     pg.clear();
     pg.pushMatrix();
     pg.pushStyle();
-    let camH = 1200.0 / 1920.0 * 640.0;
+    let camH = p.cam.height * 640.0 / p.cam.width;
     pg.translate(0, (windowHeight - camH) * 0.5);
     pg.image(p.cam, 0, 0, 640, camH);
     // pg.image(p.cam, 0, 0, 1280 / 2, 720 / 2);

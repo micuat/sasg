@@ -28,8 +28,15 @@ void ofApp::setup() {
 	}
 	else {
 		// Setup grabber
-		grabber.setDeviceID(grabber.listDevices().size() - 1);
-		grabber.setup(1280, 720);
+        if(grabber.listDevices().size() > 1) {
+            // USB capture
+            grabber.setDeviceID(0);
+            grabber.setup(1280, 800);
+        }
+        else {
+            grabber.setDeviceID(0);
+            grabber.setup(1280, 720);
+        }
 	}
 	input1.load(ofToDataPath("input1.jpg"));
 

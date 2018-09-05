@@ -146,11 +146,12 @@ void setupCamera() {
     println("Available cameras:");
     printArray(cameras);
 
-    // The camera can be initialized directly using an element
-    // from the array returned by list():
-    cam = new Capture(this, cameras[0]);
-    // Or, the settings can be defined based on the text in the list
-    //cam = new Capture(this, 640, 480, "Built-in iSight", 30);
+    if(cameras.length > 15) {
+      cam = new Capture(this, cameras[15]);
+    }
+    else {
+      cam = new Capture(this, cameras[0]);
+    }
 
     // Start capturing the images from the camera
     cam.start();
