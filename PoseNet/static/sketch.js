@@ -103,12 +103,12 @@ function setupPromise() {
   let aspectRatio = video.width / video.height;
   let longSide = 540;
   if (aspectRatio > 1.0) {
-    createCanvas(longSide * aspectRatio * 2, longSide, mode);
+    createCanvas(longSide * aspectRatio , longSide, mode);
   }
   else {
-    createCanvas(longSide * 2, longSide / aspectRatio, mode);
+    createCanvas(longSide, longSide / aspectRatio, mode);
   }
-  realWidth = width / 2;
+  realWidth = width;
 
   video.loop();
   video.elt.muted = true;
@@ -205,13 +205,12 @@ function draw3D() {
   colorMode(RGB, 255);
   pg2d.clear();
   // drawTerrain(geomFader);
-  // drawSkeleton(geomFader);
-  drawSkeleton(1.0);
+  drawSkeleton(geomFader);
 
   sh.setUniform('uBrighter', 0.0);
 
   pgBack.clear();
-  // pgBack.tint((1 - geomFader) * 255);
+  pgBack.tint((1 - geomFader) * 255);
   pgBack.image(video, 0, 0, realWidth, height);
   texture(pgBack);
   beginShape();
@@ -221,7 +220,6 @@ function draw3D() {
   vertex(0, height, 0, 0, 1);
   endShape(CLOSE);
 
-  translate(realWidth, 0);
   texture(pg2d);
   beginShape();
   vertex(0, 0, 0, 0, 0);
@@ -239,10 +237,10 @@ function draw3D() {
   shader(sh);
   sh.setUniform('uSampler', video);
   sh.setUniform('uBrighter', 1.0);
-  drawAvatars();
+  drawAvatars(geomFader);
 }
 
-function drawAvatars() {
+function drawAvatars(fader) {
   for (let j = 0; j < posesQueue.length; j++) {
     let poses = posesQueue[j];
     for (let i = 0; i < poses.length; i++) {
@@ -260,7 +258,7 @@ function drawAvatars() {
       translate(point.x, point.y);
       texture(envImage);
       rotateY(PI * -0.5);
-      let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), 0.8, 0.8);
+      let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), fader, 0.8);
       sh.setUniform('uMaterialColorOverride', [hsv.r, hsv.g, hsv.b]);
       sphere(point.r * sat / 255.0 * 1.5);
       pop();
