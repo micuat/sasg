@@ -1,3 +1,6 @@
+// this example is used for rendering video
+// http://localhost:8080/index.html
+
 // Copyright (c) 2018 ml5
 //
 // This software is released under the MIT License.

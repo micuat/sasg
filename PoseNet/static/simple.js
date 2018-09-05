@@ -1,3 +1,6 @@
+// this example is used for streaming pose data via osc
+// http://localhost:8080/simple.html
+
 // Copyright (c) 2018 ml5
 //
 // This software is released under the MIT License.
