@@ -1397,12 +1397,10 @@ var SShader = function (p) {
     pg = this.pg;
 
     this.curName = "spread";
-    // if (curPreset == 0) {
-    //   this.curName = "spread";
-    // }
-    // else {
-    //   this.curName = "pixelwave";
-    // }
+    if (curPreset == 9 - 1 && seq % 4.0 < 2.0 && p.frameCount % 4 == 0) {
+      let index = Math.floor(Math.random() * names.length);
+      this.curName = names[index];
+    }
 
     if (p.frameCount % 60 == 0) {
       // loadShaders();
