@@ -16,7 +16,12 @@ let videoFrameRate = 59.94;
 let curTime = 0;
 let isSetup = false;
 
-let clipName = "clip4.mp4";
+let preset = {
+  "clip4.mov": [{x: -50, y: 50}, {x: 50, y: 50}],
+  "clip180902.mov": [{x: -50, y: 50}, {x: 50, y: 50}],
+  "clip180902_2.mov": [{x: -100, y: 100}, {x: 0, y: 100}],
+}
+let clipName = Object.keys(preset)[2];
 let posesQueue = [];
 
 let mode;
@@ -162,16 +167,21 @@ function drawKeypoints() {
   }
 }
 
-function drawSkeleton(alpha) {
+function drawTerrain(alpha) {
+  let left = preset[clipName][0];
+  let right = preset[clipName][1];
   pg2d.strokeWeight(1);
   pg2d.stroke(255, 255, 255, alpha * 155);
   pg2d.noFill();
   pg2d.beginShape(LINE_STRIP);
   pg2d.vertex(0, height - 200);
-  pg2d.vertex(width / 2 - 50, height / 2 + 50);
-  pg2d.vertex(width / 2 + 50, height / 2 + 50);
+  pg2d.vertex(width / 2 + left.x, height / 2 + left.y);
+  pg2d.vertex(width / 2 + right.x, height / 2 + right.y);
   pg2d.vertex(width, height - 200);
   pg2d.endShape();
+}
+
+function drawSkeleton(alpha) {
   for (let k = 20; k < posesQueue.length; k++) {
     pg2d.stroke(255, 255, 255, alpha * map(k, 0, posesQueue.length, 10, 155));
     let poses = posesQueue[k];
@@ -193,10 +203,12 @@ function draw3D() {
   background(0);
   translate(-width / 2, -height / 2);
 
-  let geomFader = map(sin(millis() * 0.001 * 0.25 * Math.PI), -1, 1, 0, 1)
+  // let geomFader = map(sin(millis() * 0.001 * 0.25 * Math.PI), -1, 1, 0, 1)
+  let geomFader = map(mouseX, 0, width, 0, 1)
   stroke(255, 255, 255)
   colorMode(RGB, 255);
   pg2d.clear();
+  drawTerrain(geomFader);
   drawSkeleton(geomFader);
 
   sh.setUniform('uBrighter', 0.0);
@@ -230,25 +242,6 @@ function draw3D() {
   sh.setUniform('uSampler', video);
   sh.setUniform('uBrighter', 1.0);
   drawAvatars();
-
-  // pg3d.clear();
-  // pg3d.push();
-  // pg3d.translate(-width / 2, -height / 2);
-  // pg3d.translate(width/2,height/3*2);
-  // pg3d.texture(envImage);
-  // pg3d.shader(sh);
-  // // sh.setUniform('uMaterialColorOverride', [0.5, 0.5, 0.5]);
-  // pg3d.rotateY(PI * -0.5);
-  // pg3d.sphere(155.0);
-  // pg3d.pop();
-  // texture(pg3d);
-  // translate(0,0,1)
-  // beginShape();
-  // vertex(0, 0, 0, 0, 0);
-  // vertex(width, 0, 0, 0.5, 0);
-  // vertex(width, height, 0, 0.5, 1);
-  // vertex(0, height, 0, 0, 1);
-  // endShape(CLOSE);
 }
 
 function drawAvatars() {
