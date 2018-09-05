@@ -9,19 +9,16 @@
 let video;
 let envImage;
 let sh;
+let realWidth = 0;
 
 let poseNet;
 
-let videoFrameRate = 59.94;
-let curTime = 0;
-let isSetup = false;
-
 let preset = {
-  "clip4.mov": [{x: -50, y: 50}, {x: 50, y: 50}],
+  "clip4.mp4": [{x: -50, y: 50}, {x: 50, y: 50}],
   "clip180902.mov": [{x: -50, y: 50}, {x: 50, y: 50}],
   "clip180902_2.mov": [{x: -100, y: 100}, {x: 0, y: 100}],
 }
-let clipName = Object.keys(preset)[2];
+let clipName = Object.keys(preset)[0];
 let posesQueue = [];
 
 let mode;
@@ -102,32 +99,31 @@ function onPose(results) {
 }
 
 function setupPromise() {
-  if (isSetup) return;
-  isSetup = true;
   pixelDensity(2.0);
   let aspectRatio = video.width / video.height;
-  let longSide = 720;
+  let longSide = 540;
   if (aspectRatio > 1.0) {
-    createCanvas(longSide, longSide / aspectRatio, mode);
+    createCanvas(longSide * aspectRatio * 2, longSide, mode);
   }
   else {
-    createCanvas(longSide * aspectRatio, longSide, mode);
+    createCanvas(longSide * 2, longSide / aspectRatio, mode);
   }
+  realWidth = width / 2;
 
   video.loop();
   video.elt.muted = true;
   video.volume(0);
   video.play();
-  video.size(width, height);
+  video.size(realWidth, height);
   video.speed(0.5);
   video.hide();
 
   poseNet = ml5.poseNet(video, modelReady);
   poseNet.on('pose', onPose);
 
-  pg2d = createGraphics(width, height, P2D);
-  pg3d = createGraphics(width, height, WEBGL);
-  pgBack = createGraphics(width, height, P2D);
+  pg2d = createGraphics(realWidth, height, P2D);
+  pg3d = createGraphics(realWidth, height, WEBGL);
+  pgBack = createGraphics(realWidth, height, P2D);
 }
 
 function modelReady() {
@@ -208,27 +204,29 @@ function draw3D() {
   stroke(255, 255, 255)
   colorMode(RGB, 255);
   pg2d.clear();
-  drawTerrain(geomFader);
-  drawSkeleton(geomFader);
+  // drawTerrain(geomFader);
+  // drawSkeleton(geomFader);
+  drawSkeleton(1.0);
 
   sh.setUniform('uBrighter', 0.0);
 
   pgBack.clear();
-  pgBack.tint((1 - geomFader) * 255);
-  pgBack.image(video, 0, 0, width, height);
+  // pgBack.tint((1 - geomFader) * 255);
+  pgBack.image(video, 0, 0, realWidth, height);
   texture(pgBack);
   beginShape();
   vertex(0, 0, 0, 0, 0);
-  vertex(width, 0, 0, 1, 0);
-  vertex(width, height, 0, 1, 1);
+  vertex(realWidth, 0, 0, 1, 0);
+  vertex(realWidth, height, 0, 1, 1);
   vertex(0, height, 0, 0, 1);
   endShape(CLOSE);
 
+  translate(realWidth, 0);
   texture(pg2d);
   beginShape();
   vertex(0, 0, 0, 0, 0);
-  vertex(width, 0, 0, 1, 0);
-  vertex(width, height, 0, 1, 1);
+  vertex(realWidth, 0, 0, 1, 0);
+  vertex(realWidth, height, 0, 1, 1);
   vertex(0, height, 0, 0, 1);
   endShape(CLOSE);
 
