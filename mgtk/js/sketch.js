@@ -955,7 +955,7 @@ var SBeesAndBombs = function (p) {
     angle = p.millis() * 0.001 * p.TWO_PI;
     let decay = p.sin(p.millis() * 0.0005);
     decay = p.constrain(p.map(decay, -1, 1, -0.02, 1), 0, 1);
-    let winh = 560;
+    let winh = windowHeight * 2.0;
     for (let z = 0; z < winh; z += w) {
       for (let x = 0; x < winh; x += w) {
         pg.pushMatrix();
@@ -964,7 +964,16 @@ var SBeesAndBombs = function (p) {
         let a = angle + -offset;
         let h = p.floor(p.map(p.sin(a), -1, 1, 0.5, 1) * winh);
         h = p.map(decay, 0, 1, winh, h);
-        pg.translate(x - winh / 2, 0, z - winh / 2);
+        let y = 0;
+        if((seq % 4.0) < 2.0) {
+          y = (this.tween + (x + z/2-winh) * (1.0 / winh)) * windowHeight * 5;
+          if(y > 0) y = 0;
+        }
+        else if((seq % 4.0) >= 2.0) {
+          y = (this.tween - (x/2 + z-winh) * (1.0 / winh)) * windowHeight * 5;
+          if(y < 0) y = 0;
+        }
+        pg.translate(x - winh / 2, y, z - winh / 2);
         // p.normalMaterial();
         pg.box(w, h, w);
         //rect(x - width / 2 + w / 2, 0, w - 2, h);
