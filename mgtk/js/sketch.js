@@ -12,6 +12,125 @@ var mainPg;
 
 var curPreset = 0;
 
+var linePreset = {
+  default: {
+    globalTransformFunc: ["default"],
+    backgroundFunc: ["default"],
+    orderFunc: ["default"],
+    transformFunc: ["default"],
+    sigFunc: ["default"],
+    pointFunc: ["default"],
+    lineFunc: ["default"]
+  },
+  random: {
+  },
+  toLeft: {
+    parents: ["default"],
+    transformFunc: ["bounceLeft"],
+  },
+  toRight: {
+    parents: ["default"],
+    transformFunc: ["bounceRight"],
+  },
+  toUp: {
+    parents: ["default"],
+    transformFunc: ["bounceUp"],
+  },
+  toDown: {
+    parents: ["default"],
+    transformFunc: ["bounceDown"],
+  },
+  flat: {
+    lineFunc: ["default", "rect"]
+  },
+  toUpFlat: {
+    parents: ["toUp", "flat"],
+  },
+  toDownFlat: {
+    parents: ["toDown", "flat"],
+  },
+  sig: {
+    parents: ["default"],
+    sigFunc: ["sineT", "sine", "random"],
+    pointFunc: ["inout"],
+    lineFunc: ["sig", "sigBar"]
+  },
+  toLeftSig: {
+    parents: ["toLeft", "sig"],
+    backgroundFunc: ["default"],
+  },
+  justPoint: {
+    parents: ["default"],
+    pointFunc: ["inout"]
+  }
+};
+
+var masterPreset = [
+  { // 1
+    preset: [{ a: "shader", p: "slide" }]
+  },
+  {
+    preset: [{ a: "beesAndBombs", p: "bloom" }]
+  },
+  {
+    preset: [{ a: "beesAndBombs", p: "bloom" },
+    { a: "lines", p: "default", lines: [linePreset.toUpFlat, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
+  },
+  {
+    preset: [{ a: "beesAndBombs", p: "bloom" },
+    { a: "lines", p: "default", lines: [linePreset.sig, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
+  },
+  { // 5
+    preset: [{ a: "beesAndBombs", p: "bloom" },
+    { a: "lines", p: "default", lines: [linePreset.toLeftSig, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
+  },
+  {
+    preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid", "invert"] },
+    { a: "lines", p: "default", lines: [linePreset.random, linePreset.random, linePreset.random, linePreset.random] }]
+  }, //add drum effect
+  {
+    preset: [{ a: "ribbons", p: ["slide"] },
+    { a: "lines", p: "default", lines: [linePreset.sig, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
+  },
+  {
+    preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid", "invert"] },
+    { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
+  },
+  {
+    preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "slide" },
+    { a: "lines", p: "default", lines: [linePreset.sig, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
+  },
+  { // 10
+    preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "slide" },
+    { a: "lines", p: "default", lines: [linePreset.sig, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
+  },
+  {
+    preset: [{ a: "shader", p: "kaleid" },
+    { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
+  },
+  {
+    preset: [{ a: "shader", p: "kaleid" }]
+  },
+  {
+    preset: [{ a: "face", p: ["slide", "rgbshift"] }]
+  },
+  {
+    preset: ["starField", "ribbons", "brown"]
+  },
+  { // 15
+    preset: ["langtonAnt", "ribbons"]
+  },
+  {
+    preset: ["brown", "doublePendulum"]
+  },
+  {
+    preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "rgbshift" }]
+  },
+  {
+    preset: ["warehouse", "brown"]
+  },
+];
+
 var FuncList = function (everyNSeq, funcs) {
   this.everyNSeq = everyNSeq;
   this.funcs = funcs;
@@ -56,6 +175,22 @@ var SLines = function (p) {
   let beatFader = 1.0; // TODO: update from parent patch
   let targetII;
   let agents = [];
+
+  let midiToPreset = [];
+  for(let i in masterPreset) {
+    let found = false;
+    for(let j in masterPreset[i].preset) {
+      print(masterPreset[i].preset[j])
+      if(masterPreset[i].preset[j].lines != undefined) {
+        midiToPreset.push({preset: masterPreset[i].preset[j].lines});
+        found = true;
+        break;
+      }
+    }
+    if(found == false) {
+      midiToPreset.push({preset: [linePreset.default, linePreset.default, linePreset.default, linePreset.default]});
+    }
+  }
 
   function Agent(ii, jj) {
     this.ii = ii;
@@ -454,72 +589,6 @@ var SLines = function (p) {
     "sigFunc",
     "pointFunc",
     "lineFunc"];
-  let bPreset = {
-    default: {
-      globalTransformFunc: ["default"],
-      backgroundFunc: ["default"],
-      orderFunc: ["default"],
-      transformFunc: ["default"],
-      sigFunc: ["default"],
-      pointFunc: ["default"],
-      lineFunc: ["default"]
-    },
-    random: {
-    },
-    toLeft: {
-      parents: ["default"],
-      transformFunc: ["bounceLeft"],
-    },
-    toRight: {
-      parents: ["default"],
-      transformFunc: ["bounceRight"],
-    },
-    toUp: {
-      parents: ["default"],
-      transformFunc: ["bounceUp"],
-    },
-    toDown: {
-      parents: ["default"],
-      transformFunc: ["bounceDown"],
-    },
-    flat: {
-      lineFunc: ["default", "rect"]
-    },
-    toUpFlat: {
-      parents: ["toUp", "flat"],
-    },
-    toDownFlat: {
-      parents: ["toDown", "flat"],
-    },
-    sig: {
-      parents: ["default"],
-      sigFunc: ["sineT", "sine", "random"],
-      pointFunc: ["inout"],
-      lineFunc: ["sig", "sigBar"]
-    },
-    toLeftSig: {
-      parents: ["toLeft", "sig"],
-      backgroundFunc: ["default"],
-    },
-    justPoint: {
-      parents: ["default"],
-      pointFunc: ["inout"]
-    }
-  };
-  let midiToPreset = [
-    { preset: [bPreset.default, bPreset.default, bPreset.default, bPreset.default] },
-    { preset: [bPreset.default, bPreset.default, bPreset.default, bPreset.default] },
-    { preset: [bPreset.toUpFlat, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat] },
-    { preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat] },
-    { preset: [bPreset.toLeftSig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
-    { preset: [bPreset.random, bPreset.random, bPreset.random, bPreset.random] },
-    { preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat] },
-    { preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
-    { preset: [bPreset.sig, bPreset.toDownFlat, bPreset.toUpFlat, bPreset.toDownFlat] },
-    { preset: [bPreset.sig, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
-    { preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
-    { preset: [bPreset.justPoint, bPreset.justPoint, bPreset.justPoint, bPreset.justPoint] },
-  ]
 
   this.setup = function () {
     agents = [];
@@ -544,7 +613,7 @@ var SLines = function (p) {
       function unwrapPreset(newp, libp) {
         if (libp.parents && libp.parents.length > 0 && depthCount >= 0) {
           for (let i = 0; i < libp.parents.length; i++) {
-            unwrapPreset(newp, bPreset[libp.parents[i]]);
+            unwrapPreset(newp, linePreset[libp.parents[i]]);
           }
         }
         for (let key in libp) {
@@ -965,13 +1034,13 @@ var SBeesAndBombs = function (p) {
         let h = p.floor(p.map(p.sin(a), -1, 1, 0.5, 1) * winh);
         h = p.map(decay, 0, 1, winh, h);
         let y = 0;
-        if((seq % 4.0) < 2.0) {
-          y = (this.tween + (x + z/2-winh) * (1.0 / winh)) * windowHeight * 5;
-          if(y > 0) y = 0;
+        if ((seq % 4.0) < 2.0) {
+          y = (this.tween + (x + z / 2 - winh) * (1.0 / winh)) * windowHeight * 5;
+          if (y > 0) y = 0;
         }
-        else if((seq % 4.0) >= 2.0) {
-          y = (this.tween - (x/2 + z-winh) * (1.0 / winh)) * windowHeight * 5;
-          if(y < 0) y = 0;
+        else if ((seq % 4.0) >= 2.0) {
+          y = (this.tween - (x / 2 + z - winh) * (1.0 / winh)) * windowHeight * 5;
+          if (y < 0) y = 0;
         }
         pg.translate(x - winh / 2, y, z - winh / 2);
         // p.normalMaterial();
@@ -989,7 +1058,7 @@ var SFace = function (p) {
   this.tween = 0.0;
   let faces = [0, 17, 18, 20, 23, 24, 19, 20, 24, 25, 26, 16, 26, 45, 16, 46, 14, 15, 45, 46, 15, 16, 45, 15, 35, 13, 14, 46, 35, 14, 54, 12, 13, 35, 54, 13, 35, 53, 54, 47, 35, 46, 25, 45, 26, 54, 11, 12, 44, 45, 25, 24, 44, 25, 29, 35, 47, 55, 10, 11, 54, 55, 11, 44, 46, 45, 20, 21, 23, 42, 29, 47, 43, 44, 24, 23, 43, 24, 44, 47, 46, 43, 47, 44, 29, 30, 35, 21, 22, 23, 56, 9, 10, 55, 56, 10, 35, 52, 53, 28, 29, 42, 64, 55, 54, 23, 22, 43, 43, 42, 47, 53, 64, 54, 22, 42, 43, 34, 52, 35, 56, 8, 9, 22, 27, 42, 65, 55, 64, 53, 63, 64, 27, 28, 42, 57, 8, 56, 30, 34, 35, 65, 56, 55, 52, 63, 53, 33, 52, 34, 65, 66, 56, 66, 57, 56, 51, 63, 52, 33, 51, 52, 30, 33, 34, 21, 27, 22, 58, 7, 57, 57, 7, 8, 50, 51, 33, 51, 62, 63, 30, 32, 33, 58, 57, 66, 67, 58, 66, 61, 62, 51, 31, 30, 29, 32, 50, 33, 39, 29, 28, 39, 28, 27, 21, 39, 27, 31, 32, 30, 40, 31, 29, 39, 40, 29, 50, 61, 51, 6, 7, 58, 59, 6, 58, 59, 58, 67, 49, 61, 50, 31, 49, 50, 31, 50, 32, 38, 39, 21, 60, 59, 67, 40, 41, 31, 41, 2, 31, 20, 38, 21, 2, 3, 31, 48, 49, 31, 3, 48, 31, 48, 60, 49, 3, 4, 48, 48, 5, 59, 5, 6, 59, 60, 48, 59, 19, 38, 20, 38, 40, 39, 19, 37, 38, 4, 5, 48, 1, 2, 41, 37, 41, 40, 37, 40, 38, 36, 1, 41, 18, 37, 19, 36, 41, 37, 18, 36, 37, 17, 0, 36, 0, 1, 36, 18, 17, 36, 49, 60, 61];
   let points = [[487, 298], [489, 345], [497, 392], [507, 437], [521, 481], [543, 521], [573, 555], [609, 584], [650, 591], [689, 585], [722, 555], [751, 520], [775, 479], [788, 432], [794, 385], [800, 337], [800, 290], [510, 279], [533, 259], [565, 254], [597, 258], [626, 271], [672, 273], [700, 259], [732, 254], [762, 256], [782, 277], [652, 302], [652, 332], [651, 361], [651, 392], [617, 414], [634, 419], [652, 425], [668, 421], [684, 417], [545, 307], [563, 300], [583, 301], [600, 313], [581, 317], [561, 316], [694, 313], [710, 300], [731, 300], [748, 306], [734, 316], [713, 317], [592, 484], [612, 468], [634, 458], [650, 465], [666, 461], [687, 473], [705, 489], [686, 513], [666, 522], [647, 523], [630, 520], [609, 508], [602, 485], [634, 480], [650, 482], [666, 482], [695, 490], [664, 492], [648, 492], [631, 489], [487, 298], [489, 345], [497, 392], [507, 437], [521, 481], [543, 521], [573, 555], [609, 584], [650, 591], [689, 585], [722, 555], [751, 520], [775, 479], [788, 432], [794, 385], [800, 337], [800, 290], [510, 279], [533, 259], [565, 254], [597, 258], [626, 271], [672, 273], [700, 259], [732, 254], [762, 256], [782, 277], [652, 302], [652, 332], [651, 361], [651, 392], [617, 414], [634, 419], [652, 425], [668, 421], [684, 417], [545, 307], [563, 300], [583, 301], [600, 313], [581, 317], [561, 316], [694, 313], [710, 300], [731, 300], [748, 306], [734, 316], [713, 317], [592, 484], [612, 468], [634, 458], [650, 465], [666, 461], [687, 473], [705, 489], [686, 513], [666, 522], [647, 523], [630, 520], [609, 508], [602, 485], [634, 480], [650, 482], [666, 482], [695, 490], [664, 492], [648, 492], [631, 489]];
-  for(let i in points) {
+  for (let i in points) {
     points[i][1] -= 100;
   }
   let facePg = p.createGraphics(windowWidth, windowHeight, p.P3D);
@@ -1007,8 +1076,7 @@ var SFace = function (p) {
 
     facePg.beginDraw();
     // face
-    if(p.frameCount % 15 == 0)
-    {
+    if (p.frameCount % 15 == 0) {
       facePg.clear();
       facePg.fill(255);
       facePg.noStroke();
@@ -1885,26 +1953,6 @@ var s = function (p) {
       },
     ]))
   }
-  let midiToPreset = [
-    { preset: [{ a: "shader", p: "slide" }] }, // 1
-    { preset: [{ a: "beesAndBombs", p: "bloom" }] },
-    { preset: [{ a: "beesAndBombs", p: "bloom" }, "lines"] },
-    { preset: [{ a: "beesAndBombs", p: "bloom" }, "lines"] },
-    { preset: ["beesAndBombs", "lines"] },
-    { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid", "invert"] }, "lines"] }, //add drum effect
-    { preset: [{ a: "ribbons", p: ["slide"] }, "lines"] },
-    { preset: [{ a: "ribbons", p: ["slide", "rgbshift", "kaleid", "invert"] }, "lines"] },
-    { preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "slide" }, "lines"] },
-    { preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "slide" }, "lines"] }, // 10
-    { preset: [{ a: "shader", p: "kaleid" }, "lines"] },
-    { preset: [{ a: "shader", p: "kaleid" }] },
-    { preset: [{ a: "face", p: ["slide", "rgbshift"] }] },
-    { preset: ["starField", "ribbons", "brown"] },
-    { preset: ["langtonAnt", "ribbons"] },
-    { preset: ["brown", "doublePendulum"] },
-    { preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "rgbshift" }] },
-    { preset: ["warehouse", "brown"] },
-  ];
 
   p.setup = function () {
     name = p.folderName;
@@ -1962,11 +2010,11 @@ var s = function (p) {
     if (seq != lastSeq) {
       if (seq % funcAssets[0].everyNSeq == 0) {
         curPreset = p.oscPreset;
-        activeLayerNum = midiToPreset[curPreset].preset.length;
+        activeLayerNum = masterPreset[curPreset].preset.length;
       }
       for (let i = 0; i < funcAssets.length; i++) {
         if (i < activeLayerNum) {
-          let lp = midiToPreset[curPreset].preset[i];
+          let lp = masterPreset[curPreset].preset[i];
           if (lp == undefined) continue;
           if (lp.a != undefined) {
             funcAssets[i].preset = lp.a;
