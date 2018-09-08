@@ -1004,12 +1004,27 @@ var SBeesAndBombs = function (p) {
   this.alpha = 0;
 
   let midiToPreset = getPreset("bees", ["default"]);
+  let lastState = "default";
 
   let funcAsset = new FuncList(4, [
     {
       name: "default",
-      f: function () {
-        return 0;
+      f: function (seq, tw, x, z) {
+        if(lastState == "inout") {
+          lastState = "inTransition";
+        }
+
+        let y = 0;
+        if(lastState == "inTransition") {
+          if ((seq % 4.0) < 2.0) {
+            y = (tw * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+            if (y > 0) y = 0;
+          }
+          else {
+            lastState = "default";
+          }
+        }
+        return y;
       }
     },
     {
@@ -1024,6 +1039,7 @@ var SBeesAndBombs = function (p) {
           y = (tw * 2 - (x / 2 + z - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
           if (y < 0) y = 0;
         }
+        lastState = "inout";
         return y;
       }
     },
