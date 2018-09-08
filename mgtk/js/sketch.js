@@ -70,7 +70,7 @@ var masterPreset = [
     preset: [{ a: "shader", p: "slide" }]
   },
   {
-    preset: [{ a: "beesAndBombs", p: "bloom" }]
+    preset: [{ a: "beesAndBombs", p: "bloom" , bees: ["inout"]}]
   },
   {
     preset: [{ a: "beesAndBombs", p: "bloom" },
@@ -1003,6 +1003,32 @@ var SBeesAndBombs = function (p) {
   this.tween = 0;
   this.alpha = 0;
 
+  let midiToPreset = getPreset("bees", ["default"]);
+
+  let funcAsset = new FuncList(4, [
+    {
+      name: "default",
+      f: function () {
+        return 0;
+      }
+    },
+    {
+      name: "inout",
+      f: function (seq, tw, x, z) {
+        let y = 0;
+        if ((seq % 4.0) < 2.0) {
+          y = (tw * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+          if (y > 0) y = 0;
+        }
+        else if ((seq % 4.0) >= 2.0) {
+          y = (tw * 2 - (x / 2 + z - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+          if (y < 0) y = 0;
+        }
+        return y;
+      }
+    },
+  ]);
+
   this.setup = function () {
     ma = p.atan(p.cos(p.QUARTER_PI));
     maxD = p.dist(0, 0, 300, 300);
@@ -1011,7 +1037,12 @@ var SBeesAndBombs = function (p) {
   this.draw = function () {
     if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
-
+    if (seq != lastSeq) {
+      let presetIndex = curPreset;
+      if (presetIndex >= midiToPreset.length) presetIndex = 0;
+      funcAsset.preset = midiToPreset[presetIndex].preset;
+      funcAsset.update(seq);
+    }
     pg.beginDraw();
     pg.clear();
     pg.noStroke();
@@ -1037,15 +1068,7 @@ var SBeesAndBombs = function (p) {
         let a = angle + -offset;
         let h = p.floor(p.map(p.sin(a), -1, 1, 0.5, 1) * winh);
         h = p.map(decay, 0, 1, winh, h);
-        let y = 0;
-        if ((seq % 4.0) < 2.0) {
-          y = (this.tween + (x + z / 2 - winh) * (1.0 / winh)) * windowHeight * 5;
-          if (y > 0) y = 0;
-        }
-        else if ((seq % 4.0) >= 2.0) {
-          y = (this.tween - (x / 2 + z - winh) * (1.0 / winh)) * windowHeight * 5;
-          if (y < 0) y = 0;
-        }
+        let y = funcAsset.exec(seq, this.tween, x, z);
         pg.translate(x - winh / 2, y, z - winh / 2);
         // p.normalMaterial();
         pg.box(w, h, w);
