@@ -1425,7 +1425,7 @@ var SShader = function (p) {
   let npgs = 2;
   let params = {};
   this.curName = "spread";
-  let names = ["spread", "pixelwave"];
+  let names = ["spread", "pixelwave", "modwave"];
   this.fader = 0.0;
 
   let midiToPreset = getPreset("shader", ["default"]);
@@ -1499,6 +1499,28 @@ var SShader = function (p) {
   ];
   params["pixelwave"] = [
     {
+    }
+  ];
+  params["modwave"] = [
+    {
+      "tex9": "bpgs[1]",
+      "frequency1": 30,
+      "sync2": 0.1,
+      "offset3": 1,
+      "r4": 1,
+      "g5": 0,
+      "b6": 1,
+      "amount7": 0.03,
+      "amount10": 0.1
+    },
+    {
+      "tex11": "bpgs[0]",
+      "angle12": 0.1,
+      "speed13": 0.2,
+      "frequency14": 2,
+      "sync15": 1,
+      "offset16": 0,
+      "amount18": 0.6
     }
   ];
 
