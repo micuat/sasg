@@ -14,11 +14,15 @@ let realWidth = 0;
 let poseNet;
 
 let preset = {
+  "comp.mov": [{x: -50, y: 50}, {x: 50, y: 50}],
   "clip4.mp4": [{x: -50, y: 50}, {x: 50, y: 50}],
+  "clip180811.mp4": [{x: -50, y: 50}, {x: 50, y: 50}],
   "clip180902.mov": [{x: -50, y: 50}, {x: 50, y: 50}],
   "clip180902_2.mov": [{x: -100, y: 100}, {x: 0, y: 100}],
 }
-let clipName = Object.keys(preset)[0];
+let keys = ["clip4.mp4", "clip180902.mov", "clip180902_2.mov"];
+let curPreset = preset[keys[0]];
+let clipName = "comp.mov";
 let posesQueue = [];
 
 let mode;
@@ -98,6 +102,11 @@ function onPose(results) {
   }
 }
 
+function setScene(scene) {
+  console.log("scene " + scene);
+  curPreset = preset[keys[scene]];
+}
+
 function setupPromise() {
   pixelDensity(2.0);
   let aspectRatio = video.width / video.height;
@@ -117,6 +126,10 @@ function setupPromise() {
   video.size(realWidth, height);
   video.speed(0.5);
   video.hide();
+
+  video.addCue(0.1, ()=>{console.log("next scene 0")});
+  video.addCue(34.0, ()=>{console.log("next scene 1")});
+  video.addCue(92.0, ()=>{console.log("next scene 2")});
 
   poseNet = ml5.poseNet(video, modelReady);
   poseNet.on('pose', onPose);
@@ -164,8 +177,8 @@ function drawKeypoints() {
 }
 
 function drawTerrain(alpha) {
-  let left = preset[clipName][0];
-  let right = preset[clipName][1];
+  let left = curPreset[0];
+  let right = curPreset[1];
   pg2d.strokeWeight(1);
   pg2d.stroke(255, 255, 255, alpha * 155);
   pg2d.noFill();
@@ -204,7 +217,7 @@ function draw3D() {
   stroke(255, 255, 255)
   colorMode(RGB, 255);
   pg2d.clear();
-  // drawTerrain(geomFader);
+  drawTerrain(geomFader);
   drawSkeleton(geomFader);
 
   sh.setUniform('uBrighter', 0.0);
