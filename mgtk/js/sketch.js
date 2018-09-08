@@ -97,7 +97,7 @@ var masterPreset = [
     { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
   },
   {
-    preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "slide" },
+    preset: [{ a: "shader", p: "mpeg" }, { a: "ribbons", p: "slide" },
     { a: "lines", p: "default", lines: [linePreset.sig, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
   },
   { // 10
@@ -1978,6 +1978,17 @@ var s = function (p) {
           ppg.endDraw();
         }
       },
+      {
+        name: "mpeg",
+        f: function (lpg, ppg) {
+          ppg.beginDraw();
+          ppg.clear();
+          postShaders["mpeg"].set("time", tElapsed);
+          ppg.image(lpg, 0, 0);
+          ppg.filter(postShaders["mpeg"]);
+          ppg.endDraw();
+        }
+      },
     ]))
   }
 
@@ -2015,7 +2026,7 @@ var s = function (p) {
       postAssets[i].update();
     }
 
-    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert"];
+    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert", "mpeg"];
     for (let i in shaderTypes) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }
