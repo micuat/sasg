@@ -1425,7 +1425,7 @@ var SShader = function (p) {
   let npgs = 2;
   let params = {};
   this.curName = "spread";
-  let names = ["spread", "pixelwave", "modwave"];
+  let names = ["spread", "pixelwave", "modwave", "tri"];
   this.fader = 0.0;
 
   let midiToPreset = getPreset("shader", ["default"]);
@@ -1475,7 +1475,8 @@ var SShader = function (p) {
       "amount18": 0.975,
       "r13": "this.fader",
       "g14": "this.fader",
-      "b15": "this.fader"
+      "b15": "this.fader",
+      "render": 0
     },
     {
       "tex19": "bpgs[0]",
@@ -1499,6 +1500,7 @@ var SShader = function (p) {
   ];
   params["pixelwave"] = [
     {
+      "render": 0
     }
   ];
   params["modwave"] = [
@@ -1511,7 +1513,8 @@ var SShader = function (p) {
       "g5": 0,
       "b6": 1,
       "amount7": 0.03,
-      "amount10": 0.1
+      "amount10": 0.1,
+      "render": 0
     },
     {
       "tex11": "bpgs[0]",
@@ -1521,6 +1524,37 @@ var SShader = function (p) {
       "sync15": 1,
       "offset16": 0,
       "amount18": 0.6
+    }
+  ];
+  params["tri"] = [
+    {
+      "tex9": "bpgs[1]",
+      "sides1": 3,
+      "radius2": 0.3,
+      "smoothing3": 0.01,
+      "scrollX4": 0.1,
+      "speed5": 1,
+      "r6": 0.5,
+      "g7": 2,
+      "b8": 0.5,
+      "xMult11": 1,
+      "yMult12": 1,
+      "r13": 0.1,
+      "g14": 0.4,
+      "b15": 0.2,
+      "angle17": 0.1,
+      "speed18": 0.05,
+      "amount10": "0.99*Math.sin(tElapsed * 1.0)",
+      "render": 1
+    },
+    {
+      "tex19": "bpgs[0]",
+      "tex25": "bpgs[1]",
+      "r20": 1.7,
+      "g21": 0.4,
+      "b22": 1,
+      "amount23": 0.2,
+      "amount26": 0.5
     }
   ];
 
@@ -1573,7 +1607,7 @@ var SShader = function (p) {
     pg.pushMatrix();
     pg.pushStyle();
 
-    pg.image(fpgs[0], 0, -(windowWidth - windowHeight) * 0.5);
+    pg.image(fpgs[params[this.curName][0].render], 0, -(windowWidth - windowHeight) * 0.5);
 
     pg.popStyle();
     pg.popMatrix();
