@@ -194,6 +194,8 @@ var SLines = function (p) {
   let targetII;
   let agents = [];
 
+  let lastState = "none"; // we start from no lines
+
   let midiToPreset = getPreset("lines", [linePreset.default, linePreset.default, linePreset.default, linePreset.default]);
 
   function Agent(ii, jj) {
@@ -425,7 +427,14 @@ var SLines = function (p) {
       f: function (agent) {
         pg.rotateY(agent.tween * Math.PI);
       }
-    }]);
+    },
+    {
+      name: "inFromTop",
+      f: function (agent) {
+        pg.translate(0.0, (1 - agent.tweenPowZO()) * -200, 0.0);
+      }
+    },
+  ]);
   funcAssets.sigFunc = new FuncList(1, [
     {
       name: "default",
@@ -629,6 +638,11 @@ var SLines = function (p) {
       let presetIndex = curPreset;
       if (presetIndex >= midiToPreset.length) presetIndex = 0;
       unwrapPreset(newPreset, midiToPreset[presetIndex].preset[seq % 4]);
+
+      if (lastState == "none") {
+        lastState = "appeared";
+        newPreset["transformFunc"] = ["inFromTop"];
+      }
       for (let i in functions) {
         let funcTypeName = functions[i];
         funcAssets[funcTypeName].preset = newPreset[funcTypeName];
@@ -1010,12 +1024,12 @@ var SBeesAndBombs = function (p) {
     {
       name: "default",
       f: function (seq, tw, x, z) {
-        if(lastState == "inout") {
+        if (lastState == "inout") {
           lastState = "inTransition";
         }
 
         let y = 0;
-        if(lastState == "inTransition") {
+        if (lastState == "inTransition") {
           if ((seq % 4.0) < 2.0) {
             y = (tw * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
             if (y > 0) y = 0;
