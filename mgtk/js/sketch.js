@@ -1972,7 +1972,7 @@ var s = function (p) {
         f: function (lpg, ppg) {
           ppg.beginDraw();
           ppg.clear();
-          postShaders["invert"].set("delta", p.oscFaders[2]);
+          postShaders["invert"].set("delta", Math.min(1.0, p.oscFaders[2] * 5.0));
           ppg.image(lpg, 0, 0);
           ppg.filter(postShaders["invert"]);
           ppg.endDraw();
