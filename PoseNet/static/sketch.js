@@ -17,11 +17,12 @@ let preset = {
   "comp.mov": [{x: -50, y: 50}, {x: 50, y: 50}],
   "clip4.mp4": [{x: -50, y: 50}, {x: 50, y: 50}],
   "clip180811.mp4": [{x: -50, y: 50}, {x: 50, y: 50}],
-  "clip180902.mov": [{x: -50, y: 50}, {x: 50, y: 50}],
+  "clip180902.mov": [{x: -50, y: -50}, {x: 50, y: -50}],
   "clip180902_2.mov": [{x: -100, y: 100}, {x: 0, y: 100}],
 }
 let keys = ["clip4.mp4", "clip180902.mov", "clip180902_2.mov"];
 let curPreset = preset[keys[0]];
+let lerpPreset = preset[keys[0]];
 let clipName = "comp.mov";
 let posesQueue = [];
 
@@ -105,6 +106,7 @@ function onPose(results) {
 function setScene(scene) {
   console.log("scene " + scene);
   curPreset = preset[keys[scene]];
+  console.log(curPreset)
 }
 
 function setupPromise() {
@@ -127,9 +129,12 @@ function setupPromise() {
   video.speed(0.5);
   video.hide();
 
-  video.addCue(0.1, ()=>{console.log("next scene 0")});
-  video.addCue(34.0, ()=>{console.log("next scene 1")});
-  video.addCue(92.0, ()=>{console.log("next scene 2")});
+  // for debugging
+  video.elt.currentTime = 30;
+
+  video.addCue(0.1, setScene, 0);
+  video.addCue(34.0, setScene, 1);
+  video.addCue(92.0, setScene, 2);
 
   poseNet = ml5.poseNet(video, modelReady);
   poseNet.on('pose', onPose);
@@ -177,8 +182,13 @@ function drawKeypoints() {
 }
 
 function drawTerrain(alpha) {
-  let left = curPreset[0];
-  let right = curPreset[1];
+  lerpPreset[0].x = lerp(lerpPreset[0].x, curPreset[0].x, 0.1);
+  lerpPreset[0].y = lerp(lerpPreset[0].y, curPreset[0].y, 0.1);
+  lerpPreset[1].x = lerp(lerpPreset[1].x, curPreset[1].x, 0.1);
+  lerpPreset[1].y = lerp(lerpPreset[1].y, curPreset[1].y, 0.1);
+  let left = lerpPreset[0];
+  let right = lerpPreset[1];
+
   pg2d.strokeWeight(1);
   pg2d.stroke(255, 255, 255, alpha * 155);
   pg2d.noFill();
