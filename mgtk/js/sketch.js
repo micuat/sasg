@@ -1953,7 +1953,7 @@ var s = function (p) {
           for (let i = 0; i < 10; i++) {
             ppg.beginDraw();
             ppg.clear();
-            postShaders["bloom"].set("delta", 0.01 * p.oscFaders[2]);
+            postShaders["bloom"].set("delta", 0.1 * p.oscFaders[2]);
             ppg.image(lpg, 0, 0);
             ppg.filter(postShaders["bloom"]);
             ppg.endDraw();
