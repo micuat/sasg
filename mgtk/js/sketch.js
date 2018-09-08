@@ -131,6 +131,24 @@ var masterPreset = [
   },
 ];
 
+function getPreset(name, defaultPreset) {
+  let preset = [];
+  for(let i in masterPreset) {
+    let found = false;
+    for(let j in masterPreset[i].preset) {
+      if(masterPreset[i].preset[j][name] != undefined) {
+        preset.push({preset: masterPreset[i].preset[j][name]});
+        found = true;
+        break;
+      }
+    }
+    if(found == false) {
+      preset.push({preset: defaultPreset});
+    }
+  }
+  return preset;
+}
+
 var FuncList = function (everyNSeq, funcs) {
   this.everyNSeq = everyNSeq;
   this.funcs = funcs;
@@ -176,21 +194,7 @@ var SLines = function (p) {
   let targetII;
   let agents = [];
 
-  let midiToPreset = [];
-  for(let i in masterPreset) {
-    let found = false;
-    for(let j in masterPreset[i].preset) {
-      print(masterPreset[i].preset[j])
-      if(masterPreset[i].preset[j].lines != undefined) {
-        midiToPreset.push({preset: masterPreset[i].preset[j].lines});
-        found = true;
-        break;
-      }
-    }
-    if(found == false) {
-      midiToPreset.push({preset: [linePreset.default, linePreset.default, linePreset.default, linePreset.default]});
-    }
-  }
+  let midiToPreset = getPreset("lines", [linePreset.default, linePreset.default, linePreset.default, linePreset.default]);
 
   function Agent(ii, jj) {
     this.ii = ii;
