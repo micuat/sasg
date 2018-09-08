@@ -97,7 +97,7 @@ var masterPreset = [
     { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
   },
   {
-    preset: [{ a: "shader", p: "mpeg" }, { a: "ribbons", p: "slide" },
+    preset: [{ a: "shader", p: "mpeg", shader: ["random"] }, { a: "ribbons", p: "slide" },
     { a: "lines", p: "default", lines: [linePreset.sig, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
   },
   { // 10
@@ -1428,6 +1428,26 @@ var SShader = function (p) {
   let names = ["spread", "pixelwave"];
   this.fader = 0.0;
 
+  let midiToPreset = getPreset("shader", ["default"]);
+
+  let funcAsset = new FuncList(4, [
+    {
+      name: "default",
+      f: function (self) {
+        self.curName = "spread";
+      }
+    },
+    {
+      name: "random",
+      f: function (self, seq) {
+        self.curName = "spread";
+        if (seq % 4.0 < 2.0 && p.frameCount % 4 == 0) {
+          let index = Math.floor(Math.random() * names.length);
+          self.curName = names[index];
+        }
+      }
+    },
+  ]);
   for (let i = 0; i < npgs; i++) {
     fpgs[i] = p.createGraphics(windowWidth, windowWidth, p.P3D);
     bpgs[i] = p.createGraphics(windowWidth, windowWidth, p.P3D);
@@ -1500,11 +1520,13 @@ var SShader = function (p) {
     if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
 
-    this.curName = "spread";
-    if (curPreset == 9 - 1 && seq % 4.0 < 2.0 && p.frameCount % 4 == 0) {
-      let index = Math.floor(Math.random() * names.length);
-      this.curName = names[index];
+    if (seq != lastSeq) {
+      let presetIndex = curPreset;
+      if (presetIndex >= midiToPreset.length) presetIndex = 0;
+      funcAsset.preset = midiToPreset[presetIndex].preset;
+      funcAsset.update(seq);
     }
+    funcAsset.exec(this, seq);
 
     if (p.frameCount % 60 == 0) {
       // loadShaders();
