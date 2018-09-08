@@ -70,7 +70,7 @@ var masterPreset = [
     preset: [{ a: "shader", p: "slide" }]
   },
   {
-    preset: [{ a: "beesAndBombs", p: "bloom" , bees: ["inout"]}]
+    preset: [{ a: "beesAndBombs", p: "bloom", bees: ["inout"] }]
   },
   {
     preset: [{ a: "beesAndBombs", p: "bloom" },
@@ -101,7 +101,7 @@ var masterPreset = [
     { a: "lines", p: "default", lines: [linePreset.sig, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
   },
   { // 10
-    preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "slide" },
+    preset: [{ a: "shader", p: "kaleid" }, { a: "terrain", p: "rgbshift" }, { a: "ribbons", p: "slide" },
     { a: "lines", p: "default", lines: [linePreset.sig, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
   },
   {
@@ -133,17 +133,17 @@ var masterPreset = [
 
 function getPreset(name, defaultPreset) {
   let preset = [];
-  for(let i in masterPreset) {
+  for (let i in masterPreset) {
     let found = false;
-    for(let j in masterPreset[i].preset) {
-      if(masterPreset[i].preset[j][name] != undefined) {
-        preset.push({preset: masterPreset[i].preset[j][name]});
+    for (let j in masterPreset[i].preset) {
+      if (masterPreset[i].preset[j][name] != undefined) {
+        preset.push({ preset: masterPreset[i].preset[j][name] });
         found = true;
         break;
       }
     }
-    if(found == false) {
-      preset.push({preset: defaultPreset});
+    if (found == false) {
+      preset.push({ preset: defaultPreset });
     }
   }
   return preset;
@@ -1705,6 +1705,132 @@ var SWarehouse = function (p) {
   }
 };
 
+var STerrain = function (p) {
+  this.tween = 0;
+  this.alpha = 0;
+
+  let cols, rows;
+  let scl = 20;
+  let w = 1200;
+  let h = 500;
+  cols = w / scl;
+  rows = h / scl;
+
+  let flying = 0;
+
+  let terrain = [];
+  for (let x = 0; x < cols; x++) {
+    terrain[x] = [];
+    for (let y = 0; y < rows; y++) {
+      terrain[x][y] = 0; //specify a default value for now
+    }
+  }
+
+  let midiToPreset = getPreset("terrain", ["default"]);
+
+  let funcAsset = new FuncList(4, [
+    {
+      name: "default",
+      f: function () {
+        return 0;
+      }
+    },
+  ]);
+
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    if (this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+    if (seq != lastSeq) {
+      let presetIndex = curPreset;
+      if (presetIndex >= midiToPreset.length) presetIndex = 0;
+      funcAsset.preset = midiToPreset[presetIndex].preset;
+      funcAsset.update(seq);
+    }
+    pg.beginDraw();
+    pg.clear();
+    pg.pushMatrix();
+    pg.pushStyle();
+    pg.translate(p.width / 2, p.height / 2);
+
+    pg.directionalLight(90, 195, 126, -1, 0, 0);
+    pg.pointLight(140, 135, 196, 300, -100, 1000);
+
+    flying -= 0.1;
+    let yoff = flying;
+    for (let y = 0; y < rows; y++) {
+      let xoff = 0;
+      for (let x = 0; x < cols; x++) {
+        terrain[x][y] = p.map(p.noise(xoff, yoff), 0, 1, -100, 100);
+        xoff += 0.2;
+      }
+      yoff += 0.2;
+    }
+
+    pg.translate(0, 50);
+    pg.rotateX(p.PI / 2.5);
+
+    pg.fill(200, 200, 200);
+    pg.stroke(255);
+    // pg.noFill();
+    pg.translate(-w / 2, -h / 2);
+    for (let y = 0; y < rows - 1; y++) {
+      pg.beginShape(p.TRIANGLE_STRIP);
+      for (let x = 0; x < cols; x++) {
+        pg.vertex(x * scl, y * scl, terrain[x][y]);
+        pg.vertex(x * scl, (y + 1) * scl, terrain[x][y + 1]);
+      }
+      pg.endShape();
+    }
+
+    pg.popStyle();
+    pg.popMatrix();
+    pg.endDraw();
+  }
+};
+
+var STemplate = function (p) {
+  this.tween = 0;
+  this.alpha = 0;
+
+  let midiToPreset = getPreset("template", ["default"]);
+
+  let funcAsset = new FuncList(4, [
+    {
+      name: "default",
+      f: function () {
+        return 0;
+      }
+    },
+  ]);
+
+  this.setup = function () {
+  }
+
+  this.draw = function () {
+    if (this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+    if (seq != lastSeq) {
+      let presetIndex = curPreset;
+      if (presetIndex >= midiToPreset.length) presetIndex = 0;
+      funcAsset.preset = midiToPreset[presetIndex].preset;
+      funcAsset.update(seq);
+    }
+    pg.beginDraw();
+    pg.clear();
+    pg.pushMatrix();
+    pg.pushStyle();
+
+    pg.translate(p.width / 2, p.height / 2);
+
+    pg.popStyle();
+    pg.popMatrix();
+    pg.endDraw();
+  }
+};
+
 var s = function (p) {
   let name;
   let sLines = new SLines(p);
@@ -1720,6 +1846,7 @@ var s = function (p) {
   let sShader = new SShader(p);
   let sFeedbackShader = new SFeedbackShader(p);
   let sWarehouse = new SWarehouse(p);
+  let sTerrain = new STerrain(p);
 
   let startFrame;
   let beatFader = 1;
@@ -1915,6 +2042,22 @@ var s = function (p) {
         },
         setup: function () {
           sWarehouse.setup();
+        }
+      },
+      {
+        name: "terrain",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+          let alpha = 1.0 - tween;
+          sTerrain.pg = pg;
+          sTerrain.tween = tween;
+          sTerrain.alpha = alpha * beatFader;
+          sTerrain.draw();
+        },
+        setup: function () {
+          sTerrain.setup();
         }
       }
     ]));
