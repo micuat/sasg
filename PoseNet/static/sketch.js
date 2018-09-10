@@ -14,17 +14,19 @@ let realWidth = 0;
 let poseNet;
 
 let preset = {
-  "comp.mov": [{x: -50, y: 50}, {x: 50, y: 50}],
-  "clip4.mp4": [{x: -50, y: 50}, {x: 50, y: 50}],
-  "clip180811.mp4": [{x: -50, y: 50}, {x: 50, y: 50}],
-  "clip180902.mov": [{x: -50, y: -50}, {x: 50, y: -50}],
-  "clip180902_2.mov": [{x: -100, y: 100}, {x: 0, y: 100}],
+  "comp.mov": [{x: 0, y: -300}, {x: -50, y: 80}, {x: 50, y: 80}, {x: 0, y: -300}],
+  "clip4.mp4": [{x: 0, y: -300}, {x: -50, y: 80}, {x: 50, y: 80}, {x: 0, y: -300}],
+  "clip180811.mp4": [{x: 0, y: -300}, {x: -50, y: 80}, {x: 50, y: 80}, {x: 0, y: -300}],
+  "clip180902.mov": [{x: 0, y: -400}, {x: -50, y: -10}, {x: 50, y: -10}, {x: 0, y: -250}],
+  "clip180902_2.mov": [{x: 0, y: -300}, {x: -100, y: 100}, {x: 0, y: 100}, {x: 0, y: -300}],
 }
 let keys = ["clip4.mp4", "clip180902.mov", "clip180902_2.mov"];
 let curPreset = preset[keys[0]];
 let lerpPreset = preset[keys[0]];
 let clipName = "comp.mov";
 let posesQueue = [];
+
+let geomFaderOverride = 0;
 
 let mode;
 
@@ -106,7 +108,7 @@ function onPose(results) {
 function setScene(scene) {
   console.log("scene " + scene);
   curPreset = preset[keys[scene]];
-  console.log(curPreset)
+  geomFaderOverride = 1.0;
 }
 
 function setupPromise() {
@@ -130,7 +132,7 @@ function setupPromise() {
   video.hide();
 
   // for debugging
-  video.elt.currentTime = 30;
+  // video.elt.currentTime = 28;
 
   video.addCue(0.1, setScene, 0);
   video.addCue(34.0, setScene, 1);
@@ -182,21 +184,23 @@ function drawKeypoints() {
 }
 
 function drawTerrain(alpha) {
-  lerpPreset[0].x = lerp(lerpPreset[0].x, curPreset[0].x, 0.1);
-  lerpPreset[0].y = lerp(lerpPreset[0].y, curPreset[0].y, 0.1);
-  lerpPreset[1].x = lerp(lerpPreset[1].x, curPreset[1].x, 0.1);
-  lerpPreset[1].y = lerp(lerpPreset[1].y, curPreset[1].y, 0.1);
-  let left = lerpPreset[0];
-  let right = lerpPreset[1];
+  for(let i in lerpPreset) {
+    lerpPreset[i].x = lerp(lerpPreset[i].x, curPreset[i].x, 0.1);
+    lerpPreset[i].y = lerp(lerpPreset[i].y, curPreset[i].y, 0.1);
+  }
+  let bleft = lerpPreset[0];
+  let tleft = lerpPreset[1];
+  let tright = lerpPreset[2];
+  let bright = lerpPreset[3];
 
   pg2d.strokeWeight(1);
   pg2d.stroke(255, 255, 255, alpha * 155);
   pg2d.noFill();
   pg2d.beginShape(LINE_STRIP);
-  pg2d.vertex(0, height - 200);
-  pg2d.vertex(width / 2 + left.x, height / 2 + left.y);
-  pg2d.vertex(width / 2 + right.x, height / 2 + right.y);
-  pg2d.vertex(width, height - 200);
+  pg2d.vertex(bleft.x, height + bleft.y);
+  pg2d.vertex(width / 2 + tleft.x, height / 2 + tleft.y);
+  pg2d.vertex(width / 2 + tright.x, height / 2 + tright.y);
+  pg2d.vertex(width + bright.x, height + bright.y);
   pg2d.endShape();
 }
 
@@ -215,6 +219,8 @@ function drawSkeleton(alpha) {
   }
 }
 
+let geomFader = 0.0;
+
 function draw3D() {
   if (_renderer.name != "p5.RendererGL") {
     return;
@@ -222,18 +228,28 @@ function draw3D() {
   background(0);
   translate(-width / 2, -height / 2);
 
-  // let geomFader = map(sin(millis() * 0.001 * 0.25 * Math.PI), -1, 1, 0, 1)
-  let geomFader = map(mouseX, 0, width, 0, 1)
+  // let geomFader = map(mouseX, 0, width, 0, 1)
+  // override!
+  if (geomFaderOverride > 0.5) {
+    geomFader = geomFader + 0.1;
+    if(geomFader >= 5.0) {
+      geomFaderOverride = 0.0;
+    }
+  }
+  else {
+    geomFader = lerp(geomFader, constrain(map(sin(millis() * 0.001 * 0.25 * Math.PI), -1, 1, -0.5, 1.5), 0, 1), 0.1);
+  }
+  let realGeomFader = constrain(geomFader, 0, 1);
   stroke(255, 255, 255)
   colorMode(RGB, 255);
   pg2d.clear();
-  drawTerrain(geomFader);
-  drawSkeleton(geomFader);
+  drawTerrain(realGeomFader);
+  drawSkeleton(realGeomFader);
 
   sh.setUniform('uBrighter', 0.0);
 
   pgBack.clear();
-  pgBack.tint((1 - geomFader) * 255);
+  pgBack.tint((1 - realGeomFader) * 255);
   pgBack.image(video, 0, 0, realWidth, height);
   texture(pgBack);
   beginShape();
@@ -260,7 +276,7 @@ function draw3D() {
   shader(sh);
   sh.setUniform('uSampler', video);
   sh.setUniform('uBrighter', 1.0);
-  drawAvatars(geomFader);
+  drawAvatars(realGeomFader);
 }
 
 function drawAvatars(fader) {
