@@ -34,6 +34,21 @@ let pg2d;
 let pg3d;
 let pgBack;
 
+let tshirtTexts = ["Doing\nNothing",
+"I WANNA\nGET\nBETTER",
+"BUSINESS\nREPLY\nMAIL",
+"VETEMENTS",
+"STAY\nHERE WID\nME!",
+"KNOWLEDGE\nIS\nPOWER",
+"SHOOT\nPICTURES",
+"THAT DAY DEVELOP\nSO OBVIOUS\nNOT",
+"NOTHING\nCHANGES\nIF NOTHING\nCHANGES",
+"It's\nLovely!",
+"I KNOW YOU'RE\nIN A VERY FEEL\nHOUSE NOW\nBUCKET.\nBUT YOU MUST\nHOME MOTION\nTHE LIGHT.",
+"NEW YORK\nTHEY WANTS\nALMOST EVERYTHING",
+"SCULPTOR"];
+let tshirtText = [tshirtTexts[0], tshirtTexts[1], tshirtTexts[2], tshirtTexts[3]];
+
 // https://stackoverflow.com/questions/17242144/javascript-convert-hsb-hsv-color-to-rgb-accurately
 function HSVtoRGB(h, s, v) {
   var r, g, b, i, f, p, q, t;
@@ -67,6 +82,7 @@ function preload() {
   });
   sh = loadShader('vert.glsl', 'frag.glsl');
   envImage = loadImage('assets/env.jpg');
+  font = loadFont('assets/Avenir.otf');
 }
 
 function setup() {
@@ -205,12 +221,29 @@ function drawTerrain(alpha) {
 }
 
 function drawSkeleton(alpha) {
+  pg2d.textFont(font);
+  pg2d.textSize(24);
+  pg2d.textAlign(CENTER, TOP);
+
+  if(frameCount % 150 == 0) {
+    for(let i in tshirtText) {
+      tshirtText[i] = random(tshirtTexts);
+    }
+  }
+
   for (let k = 20; k < posesQueue.length; k++) {
     pg2d.stroke(255, 255, 255, alpha * map(k, 0, posesQueue.length, 10, 155));
     let poses = posesQueue[k];
     for (let i = 0; i < poses.length; i++) {
       let skeleton = poses[i].skeleton;
       for (let j = 0; j < skeleton.length; j++) {
+        if(k == posesQueue.length - 1 && j == 4) {
+          pg2d.push();
+          pg2d.fill(255, alpha * 255)
+          let index = Math.floor(constrain(map(skeleton[4][0].position.x, 0, width, 0, 4), 0, 3));
+          pg2d.text(tshirtText[index], lerp(skeleton[4][0].position.x, skeleton[1][1].position.x, 0.5), skeleton[1][1].position.y + 20);
+          pg2d.pop();
+        }
         let partA = skeleton[j][0];
         let partB = skeleton[j][1];
         pg2d.line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
@@ -297,7 +330,7 @@ function drawAvatars(fader) {
       translate(point.x, point.y);
       texture(envImage);
       rotateY(PI * -0.5);
-      let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), fader, 0.8);
+      let hsv = HSVtoRGB(map(point.x, 0.0, width, 0.0, 1.0), 0.4 * fader, 0.8);
       sh.setUniform('uMaterialColorOverride', [hsv.r, hsv.g, hsv.b]);
       sphere(point.r * sat / 255.0 * 1.5);
       pop();
