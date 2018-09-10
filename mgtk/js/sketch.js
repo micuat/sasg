@@ -112,7 +112,8 @@ var masterPreset = [
     preset: [{ a: "shader", p: "kaleid" }]
   },
   {
-    preset: [{ a: "face", p: ["slide", "rgbshift"] }]
+    preset: [{ a: "terrain", p: "rgbshift" }, { a: "face", p: "radial" }]
+    // preset: [{ a: "face", p: ["slide", "rgbshift"] }]
   },
   {
     preset: ["starField", "ribbons", "brown"]
@@ -2240,6 +2241,17 @@ var s = function (p) {
           ppg.endDraw();
         }
       },
+      {
+        name: "radial",
+        f: function (lpg, ppg) {
+          ppg.beginDraw();
+          ppg.clear();
+          postShaders["radial"].set("delta", 3.0);
+          ppg.image(lpg, 0, 0);
+          ppg.filter(postShaders["radial"]);
+          ppg.endDraw();
+        }
+      },
     ]))
   }
 
@@ -2277,7 +2289,7 @@ var s = function (p) {
       postAssets[i].update();
     }
 
-    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert", "mpeg"];
+    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert", "mpeg", "radial"];
     for (let i in shaderTypes) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }

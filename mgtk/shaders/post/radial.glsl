@@ -16,8 +16,10 @@ void main() {
 	vec2 nFragCoord = fragCoord.st - vec2(0.5);
 
 	vec4 c1 = texture2D(texture, fragCoord);
-  float alpha = 1.0 - length(nFragCoord * vec2(1, 560.0/1280.0)) * delta;
+  float alpha = length(nFragCoord * vec2(1, 560.0/1280.0)) * delta;
 	alpha = min(max(0.0, alpha), 1.0);
+  alpha = pow(alpha, 4.0);
+  alpha = 1.0 - alpha;
   c1.a *= alpha;
 	gl_FragColor = vec4(c1);
 }
