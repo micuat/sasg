@@ -222,7 +222,6 @@ function drawTerrain(alpha) {
 
 function drawSkeleton(alpha) {
   pg2d.textFont(font);
-  pg2d.textSize(24);
   pg2d.textAlign(CENTER, TOP);
 
   if(frameCount % 150 == 0) {
@@ -239,6 +238,7 @@ function drawSkeleton(alpha) {
       for (let j = 0; j < skeleton.length; j++) {
         if(k == posesQueue.length - 1 && j == 4) {
           pg2d.push();
+          pg2d.textSize(poses[i].tall * 0.05);
           pg2d.fill(255, alpha * 255)
           let index = Math.floor(constrain(map(skeleton[4][0].position.x, 0, width, 0, 4), 0, 3));
           pg2d.text(tshirtText[index], lerp(skeleton[4][0].position.x, skeleton[1][1].position.x, 0.5), skeleton[1][1].position.y + 20);
