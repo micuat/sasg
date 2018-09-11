@@ -127,7 +127,7 @@ var masterPreset = [
     preset: ["starField", "ribbons", "brown"]
   },
   {
-    preset: ["langtonAnt", "ribbons"]
+    preset: [{a: "langtonAnt", p: ["slide", "rgbshift", "kaleid"]}, "ribbons"]
   },
   {
     preset: ["brown", "doublePendulum"]
@@ -1332,12 +1332,12 @@ var SLangtonAnt = function (p) {
     if (x > windowWidth / m - 1) {
       x = 0;
     } else if (x < 0) {
-      x = windowWidth / m - 1;
+      x = Math.floor(windowWidth / m - 1);
     }
     if (y > windowHeight / m - 1) {
       y = 0;
     } else if (y < 0) {
-      y = windowHeight / m - 1;
+      y = Math.floor(windowHeight / m - 1);
     }
   }
 
@@ -1347,7 +1347,7 @@ var SLangtonAnt = function (p) {
 
     if (toSetup) {
       pg = this.pg;
-      grid = make2DArray(windowWidth / m, windowHeight / m);
+      grid = make2DArray(Math.floor(windowWidth / m), Math.floor(windowHeight / m));
       pg.beginDraw();
       pg.clear();
       pg.endDraw();
@@ -1510,7 +1510,8 @@ var SShader = function (p) {
   let params = {};
   this.curName = "spread";
   let names = ["spread", "pixelwave", "modwave", "tri", "holo"];
-  this.fader = 0.0;
+  this.fader8 = 0.0;
+  this.fader9 = 0.0;
 
   let midiToPreset = getPreset("shader", ["default"]);
 
@@ -1545,7 +1546,7 @@ var SShader = function (p) {
   params["spread"] = [
     {
       "tex17": "bpgs[1]",
-      "sides1": 10,
+      "sides1": 1000,
       "radius2": 0.3,
       "smoothing3": 0.01,
       "frequency4": 2,
@@ -1557,9 +1558,9 @@ var SShader = function (p) {
       "xMult11": 1,
       "yMult12": 1,
       "amount18": 0.975,
-      "r13": "this.fader",
-      "g14": "this.fader",
-      "b15": "this.fader",
+      "r13": "this.fader8",
+      "g14": "this.fader8",
+      "b15": "this.fader8",
       "render": 0
     },
     {
@@ -1567,7 +1568,7 @@ var SShader = function (p) {
       "amount20": 1.05,
       "xMult21": 1,
       "yMult22": 1,
-      "scale23": 20,
+      "scale23": "p.map(this.fader9, 0.0, 1.0, 20.0, 2.0)",
       "offset24": 0.5,
       "scale25": 3,
       "offset26": 0.1,
@@ -2172,7 +2173,8 @@ var s = function (p) {
           pg.endDraw();
           let alpha = 1.0 - tween;
           sShader.pg = pg;
-          sShader.fader = p.oscFaders[3];
+          sShader.fader8 = p.oscFaders[8];
+          sShader.fader9 = p.oscFaders[9];
           sShader.draw();
         },
         setup: function () {
