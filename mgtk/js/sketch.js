@@ -1,5 +1,7 @@
-var windowWidth = 1280 / 2;
-var windowHeight = 560 / 2;
+// var windowWidth = 1280 / 2;
+// var windowHeight = 560 / 2;
+var windowWidth = 1920 / 2;
+var windowHeight = 840 / 2;
 var bpm = 124;
 var tElapsed = 0;
 var lastSeq = -1;
@@ -861,8 +863,8 @@ var SGameOfLife = function (p) {
   this.alpha = 1.0;
 
   this.setup = function () {
-    cols = p.width / resolution;
-    rows = p.height / resolution;
+    cols = Math.floor(p.width / resolution);
+    rows = Math.floor(p.height / resolution);
     grid = make2DArray(cols, rows);
 
     let doRandom = gap == 16;//p.random(1) < 0.2 ? true : false;
@@ -1096,7 +1098,7 @@ var SBeesAndBombs = function (p) {
     angle = p.millis() * 0.001 * p.TWO_PI;
     let decay = p.sin(p.millis() * 0.0005);
     decay = p.constrain(p.map(decay, -1, 1, -0.02, 1), 0, 1);
-    let winh = windowHeight * 2.0;
+    let winh = windowHeight * 1.5;
     for (let z = 0; z < winh; z += w) {
       for (let x = 0; x < winh; x += w) {
         pg.pushMatrix();
@@ -1144,8 +1146,8 @@ var SFace = function (p) {
         pg.texture(facePg)
         for (let i = 0; i < faces.length; i++) {
           let idx = faces[i];
-          let x = p.facePoints[idx][0] * 0.5;
-          let y = p.facePoints[idx][1] * 0.5;
+          let x = p.facePoints[idx][0] * 0.5 * 1.5;
+          let y = p.facePoints[idx][1] * 0.5 * 1.5;
           pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
         }
         pg.endShape();
@@ -1156,8 +1158,8 @@ var SFace = function (p) {
       f: function () {
         let modPoints = [];
         for (let i = 0; i < p.facePoints.length; i++) {
-          let tx = p.facePoints[i][0] * 0.5;
-          let ty = p.facePoints[i][1] * 0.5;
+          let tx = p.facePoints[i][0] * 0.5 * 1.5;
+          let ty = p.facePoints[i][1] * 0.5 * 1.5;
           let x = tx + p.noise(tx, ty, tElapsed) * 30 - 15;
           let y = ty + p.noise(tx * 0.4, ty * 1.1, tElapsed) * 30 - 15;
           modPoints[i] = { x: x, y: y };
@@ -1181,14 +1183,14 @@ var SFace = function (p) {
         for (let i = 6; i < p.posePoints.length; i++) {
           pg.noStroke();
           pg.fill(255, 0, 0);
-          let x = p.map(p.posePoints[i][0], 0, 640, 80, 640 - 80);
-          let y = p.map(p.posePoints[i][1], 0, 480, 0, 360);
+          let x = p.map(p.posePoints[i][0], 0, 640, 80, 640 - 80) * 1.5;
+          let y = p.map(p.posePoints[i][1], 0, 480, 0, 360) * 1.5;
           pg.ellipse(x, y, 14, 14)
 
           pg.stroke(255);
           pg.fill(255, 0, 0);
-          let x0 = p.map(p.posePoints[i-1][0], 0, 640, 80, 640 - 80);
-          let y0 = p.map(p.posePoints[i-1][1], 0, 480, 0, 360);
+          let x0 = p.map(p.posePoints[i-1][0], 0, 640, 80, 640 - 80) * 1.5;
+          let y0 = p.map(p.posePoints[i-1][1], 0, 480, 0, 360) * 1.5;
           pg.line(x, y, x0, y0)
         }
       }
@@ -1235,9 +1237,9 @@ var SFace = function (p) {
     pg.clear();
     pg.pushMatrix();
     pg.pushStyle();
-    let camH = p.cam.height * 640.0 / p.cam.width;
+    let camH = p.cam.height * 960 / p.cam.width;
     pg.translate(0, (windowHeight - camH) * 0.5);
-    pg.image(p.cam, 0, 0, 640, camH);
+    pg.image(p.cam, 0, 0, 960, camH);
 
     funcAsset.exec();
     pg.popStyle();
