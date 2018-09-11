@@ -124,20 +124,20 @@ var masterPreset = [
     { a: "face", p: "darktoalpha", face: ["body"] }]
   },
   { // 15
-    preset: ["starField", "ribbons", "brown"]
+    preset: [{a: ["gameOfLife", "langtonAnt"], p: ["slide", "rgbshift", "kaleid"]}, "ribbons"]
   },
-  {
-    preset: [{a: "langtonAnt", p: ["slide", "rgbshift", "kaleid"]}, "ribbons"]
-  },
-  {
-    preset: ["brown", "doublePendulum"]
-  },
-  {
-    preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "rgbshift" }]
-  },
-  {
-    preset: ["warehouse", "brown"]
-  },
+  // {
+  //   preset: ["starField", "ribbons", "brown"]
+  // },
+  // {
+  //   preset: ["brown", "doublePendulum"]
+  // },
+  // {
+  //   preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "rgbshift" }]
+  // },
+  // {
+  //   preset: ["warehouse", "brown"]
+  // },
 ];
 
 function getPreset(name, defaultPreset) {
@@ -863,8 +863,8 @@ var SGameOfLife = function (p) {
   this.alpha = 1.0;
 
   this.setup = function () {
-    cols = Math.floor(p.width / resolution);
-    rows = Math.floor(p.height / resolution);
+    cols = Math.floor(windowWidth / resolution);
+    rows = Math.floor(windowHeight / resolution);
     grid = make2DArray(cols, rows);
 
     let doRandom = gap == 16;//p.random(1) < 0.2 ? true : false;
@@ -884,24 +884,17 @@ var SGameOfLife = function (p) {
 
       }
     }
-    // let bloc = [[10, 10], [11, 10], [12, 10], [13, 7], [13, 8], [13, 9], [10, 5], [11, 5], [12, 5], [8, 7], [8, 8], [8, 9]];
-    // for (let i in bloc) {
-    //   for (let y = 0; y < 1; y++) {
-    //     for (let x = 0; x < 1; x++) {
-    //       let dx = 10;
-    //       let dy = 0;
-    //       grid[bloc[i][0] + dx][bloc[i][1] + dy] = 1;
-    //       grid[28 - bloc[i][0] + dx][bloc[i][1] + dy] = 1;
-    //       grid[bloc[i][0] + dx][22 - bloc[i][1] + dy] = 1;
-    //       grid[28 - bloc[i][0] + dx][22 - bloc[i][1] + dy] = 1;
-    //     }
-    //   }
-    // }
   }
 
   this.draw = function () {
-    p.noStroke();
-    p.translate(-p.width / 2, -p.height / 2);
+    if (this.pg == undefined || this.pg == null) return;
+    pg = this.pg;
+
+    pg.beginDraw();
+    pg.clear();
+    pg.pushMatrix();
+    pg.pushStyle();
+    pg.noStroke();
     if (p.getCount() % bpm == 0) {
       gap = gap - 1;
       if (gap < 12) gap = 16;
@@ -916,9 +909,9 @@ var SGameOfLife = function (p) {
         let x = i * resolution;
         let y = j * resolution;
         if (grid[i][j] == 1) {
-          p.fill(255, 255 * this.alpha);
+          pg.fill(255, 255);
           // p.stroke(0);
-          p.rect(x, y, resolution - 1, resolution - 1);
+          pg.rect(x, y, resolution - 1, resolution - 1);
         }
       }
     }
@@ -947,6 +940,9 @@ var SGameOfLife = function (p) {
 
       grid = next;
     }
+    pg.popStyle();
+    pg.popMatrix();
+    pg.endDraw();
   }
 
 
@@ -2076,6 +2072,7 @@ var s = function (p) {
           pg.endDraw();
           let alpha = 1.0 - tween;
           p.push();
+          sGameOfLife.pg = pg;
           sGameOfLife.alpha = alpha * beatFader;
           sGameOfLife.draw();
           p.pop();
