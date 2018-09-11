@@ -2432,16 +2432,30 @@ var s = function (p) {
   let remoteLocation = new Packages.netP5.NetAddress("127.0.0.1", 6667);
 
   function sendOsc() {
-    let m = new Packages.oscP5.OscMessage("/tw/ABCD/k/" + Math.floor(p.oscFaders[3] * 255));
+    let amount = 255;
+    // if(tElapsed * (bpm / 120.0) % 1.0 > p.oscFaders[3]) amount = 0;
+    amount = Math.floor(Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 2.0) * 128 + 128);
+    let m = new Packages.oscP5.OscMessage("/tw/ABCD/k/" + amount);
     p.oscP5.send(m, remoteLocation);
+
+    if(seq != lastSeq) {
+      m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + 1);
+      // m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + Math.floor(p.random(2)));
+      p.oscP5.send(m, remoteLocation);
+      m = new Packages.oscP5.OscMessage("/tw/ABCD/b/" + 1);
+      p.oscP5.send(m, remoteLocation);
+      m = new Packages.oscP5.OscMessage("/tw/ABCD/x/" + 2);
+      p.oscP5.send(m, remoteLocation);
+    }
   }
 
   p.draw = function () {
-    sendOsc();
     p.background(0);
     tElapsed = p.millis() * 0.001 + p.oscFaders[1];
     let t = tElapsed * (bpm / 120.0);
     seq = Math.floor(tElapsed * (bpm / 120.0)) + p.seqOffset;
+
+    sendOsc();
 
     if (seq != lastSeq) {
       if (seq % funcAssets[0].everyNSeq == 0) {
