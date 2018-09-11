@@ -1960,8 +1960,8 @@ var STerrain = function (p) {
       yoff += 0.2;
     }
 
-    pg.translate(0, 50);
-    pg.rotateX(p.PI / 2.5);
+    pg.translate(0, 100);
+    pg.rotateX(p.PI / 2.2);
 
     pg.fill(200, 200, 200);
     pg.stroke(255);
