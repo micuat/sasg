@@ -112,7 +112,7 @@ var masterPreset = [
     preset: [{ a: "shader", p: "kaleid" }]
   },
   {
-    preset: [{ a: "terrain", p: "rgbshift" }, { a: "face", p: "darktoalpha" }]
+    preset: [{ a: "terrain", p: "rgbshift" }, { a: "face", p: "darktoalpha", face: ["default", "wireframe"] }]
   },
   {
     preset: ["starField", "ribbons", "brown"]
@@ -1120,12 +1120,54 @@ var SFace = function (p) {
   }
   let facePg = p.createGraphics(windowWidth, windowHeight, p.P3D);
 
+  let midiToPreset = getPreset("face", ["default"]);
+
+  let funcAsset = new FuncList(4, [
+    {
+      name: "default",
+      f: function () {
+        pg.fill(255);
+        pg.noStroke();
+        pg.beginShape(p.TRIANGLES);
+        pg.texture(facePg)
+        for (let i = 0; i < faces.length; i++) {
+          let idx = faces[i];
+          let x = p.facePoints[idx][0] * 0.5;
+          let y = p.facePoints[idx][1] * 0.5;
+          pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
+        }
+        pg.endShape();
+      }
+    },
+    {
+      name: "wireframe",
+      f: function () {
+        pg.stroke(255);
+        pg.noFill();
+        pg.beginShape(p.TRIANGLES);
+        for (let i = 0; i < faces.length; i++) {
+          let idx = faces[i];
+          let x = p.facePoints[idx][0] * 0.5;
+          let y = p.facePoints[idx][1] * 0.5;
+          pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
+        }
+        pg.endShape();
+      }
+    },
+  ]);
+
   this.setup = function () {
   }
 
   this.draw = function () {
     if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
+    if (seq != lastSeq) {
+      let presetIndex = curPreset;
+      if (presetIndex >= midiToPreset.length) presetIndex = 0;
+      funcAsset.preset = midiToPreset[presetIndex].preset;
+      funcAsset.update(seq);
+    }
 
     if (p.cam.available() == true) {
       p.cam.read();
@@ -1173,21 +1215,7 @@ var SFace = function (p) {
     }
 
     // face
-    {
-      pg.fill(255);
-      pg.noStroke();
-      pg.beginShape(p.TRIANGLES);
-      pg.texture(facePg)
-      for (let i = 0; i < faces.length; i++) {
-        let idx = faces[i];
-        let x = p.facePoints[idx][0] * 0.5;
-        let y = p.facePoints[idx][1] * 0.5;
-        pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
-      }
-      pg.endShape();
-    }
-    // pg.blendMode(p.BLEND);
-    // pg.image(facePg, 0, 0);
+    funcAsset.exec();
     pg.popStyle();
     pg.popMatrix();
     pg.endDraw();
