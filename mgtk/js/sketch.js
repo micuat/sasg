@@ -99,7 +99,7 @@ var masterPreset = [
     { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
   },
   {
-    preset: [{ a: "shader", p: "mpeg", shader: ["random"] }, { a: "ribbons", p: "slide" },
+    preset: [{ a: "shader", p: "mpeg", shader: ["randomBurst"] }, { a: "ribbons", p: "slide" },
     { a: "lines", p: "default", lines: [linePreset.sig, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
   },
   { // 10
@@ -124,7 +124,7 @@ var masterPreset = [
     { a: "face", p: "darktoalpha", face: ["body"] }]
   },
   { // 15
-    preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["random", "holo"] },
+    preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
     { a: ["default", "gameOfLife", "langtonAnt"], p: ["rgbshift"] }]
   },
   // {
@@ -1531,6 +1531,16 @@ var SShader = function (p) {
     },
     {
       name: "random",
+      f: function (self, seq) {
+        if (seq != lastSeq && seq % 4.0 < 1.0) {
+          let mynames = ["pixelwave", "modwave", "tri"];
+          let index = Math.floor(Math.random() * mynames.length);
+          self.curName = mynames[index];
+        }
+      }
+    },
+    {
+      name: "randomBurst",
       f: function (self, seq) {
         self.curName = "spread";
         if (seq % 4.0 < 2.0 && p.frameCount % 4 == 0) {
