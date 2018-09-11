@@ -112,8 +112,7 @@ var masterPreset = [
     preset: [{ a: "shader", p: "kaleid" }]
   },
   {
-    preset: [{ a: "terrain", p: "rgbshift" }, { a: "face", p: "radial" }]
-    // preset: [{ a: "face", p: ["slide", "rgbshift"] }]
+    preset: [{ a: "terrain", p: "rgbshift" }, { a: "face", p: "darktoalpha" }]
   },
   {
     preset: ["starField", "ribbons", "brown"]
@@ -2252,6 +2251,17 @@ var s = function (p) {
           ppg.endDraw();
         }
       },
+      {
+        name: "darktoalpha",
+        f: function (lpg, ppg) {
+          ppg.beginDraw();
+          ppg.clear();
+          postShaders["darktoalpha"].set("delta", 3.0);
+          ppg.image(lpg, 0, 0);
+          ppg.filter(postShaders["darktoalpha"]);
+          ppg.endDraw();
+        }
+      },
     ]))
   }
 
@@ -2289,7 +2299,7 @@ var s = function (p) {
       postAssets[i].update();
     }
 
-    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert", "mpeg", "radial"];
+    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert", "mpeg", "radial", "darktoalpha"];
     for (let i in shaderTypes) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }
