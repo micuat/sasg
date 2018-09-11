@@ -1591,7 +1591,7 @@ var SShader = function (p) {
       "amount20": 1.05,
       "xMult21": 1,
       "yMult22": 1,
-      "scale23": "p.map(this.fader9, 0.0, 1.0, 20.0, 2.0)",
+      "scale23": "p.map(Math.pow(this.fader9,2.0), 0.0, 1.0, 2.0, 20.0)",
       "offset24": 0.5,
       "scale25": 3,
       "offset26": 0.1,
