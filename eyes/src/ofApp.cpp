@@ -28,10 +28,18 @@ void ofApp::setup() {
 	}
 	else {
 		// Setup grabber
-        if(grabber.listDevices().size() > 1) {
+        auto cameras = grabber.listDevices();
+        if(cameras.size() > 1) {
             // USB capture
-            grabber.setDeviceID(0);
-            grabber.setup(1280, 800);
+            int index = 0;
+//            for(int i = 0; i < cameras.size(); i++) {
+//                if(cameras.at(i).deviceName == "USB Capture HDMI") {
+//                    index = i;
+//                    break;
+//                }
+//            }
+            grabber.setDeviceID(1);
+            grabber.setup(1280, 720);
         }
         else {
             grabber.setDeviceID(0);
@@ -109,6 +117,7 @@ void ofApp::update() {
 //--------------------------------------------------------------
 void ofApp::draw() {
 	ofBackground(0);
+    grabber.draw(0,0);
     tracker0.drawDebug();
 
 //    // check if there is a face
