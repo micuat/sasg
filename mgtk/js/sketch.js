@@ -112,7 +112,7 @@ var masterPreset = [
     preset: [{ a: "shader", p: "kaleid" }]
   },
   {
-    preset: [{ a: "terrain", p: "rgbshift" }, { a: "face", p: "darktoalpha", face: ["default", "wireframe"] }]
+    preset: [{ a: "shader", p: "mpeg", shader: ["random"] }, { a: "terrain", p: "rgbshift" }, { a: "face", p: "darktoalpha", face: ["default", "wireframe"] }]
   },
   {
     preset: ["starField", "ribbons", "brown"]
@@ -1142,14 +1142,23 @@ var SFace = function (p) {
     {
       name: "wireframe",
       f: function () {
+        let modPoints = [];
+        for (let i = 0; i < p.facePoints.length; i++) {
+          let tx = p.facePoints[i][0] * 0.5;
+          let ty = p.facePoints[i][1] * 0.5;
+          let x = tx + p.noise(tx, ty, tElapsed) * 30 - 15;
+          let y = ty + p.noise(tx * 0.4, ty * 1.1, tElapsed) * 30 - 15;
+          modPoints[i] = {x: x, y: y};
+        }
+
         pg.stroke(255);
         pg.noFill();
         pg.beginShape(p.TRIANGLES);
         for (let i = 0; i < faces.length; i++) {
           let idx = faces[i];
-          let x = p.facePoints[idx][0] * 0.5;
-          let y = p.facePoints[idx][1] * 0.5;
-          pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
+          let x = modPoints[idx].x;
+          let y = modPoints[idx].y;
+          pg.vertex(x, y, 0);
         }
         pg.endShape();
       }
