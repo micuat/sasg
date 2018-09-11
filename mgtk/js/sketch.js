@@ -1509,7 +1509,7 @@ var SShader = function (p) {
   let npgs = 2;
   let params = {};
   this.curName = "spread";
-  let names = ["spread", "pixelwave", "modwave", "tri"];
+  let names = ["spread", "pixelwave", "modwave", "tri", "holo"];
   this.fader = 0.0;
 
   let midiToPreset = getPreset("shader", ["default"]);
@@ -1641,6 +1641,33 @@ var SShader = function (p) {
       "amount26": 0.5
     }
   ];
+  params["holo"] = [
+    {
+      "tex19":  "bpgs[0]",
+      "frequency1": 10,
+      "sync2": 0.2,
+      "offset3": 0.1,
+      "nSides4": 4,
+      "nSides5": 4,
+      "amount6": 2,
+      "scale7": 100,
+      "offset8": 1,
+      "threshold9": 0.8,
+      "tolerance10": 0.04,
+      "amount12": 0.5,
+      "pixelX13": 10,
+      "pixelY14": 10,
+      "r15": 2,
+      "g16": 2,
+      "b17": 2,
+      "amount20": 0.5,
+      "amount21": 0.001,
+      "amount22": 0.5,
+      "xMult23": 1,
+      "yMult24": 1,
+      "render": 0
+    }
+  ]
 
   function loadShaders() {
     for (let i in names) {
