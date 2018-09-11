@@ -112,7 +112,9 @@ var masterPreset = [
     preset: [{ a: "shader", p: "kaleid" }]
   },
   {
-    preset: [{ a: "shader", p: "mpeg", shader: ["random"] }, { a: "terrain", p: "rgbshift" }, { a: "face", p: "darktoalpha", face: ["default", "wireframe"] }]
+    preset: [{ a: "shader", p: ["mpeg", "slide", "invert"], shader: ["random"] },
+    { a: "terrain", p: ["rgbshift", "slide", "invert"] },
+    { a: "face", p: "darktoalpha", face: ["default", "wireframe"] }]
   },
   {
     preset: ["starField", "ribbons", "brown"]
@@ -1148,7 +1150,7 @@ var SFace = function (p) {
           let ty = p.facePoints[i][1] * 0.5;
           let x = tx + p.noise(tx, ty, tElapsed) * 30 - 15;
           let y = ty + p.noise(tx * 0.4, ty * 1.1, tElapsed) * 30 - 15;
-          modPoints[i] = {x: x, y: y};
+          modPoints[i] = { x: x, y: y };
         }
 
         pg.stroke(255);
