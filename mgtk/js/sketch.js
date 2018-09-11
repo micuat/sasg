@@ -2031,13 +2031,24 @@ var s = function (p) {
   let sRibbons = new SRibbons(p);
   let sBeesAndBombs = new SBeesAndBombs(p);
   let sFace = new SFace(p);
-  let sBrown = new SBrown(p);
   let sLangtonAnt = new SLangtonAnt(p);
   let sDoublePendulum = new SDoublePendulum(p);
   let sShader = new SShader(p);
-  let sFeedbackShader = new SFeedbackShader(p);
   let sWarehouse = new SWarehouse(p);
   let sTerrain = new STerrain(p);
+
+  sLines.setup();
+  sCircleMorph.setup();
+  sStarField.setup();
+  sGameOfLife.setup();
+  sRibbons.setup();
+  sBeesAndBombs.setup();
+  sFace.setup();
+  sLangtonAnt.setup();
+  sDoublePendulum.setup();
+  sShader.setup();
+  sWarehouse.setup();
+  sTerrain.setup();
 
   let startFrame;
   let beatFader = 1;
@@ -2147,19 +2158,19 @@ var s = function (p) {
           sFace.setup();
         }
       },
-      {
-        name: "brown",
-        f: function (tween, pg) {
-          let alpha = 1.0 - tween;
-          sBrown.pg = pg;
-          sBrown.tween = tween;
-          sBrown.alpha = alpha * beatFader;
-          sBrown.draw();
-        },
-        setup: function () {
-          sBrown.setup();
-        }
-      },
+      // {
+      //   name: "brown",
+      //   f: function (tween, pg) {
+      //     let alpha = 1.0 - tween;
+      //     sBrown.pg = pg;
+      //     sBrown.tween = tween;
+      //     sBrown.alpha = alpha * beatFader;
+      //     sBrown.draw();
+      //   },
+      //   setup: function () {
+      //     sBrown.setup();
+      //   }
+      // },
       {
         name: "langtonAnt",
         f: function (tween, pg) {
@@ -2205,22 +2216,22 @@ var s = function (p) {
           sShader.setup();
         }
       },
-      {
-        name: "feedbackShader",
-        f: function (tween, pg) {
-          pg.beginDraw();
-          pg.clear();
-          pg.endDraw();
-          let alpha = 1.0 - tween;
-          sFeedbackShader.pg = pg;
-          sFeedbackShader.tween = tween;
-          sFeedbackShader.alpha = alpha * beatFader;
-          sFeedbackShader.draw();
-        },
-        setup: function () {
-          sFeedbackShader.setup();
-        }
-      },
+      // {
+      //   name: "feedbackShader",
+      //   f: function (tween, pg) {
+      //     pg.beginDraw();
+      //     pg.clear();
+      //     pg.endDraw();
+      //     let alpha = 1.0 - tween;
+      //     sFeedbackShader.pg = pg;
+      //     sFeedbackShader.tween = tween;
+      //     sFeedbackShader.alpha = alpha * beatFader;
+      //     sFeedbackShader.draw();
+      //   },
+      //   setup: function () {
+      //     sFeedbackShader.setup();
+      //   }
+      // },
       {
         name: "warehouse",
         f: function (tween, pg) {
