@@ -2434,7 +2434,7 @@ var s = function (p) {
   function sendOsc() {
     let amount = 255;
     // if(tElapsed * (bpm / 120.0) % 1.0 > p.oscFaders[3]) amount = 0;
-    amount = Math.floor(Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 2.0) * 128 + 128);
+    amount = Math.floor((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 2.0) * 128 + 128) * p.oscFaders[3]);
     let m = new Packages.oscP5.OscMessage("/tw/ABCD/k/" + amount);
     p.oscP5.send(m, remoteLocation);
 
