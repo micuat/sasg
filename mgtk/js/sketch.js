@@ -124,7 +124,8 @@ var masterPreset = [
     { a: "face", p: "darktoalpha", face: ["body"] }]
   },
   { // 15
-    preset: [{a: ["gameOfLife", "langtonAnt"], p: ["slide", "rgbshift", "kaleid"]}, "ribbons"]
+    preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["random", "holo"] },
+    { a: ["default", "gameOfLife", "langtonAnt"], p: ["rgbshift"] }]
   },
   // {
   //   preset: ["starField", "ribbons", "brown"]
@@ -1185,8 +1186,8 @@ var SFace = function (p) {
 
           pg.stroke(255);
           pg.fill(255, 0, 0);
-          let x0 = p.map(p.posePoints[i-1][0], 0, 640, 80, 640 - 80) * 1.5;
-          let y0 = p.map(p.posePoints[i-1][1], 0, 480, 0, 360) * 1.5;
+          let x0 = p.map(p.posePoints[i - 1][0], 0, 640, 80, 640 - 80) * 1.5;
+          let y0 = p.map(p.posePoints[i - 1][1], 0, 480, 0, 360) * 1.5;
           pg.line(x, y, x0, y0)
         }
       }
@@ -1355,6 +1356,7 @@ var SLangtonAnt = function (p) {
     pg.pushStyle();
     pg.strokeWeight(m);
     pg.fill(0);
+    pg.clear();
 
     for (let n = 0; n < 40; n++) {
       let state = grid[x][y];
@@ -1366,15 +1368,24 @@ var SLangtonAnt = function (p) {
         grid[x][y] = 0;
       }
 
-      if (grid[x][y] == 1) {
-        pg.stroke(0);
-        pg.point(x * m, y * m);
-      }
-      else {
-        pg.stroke(255);
-        pg.point(x * m, y * m);
-      }
+      // if (grid[x][y] == 1) {
+      //   pg.stroke(0);
+      //   pg.point(x * m, y * m);
+      // }
+      // else {
+      //   pg.stroke(255);
+      //   pg.point(x * m, y * m);
+      // }
       moveForward();
+    }
+
+    pg.fill(255);
+    pg.noStroke();
+    for (let i = 0; i < grid.length; i++) {
+      for (let j = 0; j < grid[0].length; j++) {
+        if (grid[i][j] == 1)
+          pg.rect(i * m - m / 2, j * m - m / 2, m, m);
+      }
     }
     pg.popStyle();
     pg.popMatrix();
@@ -1528,6 +1539,12 @@ var SShader = function (p) {
         }
       }
     },
+    {
+      name: "holo",
+      f: function (self, seq) {
+        self.curName = "holo";
+      }
+    },
   ]);
   for (let i = 0; i < npgs; i++) {
     fpgs[i] = p.createGraphics(windowWidth, windowWidth, p.P3D);
@@ -1640,7 +1657,7 @@ var SShader = function (p) {
   ];
   params["holo"] = [
     {
-      "tex19":  "bpgs[0]",
+      "tex19": "bpgs[0]",
       "frequency1": 10,
       "sync2": 0.2,
       "offset3": 0.1,
@@ -2342,6 +2359,17 @@ var s = function (p) {
           ppg.endDraw();
         }
       },
+      {
+        name: "pixelate",
+        f: function (lpg, ppg) {
+          ppg.beginDraw();
+          ppg.clear();
+          postShaders["pixelate"].set("delta", 3.0);
+          ppg.image(lpg, 0, 0);
+          ppg.filter(postShaders["pixelate"]);
+          ppg.endDraw();
+        }
+      },
     ]))
   }
 
@@ -2379,7 +2407,7 @@ var s = function (p) {
       postAssets[i].update();
     }
 
-    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert", "mpeg", "radial", "darktoalpha"];
+    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert", "mpeg", "radial", "darktoalpha", "pixelate"];
     for (let i in shaderTypes) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }
