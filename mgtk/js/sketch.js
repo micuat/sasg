@@ -2025,30 +2025,17 @@ var STemplate = function (p) {
 var s = function (p) {
   let name;
   let sLines = new SLines(p);
-  let sCircleMorph = new SCircleMorph(p);
-  let sStarField = new SStarField(p);
+  // let sCircleMorph = new SCircleMorph(p);
+  // let sStarField = new SStarField(p);
   let sGameOfLife = new SGameOfLife(p);
   let sRibbons = new SRibbons(p);
   let sBeesAndBombs = new SBeesAndBombs(p);
   let sFace = new SFace(p);
   let sLangtonAnt = new SLangtonAnt(p);
-  let sDoublePendulum = new SDoublePendulum(p);
+  // let sDoublePendulum = new SDoublePendulum(p);
   let sShader = new SShader(p);
-  let sWarehouse = new SWarehouse(p);
+  // let sWarehouse = new SWarehouse(p);
   let sTerrain = new STerrain(p);
-
-  sLines.setup();
-  sCircleMorph.setup();
-  sStarField.setup();
-  sGameOfLife.setup();
-  sRibbons.setup();
-  sBeesAndBombs.setup();
-  sFace.setup();
-  sLangtonAnt.setup();
-  sDoublePendulum.setup();
-  sShader.setup();
-  sWarehouse.setup();
-  sTerrain.setup();
 
   let startFrame;
   let beatFader = 1;
@@ -2079,29 +2066,29 @@ var s = function (p) {
           sLines.setup();
         }
       },
-      {
-        name: "circleMorph",
-        f: function (tween, pg) {
-          pg.beginDraw();
-          pg.clear();
-          pg.endDraw();
-          let alpha = 1.0 - tween;
-          p.push();
-          p.stroke(255, beatFader * alpha * 255);
-          sCircleMorph.draw();
-          p.pop();
-        }
-      },
-      {
-        name: "starField",
-        f: function (tween, pg) {
-          sStarField.pg = pg;
-          sStarField.tween = tween;
-          let alpha = 1.0 - tween;
-          sStarField.alpha = alpha * beatFader;
-          sStarField.draw();
-        }
-      },
+      // {
+      //   name: "circleMorph",
+      //   f: function (tween, pg) {
+      //     pg.beginDraw();
+      //     pg.clear();
+      //     pg.endDraw();
+      //     let alpha = 1.0 - tween;
+      //     p.push();
+      //     p.stroke(255, beatFader * alpha * 255);
+      //     sCircleMorph.draw();
+      //     p.pop();
+      //   }
+      // },
+      // {
+      //   name: "starField",
+      //   f: function (tween, pg) {
+      //     sStarField.pg = pg;
+      //     sStarField.tween = tween;
+      //     let alpha = 1.0 - tween;
+      //     sStarField.alpha = alpha * beatFader;
+      //     sStarField.draw();
+      //   }
+      // },
       {
         name: "gameOfLife",
         f: function (tween, pg) {
@@ -2184,22 +2171,22 @@ var s = function (p) {
           sLangtonAnt.setup();
         }
       },
-      {
-        name: "doublePendulum",
-        f: function (tween, pg) {
-          pg.beginDraw();
-          pg.clear();
-          pg.endDraw();
-          let alpha = 1.0 - tween;
-          sDoublePendulum.pg = pg;
-          sDoublePendulum.tween = tween;
-          sDoublePendulum.alpha = alpha * beatFader;
-          sDoublePendulum.draw();
-        },
-        setup: function () {
-          sDoublePendulum.setup();
-        }
-      },
+      // {
+      //   name: "doublePendulum",
+      //   f: function (tween, pg) {
+      //     pg.beginDraw();
+      //     pg.clear();
+      //     pg.endDraw();
+      //     let alpha = 1.0 - tween;
+      //     sDoublePendulum.pg = pg;
+      //     sDoublePendulum.tween = tween;
+      //     sDoublePendulum.alpha = alpha * beatFader;
+      //     sDoublePendulum.draw();
+      //   },
+      //   setup: function () {
+      //     sDoublePendulum.setup();
+      //   }
+      // },
       {
         name: "shader",
         f: function (tween, pg) {
@@ -2232,22 +2219,22 @@ var s = function (p) {
       //     sFeedbackShader.setup();
       //   }
       // },
-      {
-        name: "warehouse",
-        f: function (tween, pg) {
-          pg.beginDraw();
-          pg.clear();
-          pg.endDraw();
-          let alpha = 1.0 - tween;
-          sWarehouse.pg = pg;
-          sWarehouse.tween = tween;
-          sWarehouse.alpha = alpha * beatFader;
-          sWarehouse.draw();
-        },
-        setup: function () {
-          sWarehouse.setup();
-        }
-      },
+      // {
+      //   name: "warehouse",
+      //   f: function (tween, pg) {
+      //     pg.beginDraw();
+      //     pg.clear();
+      //     pg.endDraw();
+      //     let alpha = 1.0 - tween;
+      //     sWarehouse.pg = pg;
+      //     sWarehouse.tween = tween;
+      //     sWarehouse.alpha = alpha * beatFader;
+      //     sWarehouse.draw();
+      //   },
+      //   setup: function () {
+      //     sWarehouse.setup();
+      //   }
+      // },
       {
         name: "terrain",
         f: function (tween, pg) {
@@ -2461,6 +2448,21 @@ var s = function (p) {
   }
 
   p.draw = function () {
+    if(p.frameCount == 10) {
+      ss = [sLines, sGameOfLife, sRibbons, sBeesAndBombs, sFace, sLangtonAnt, sShader, sTerrain]
+      for(let i in ss) {
+        ss[i].setup();
+        ss[i].setup();
+        ss[i].pg = layerPgs[0];
+        for(let j = 0; j < 60; j++) {
+          ss[i].draw();
+        }
+        ss[i].setup();
+      }
+      layerPgs[0].beginDraw();
+      layerPgs[0].clear();
+      layerPgs[0].endDraw();
+    }
     p.background(0);
     tElapsed = p.millis() * 0.001 + p.oscFaders[1];
     let t = tElapsed * (bpm / 120.0);
