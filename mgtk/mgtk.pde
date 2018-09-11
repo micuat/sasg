@@ -54,7 +54,7 @@ MidiBus myBus;
 public ArrayList<Movie> movies = new ArrayList<Movie>();
 public Capture cam;
 
-OscP5 oscP5;
+public OscP5 oscP5;
 NetAddress myRemoteLocation;
 
 private static ScriptEngineManager engineManager;

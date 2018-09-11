@@ -2429,8 +2429,15 @@ var s = function (p) {
   }
 
   let activeLayerNum = 2;
+  let remoteLocation = new Packages.netP5.NetAddress("127.0.0.1", 6667);
+
+  function sendOsc() {
+    let m = new Packages.oscP5.OscMessage("/tw/ABCD/k/" + Math.floor(p.oscFaders[3] * 255));
+    p.oscP5.send(m, remoteLocation);
+  }
 
   p.draw = function () {
+    sendOsc();
     p.background(0);
     tElapsed = p.millis() * 0.001 + p.oscFaders[1];
     let t = tElapsed * (bpm / 120.0);
