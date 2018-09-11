@@ -114,12 +114,17 @@ var masterPreset = [
   {
     preset: [{ a: "shader", p: ["mpeg", "slide", "invert"], shader: ["random"] },
     { a: "terrain", p: ["rgbshift", "slide", "invert"] },
-    { a: "face", p: "darktoalpha", face: ["default", "wireframe"] }]
+    { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe"] }]
   },
   {
-    preset: ["starField", "ribbons", "brown"]
+    preset: [{ a: "shader", p: ["mpeg", "slide", "invert"], shader: ["random"] },
+    { a: "terrain", p: ["rgbshift", "slide", "invert"] },
+    { a: "face", p: "darktoalpha", face: ["body"] }]
   },
   { // 15
+    preset: ["starField", "ribbons", "brown"]
+  },
+  {
     preset: ["langtonAnt", "ribbons"]
   },
   {
@@ -1128,6 +1133,11 @@ var SFace = function (p) {
     {
       name: "default",
       f: function () {
+      }
+    },
+    {
+      name: "faceDelay",
+      f: function () {
         pg.fill(255);
         pg.noStroke();
         pg.beginShape(p.TRIANGLES);
@@ -1142,7 +1152,7 @@ var SFace = function (p) {
       }
     },
     {
-      name: "wireframe",
+      name: "faceWireframe",
       f: function () {
         let modPoints = [];
         for (let i = 0; i < p.facePoints.length; i++) {
@@ -1163,6 +1173,24 @@ var SFace = function (p) {
           pg.vertex(x, y, 0);
         }
         pg.endShape();
+      }
+    },
+    {
+      name: "body",
+      f: function () {
+        for (let i = 6; i < p.posePoints.length; i++) {
+          pg.noStroke();
+          pg.fill(255, 0, 0);
+          let x = p.map(p.posePoints[i][0], 0, 640, 80, 640 - 80);
+          let y = p.map(p.posePoints[i][1], 0, 480, 0, 360);
+          pg.ellipse(x, y, 14, 14)
+
+          pg.stroke(255);
+          pg.fill(255, 0, 0);
+          let x0 = p.map(p.posePoints[i-1][0], 0, 640, 80, 640 - 80);
+          let y0 = p.map(p.posePoints[i-1][1], 0, 480, 0, 360);
+          pg.line(x, y, x0, y0)
+        }
       }
     },
   ]);
@@ -1210,22 +1238,7 @@ var SFace = function (p) {
     let camH = p.cam.height * 640.0 / p.cam.width;
     pg.translate(0, (windowHeight - camH) * 0.5);
     pg.image(p.cam, 0, 0, 640, camH);
-    // pg.image(p.cam, 0, 0, 1280 / 2, 720 / 2);
 
-    // body
-    {
-      pg.noStroke();
-      pg.fill(255, 0, 0);
-      for (let i = 0; i < p.posePoints.length; i++) {
-        // let x = p.facePoints[i][0] * 0.5;
-        // let y = p.facePoints[i][1] * 0.5;
-        let x = p.map(p.posePoints[i][0], 0, 640, 80, 640 - 80);
-        let y = p.map(p.posePoints[i][1], 0, 480, 0, 360);
-        pg.ellipse(x, y, 14, 14)
-      }
-    }
-
-    // face
     funcAsset.exec();
     pg.popStyle();
     pg.popMatrix();
