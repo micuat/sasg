@@ -1966,7 +1966,7 @@ var s = function (p) {
         f: function (lpg, ppg) {
           ppg.beginDraw();
           ppg.clear();
-          postShaders["rgbshift"].set("delta", 300.0 * dampedFaders[2]);
+          postShaders["rgbshift"].set("delta", 300.0 * dampedFaders[2] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 1.0) * 0.5 + 0.5));
           ppg.image(lpg, 0, 0);
           ppg.filter(postShaders["rgbshift"]);
           ppg.endDraw();
@@ -1978,7 +1978,7 @@ var s = function (p) {
           ppg.beginDraw();
           ppg.clear();
           postShaders["slide"].set("time", tElapsed);
-          postShaders["slide"].set("delta", 0.1 * dampedFaders[2]);
+          postShaders["slide"].set("delta", 0.1 * dampedFaders[2] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 1.0) * 0.5 + 0.5));
           ppg.image(lpg, 0, 0);
           ppg.filter(postShaders["slide"]);
           ppg.endDraw();
@@ -1994,7 +1994,7 @@ var s = function (p) {
           for (let i = 0; i < 10; i++) {
             ppg.beginDraw();
             ppg.clear();
-            postShaders["bloom"].set("delta", 0.1 * dampedFaders[2]);
+            postShaders["bloom"].set("delta", 0.1 * dampedFaders[2] * (Math.cos(tElapsed * (bpm / 120.0) * Math.PI * 1.0) * 0.5 + 0.5));
             ppg.image(lpg, 0, 0);
             ppg.filter(postShaders["bloom"]);
             ppg.endDraw();
@@ -2013,7 +2013,7 @@ var s = function (p) {
         f: function (lpg, ppg) {
           ppg.beginDraw();
           ppg.clear();
-          postShaders["invert"].set("delta", Math.min(1.0, dampedFaders[2] * 5.0));
+          postShaders["invert"].set("delta", Math.min(1.0, dampedFaders[2] * 5.0 * (Math.cos(tElapsed * (bpm / 120.0) * Math.PI * 1.0) * 0.5 + 0.5)));
           ppg.image(lpg, 0, 0);
           ppg.filter(postShaders["invert"]);
           ppg.endDraw();
