@@ -1674,7 +1674,7 @@ var SShader = function (p) {
       "r4": 1,
       "g5": 0,
       "b6": 1,
-      "amount7": 0.03,
+      "amount7": "Math.sin(tElapsed * 0.1)",//0.03,
       "amount10": 0.1,
       "render": 0
     },
