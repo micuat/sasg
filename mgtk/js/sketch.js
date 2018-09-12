@@ -1103,8 +1103,8 @@ var SBeesAndBombs = function (p) {
         let d = p.dist(x, z, winh / 2, winh / 2);
         let offset = p.map(d, 0, maxD, -p.PI, p.PI);
         let a = angle + -offset;
-        let h = p.floor(p.map(p.sin(a), -1, 1, 0.5, 1) * winh);
-        h = p.map(decay, 0, 1, winh, h);
+        let h = winh;//p.floor(p.map(p.sin(a), -1, 1, 0.5, 1) * winh);
+        //h = p.map(decay, 0, 1, winh, h);
         let y = funcAsset.exec(seq, this.tween, x, z);
         pg.translate(x - winh / 2, y, z - winh / 2);
         // p.normalMaterial();
