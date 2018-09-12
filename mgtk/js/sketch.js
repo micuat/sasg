@@ -1698,6 +1698,7 @@ var STerrain = function (p) {
       let xoff = 0;
       for (let x = 0; x < cols; x++) {
         terrain[x][y] = p.map(p.noise(xoff, yoff), 0, 1, -100, 100);
+        terrain[x][y] = p.lerp(terrain[x][y], Math.cos(x * 0.1)*200, dampedFaders[12] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5) * 0.5 + 0.5));
         xoff += 0.2;
       }
       yoff += 0.2;
