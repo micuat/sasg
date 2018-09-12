@@ -114,13 +114,13 @@ var masterPreset = [
     preset: [{ a: "shader", p: "kaleid" }]
   },
   {
-    preset: [{ a: "shader", p: ["mpeg", "slide", "invert"], shader: ["random"] },
-    { a: "terrain", p: ["rgbshift", "slide", "invert"] },
+    preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
+    // { a: "terrain", p: ["rgbshift", "slide", "invert"] },
     { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe"] }]
   },
   {
-    preset: [{ a: "shader", p: ["mpeg", "slide", "invert"], shader: ["random"] },
-    { a: "terrain", p: ["rgbshift", "slide", "invert"] },
+    preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
+    // { a: "terrain", p: ["rgbshift", "slide", "invert"] },
     { a: "face", p: "darktoalpha", face: ["body"] }]
   },
   { // 15
@@ -1553,6 +1553,18 @@ var SShader = function (p) {
       name: "holo",
       f: function (self, seq) {
         self.curName = "holo";
+      }
+    },
+    {
+      name: "tri",
+      f: function (self, seq) {
+        self.curName = "tri";
+      }
+    },
+    {
+      name: "modwave",
+      f: function (self, seq) {
+        self.curName = "modwave";
       }
     },
   ]);
