@@ -2551,7 +2551,7 @@ var s = function (p) {
         ss[i].setup();
         ss[i].setup();
         ss[i].pg = layerPgs[0];
-        for(let j = 0; j < 60; j++) {
+        for(let j = 0; j < 10; j++) {
           ss[i].draw();
         }
         ss[i].setup();
