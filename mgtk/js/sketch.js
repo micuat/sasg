@@ -81,7 +81,7 @@ var masterPreset = [
   },
   {
     preset: [{ a: "beesAndBombs", p: "bloom" },
-    { a: "lines", p: "default", lines: [linePreset.toUpFlat, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
+    { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.toUpFlat, linePreset.toDownFlat] }]
   },
   {
     preset: [{ a: "beesAndBombs", p: "bloom" },
