@@ -106,13 +106,15 @@ var masterPreset = [
     { a: "lines", p: "default", lines: [linePreset.sig, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
   },
   { // 10
-    preset: [{ a: "shader", p: "kaleid" }, { a: "terrain", p: "rgbshift" }, { a: "ribbons", p: "slide" },
+    preset: [{ a: "shader", p: "kaleid" },
+    { a: "terrain", p: "rgbshift" },
+    { a: "ribbons", p: "slide" },
     { a: "lines", p: "default", lines: [linePreset.sig, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
   },
-  {
-    preset: [{ a: "shader", p: "kaleid" },
-    { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
-  },
+  // {
+  //   preset: [{ a: "shader", p: "kaleid" },
+  //   { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
+  // },
   {
     preset: [{ a: "shader", p: "kaleid" }]
   },
