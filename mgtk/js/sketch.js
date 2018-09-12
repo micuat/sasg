@@ -667,7 +667,7 @@ var SLines = function (p) {
 
     pg.pushMatrix();
     pg.pushStyle();
-    pg.translate(windowWidth / 2, windowHeight / 2);
+    pg.translate(windowWidth / 2, windowHeight / 2 + p.map(p.oscFaders[10], 0, 1, -windowHeight, 0));
     function drawBeat() {
       // beatFader = p.oscFaders[3];
       pg.stroke(255, 255 * beatFader);
@@ -2044,7 +2044,7 @@ var STerrain = function (p) {
     pg.clear();
     pg.pushMatrix();
     pg.pushStyle();
-    pg.translate(p.width / 2, p.height / 2);
+    pg.translate(p.width / 2, p.height / 2 + p.map(p.oscFaders[10], 0, 1, windowHeight, 0));
 
     pg.directionalLight(90, 195, 126, -1, 0, 0);
     pg.pointLight(140, 135, 196, 300, -100, 1000);
