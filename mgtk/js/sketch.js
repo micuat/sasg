@@ -17,6 +17,8 @@ var lastPreset = 0;
 
 var reloaded = true;
 
+var dampedFaders = new Array(20);
+
 var linePreset = {
   default: {
     globalTransformFunc: ["default"],
@@ -107,17 +109,18 @@ var masterPreset = [
   },
   { // 10
     preset: [{ a: "shader", p: "kaleid" },
-    { a: "terrain", p: "rgbshift" },
     { a: "ribbons", p: "slide" },
     { a: "lines", p: "default", lines: [linePreset.sig, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
   },
-  // {
-  //   preset: [{ a: "shader", p: "kaleid" },
-  //   { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
-  // },
   {
-    preset: [{ a: "shader", p: "kaleid" }]
+    preset: [{ a: "shader", p: "kaleid" },
+    { a: "terrain", p: "rgbshift" },
+    // { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }
+    ]
   },
+  // {
+  //   preset: [{ a: "shader", p: "kaleid" }]
+  // },
   {
     preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
     // { a: "terrain", p: ["rgbshift", "slide", "invert"] },
@@ -128,7 +131,7 @@ var masterPreset = [
     // { a: "terrain", p: ["rgbshift", "slide", "invert"] },
     { a: "face", p: "darktoalpha", face: ["body"] }]
   },
-  { // 15
+  {
     preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
     { a: ["default", "gameOfLife", "langtonAnt"], p: ["rgbshift"] }]
   },
@@ -667,9 +670,9 @@ var SLines = function (p) {
 
     pg.pushMatrix();
     pg.pushStyle();
-    pg.translate(windowWidth / 2, windowHeight / 2 + p.map(p.oscFaders[10], 0, 1, -windowHeight, 0));
+    pg.translate(windowWidth / 2, windowHeight / 2 + p.map(dampedFaders[10], 0, 1, -windowHeight, 0));
     function drawBeat() {
-      // beatFader = p.oscFaders[3];
+      // beatFader = dampedFaders[3];
       pg.stroke(255, 255 * beatFader);
       pg.strokeWeight(2);
 
@@ -1919,8 +1922,8 @@ var SFeedbackShader = function (p) {
         curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
         oscShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
         oscShader.set("bgColor1", backCol[0], backCol[1], backCol[2]);
-        oscShader.set("phaseFader", p.oscFaders[5]);
-        oscShader.set("xFader", p.oscFaders[6] * 10.0);
+        oscShader.set("phaseFader", dampedFaders[5]);
+        oscShader.set("xFader", dampedFaders[6] * 10.0);
         oscShader.set("oscNum", i * 1.0);
         oscShader.set("backTex", backPg);
         let oscPg = oscPgs[i];
@@ -1938,11 +1941,11 @@ var SFeedbackShader = function (p) {
       texShader.set("osc1Tex", oscPgs[1]);
       texShader.set("osc2Tex", oscPgs[2]);
       texShader.set("backTex", backPg);
-      texShader.set("feedbackFader", 1.0 - Math.pow(1.0 - p.oscFaders[4], 4.0));
-      texShader.set("phaseFader", p.oscFaders[5]);
-      texShader.set("xFader", p.oscFaders[6] * 10.0);
-      texShader.set("rAmountFader", p.oscFaders[7] * 1.0);
-      texShader.set("modulationFader", p.oscFaders[19] * 1.0);
+      texShader.set("feedbackFader", 1.0 - Math.pow(1.0 - dampedFaders[4], 4.0));
+      texShader.set("phaseFader", dampedFaders[5]);
+      texShader.set("xFader", dampedFaders[6] * 10.0);
+      texShader.set("rAmountFader", dampedFaders[7] * 1.0);
+      texShader.set("modulationFader", dampedFaders[19] * 1.0);
       frontPg.beginDraw();
       frontPg.filter(texShader);
       frontPg.endDraw();
@@ -1958,7 +1961,7 @@ var SFeedbackShader = function (p) {
     pg.pushStyle();
 
     levelShader.set("pgTexture", frontPg);
-    levelShader.set("masterFader", p.oscFaders[0] * 1.0);
+    levelShader.set("masterFader", dampedFaders[0] * 1.0);
     levelShader.set("seq", seq % 4.0);
     if (true || shaderUpdated == false) {
       pg.filter(levelShader);
@@ -2044,7 +2047,7 @@ var STerrain = function (p) {
     pg.clear();
     pg.pushMatrix();
     pg.pushStyle();
-    pg.translate(p.width / 2, p.height / 2 + p.map(p.oscFaders[10], 0, 1, windowHeight, 0));
+    pg.translate(p.width / 2, p.height / 2 + p.map(dampedFaders[10], 0, 1, windowHeight, 0));
 
     pg.directionalLight(90, 195, 126, -1, 0, 0);
     pg.pointLight(140, 135, 196, 300, -100, 1000);
@@ -2297,8 +2300,8 @@ var s = function (p) {
           pg.endDraw();
           let alpha = 1.0 - tween;
           sShader.pg = pg;
-          sShader.fader8 = p.oscFaders[8];
-          sShader.fader9 = p.oscFaders[9];
+          sShader.fader8 = dampedFaders[8];
+          sShader.fader9 = dampedFaders[9];
           sShader.draw();
         },
         setup: function () {
@@ -2383,7 +2386,7 @@ var s = function (p) {
         f: function (lpg, ppg) {
           ppg.beginDraw();
           ppg.clear();
-          postShaders["rgbshift"].set("delta", 300.0 * p.oscFaders[2]);
+          postShaders["rgbshift"].set("delta", 300.0 * dampedFaders[2]);
           ppg.image(lpg, 0, 0);
           ppg.filter(postShaders["rgbshift"]);
           ppg.endDraw();
@@ -2395,7 +2398,7 @@ var s = function (p) {
           ppg.beginDraw();
           ppg.clear();
           postShaders["slide"].set("time", tElapsed);
-          postShaders["slide"].set("delta", 0.1 * p.oscFaders[2]);
+          postShaders["slide"].set("delta", 0.1 * dampedFaders[2]);
           ppg.image(lpg, 0, 0);
           ppg.filter(postShaders["slide"]);
           ppg.endDraw();
@@ -2411,7 +2414,7 @@ var s = function (p) {
           for (let i = 0; i < 10; i++) {
             ppg.beginDraw();
             ppg.clear();
-            postShaders["bloom"].set("delta", 0.1 * p.oscFaders[2]);
+            postShaders["bloom"].set("delta", 0.1 * dampedFaders[2]);
             ppg.image(lpg, 0, 0);
             ppg.filter(postShaders["bloom"]);
             ppg.endDraw();
@@ -2430,7 +2433,7 @@ var s = function (p) {
         f: function (lpg, ppg) {
           ppg.beginDraw();
           ppg.clear();
-          postShaders["invert"].set("delta", Math.min(1.0, p.oscFaders[2] * 5.0));
+          postShaders["invert"].set("delta", Math.min(1.0, dampedFaders[2] * 5.0));
           ppg.image(lpg, 0, 0);
           ppg.filter(postShaders["invert"]);
           ppg.endDraw();
@@ -2521,9 +2524,13 @@ var s = function (p) {
     for (let i in shaderTypes) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }
+
+    for(let i = 0; i < dampedFaders.length; i++) {
+      dampedFaders[i] = p.oscFaders[i];
+    }
   }
 
-  p.getCount = function () { return p.frameCount - startFrame + Math.floor(p.oscFaders[1] * 60) };
+  p.getCount = function () { return p.frameCount - startFrame + Math.floor(dampedFaders[1] * 60) };
 
   p.keyPressed = function () {
     if(p.key == 'a') {
@@ -2536,8 +2543,8 @@ var s = function (p) {
 
   function sendOsc() {
     let amount = 255;
-    // if(tElapsed * (bpm / 120.0) % 1.0 > p.oscFaders[3]) amount = 0;
-    amount = Math.floor((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 2.0) * 128 + 128) * p.oscFaders[3]);
+    // if(tElapsed * (bpm / 120.0) % 1.0 > dampedFaders[3]) amount = 0;
+    amount = Math.floor((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 2.0) * 128 + 128) * dampedFaders[3]);
     let m = new Packages.oscP5.OscMessage("/tw/ABCD/k/" + amount);
     p.oscP5.send(m, remoteLocation);
 
@@ -2555,6 +2562,9 @@ var s = function (p) {
   }
 
   p.draw = function () {
+    for(let i = 0; i < dampedFaders.length; i++) {
+      dampedFaders[i] = p.lerp(dampedFaders[i], p.oscFaders[i], 0.1);
+    }
     if(p.frameCount > 10 && reloaded) {
       ss = [sLines, sGameOfLife, sRibbons, sBeesAndBombs, sFace, sLangtonAnt, sShader, sTerrain]
       for(let i in ss) {
@@ -2573,7 +2583,7 @@ var s = function (p) {
       reloaded = false;
     }
     p.background(0);
-    tElapsed = (p.millis() - startTime) * 0.001 + p.oscFaders[1];
+    tElapsed = (p.millis() - startTime) * 0.001 + dampedFaders[1];
     let t = tElapsed * (bpm / 120.0);
     seq = Math.floor(tElapsed * (bpm / 120.0));// + p.seqOffset;
 
