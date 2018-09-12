@@ -2543,6 +2543,8 @@ var s = function (p) {
 
     if(seq != lastSeq) {
       // m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + 1);
+      m = new Packages.oscP5.OscMessage("/tw/ABCD/b/" + Math.floor(p.random(1)));
+      p.oscP5.send(m, remoteLocation);
       m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + Math.floor(p.random(2)));
       p.oscP5.send(m, remoteLocation);
       m = new Packages.oscP5.OscMessage("/tw/ABCD/b/" + 1);
