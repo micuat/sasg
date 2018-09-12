@@ -15,6 +15,8 @@ var mainPg;
 var curPreset = 0;
 var lastPreset = 0;
 
+var reloaded = true;
+
 var linePreset = {
   default: {
     globalTransformFunc: ["default"],
@@ -1142,6 +1144,7 @@ var SFace = function (p) {
   }
   let facePg = p.createGraphics(windowWidth, windowHeight, p.P3D);
 
+  let scaling = 1.5;
   let midiToPreset = getPreset("face", ["default"]);
 
   let funcAsset = new FuncList(4, [
@@ -1152,7 +1155,8 @@ var SFace = function (p) {
     },
     {
       name: "faceDelay",
-      f: function () {
+      f: function (getType) {
+        if(getType) return "face";
         pg.fill(255);
         pg.noStroke();
         pg.beginShape(p.TRIANGLES);
@@ -1168,7 +1172,8 @@ var SFace = function (p) {
     },
     {
       name: "faceWireframe",
-      f: function () {
+      f: function (getType) {
+        if(getType) return "face";
         let modPoints = [];
         for (let i = 0; i < p.facePoints.length; i++) {
           let tx = p.facePoints[i][0] * 0.5 * 1.5;
@@ -1204,7 +1209,8 @@ var SFace = function (p) {
     },
     {
       name: "faceLost",
-      f: function () {
+      f: function (getType) {
+        if(getType) return "face";
         pg.fill(255);
         pg.noStroke();
         for (let i = 0; i < faces.length; i+=3) {
@@ -1234,7 +1240,8 @@ var SFace = function (p) {
     },
     {
       name: "body",
-      f: function () {
+      f: function (getType) {
+        if(getType) return "body";
         for (let i = 8; i < p.posePoints.length; i++) {
           // pg.noStroke();
           // pg.fill(255, 0, 0);
@@ -1278,6 +1285,7 @@ var SFace = function (p) {
     }
 
     facePg.beginDraw();
+
     // face
     if (p.frameCount % 15 == 0) {
       facePg.clear();
@@ -1301,10 +1309,21 @@ var SFace = function (p) {
     pg.pushMatrix();
     pg.pushStyle();
     let camH = p.cam.height * 960 / p.cam.width;
+
+    if(funcAsset.exec(true) == "face") {
+      scaling = p.lerp(scaling, 1.5, 0.1);
+    }
+    else {
+      scaling = p.lerp(scaling, 1.0, 0.1);
+    }
+    pg.translate(windowWidth/2, windowHeight/2);
+    pg.scale(scaling, scaling);
+    pg.translate(-windowWidth/2, -windowHeight/2);
+
     pg.translate(0, (windowHeight - camH) * 0.5);
     pg.image(p.cam, 0, 0, 960, camH);
 
-    funcAsset.exec();
+    funcAsset.exec(false);
     pg.popStyle();
     pg.popMatrix();
     pg.endDraw();
@@ -2526,7 +2545,7 @@ var s = function (p) {
   }
 
   p.draw = function () {
-    if(p.frameCount == 10) {
+    if(p.frameCount > 10 && reloaded) {
       ss = [sLines, sGameOfLife, sRibbons, sBeesAndBombs, sFace, sLangtonAnt, sShader, sTerrain]
       for(let i in ss) {
         ss[i].setup();
@@ -2540,6 +2559,8 @@ var s = function (p) {
       layerPgs[0].beginDraw();
       layerPgs[0].clear();
       layerPgs[0].endDraw();
+
+      reloaded = false;
     }
     p.background(0);
     tElapsed = p.millis() * 0.001 + p.oscFaders[1];
