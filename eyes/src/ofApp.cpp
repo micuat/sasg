@@ -33,7 +33,7 @@ void ofApp::setup() {
             // USB capture
             int index = 0;
             for(int i = 0; i < cameras.size(); i++) {
-                if(cameras.at(i).deviceName == "USB Capture HDMI") {
+                if(cameras.at(i).deviceName.find("USB Capture HDMI") == 0) {
                     index = i;
                     break;
                 }

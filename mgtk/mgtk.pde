@@ -148,7 +148,13 @@ void setupCamera() {
 
     if(cameras.length > 15) {
       println("loading HD cam");
-      cam = new Capture(this, 1280, 720, "USB Capture HDMI", 30);
+      // cam = new Capture(this, 1280, 720, "USB Capture HDMI", 30);
+      for(int i = 0; i < cameras.length; i++) {
+        if(cameras[i].startsWith("name=USB Capture HDMI")) {
+          cam = new Capture(this, cameras[i]);
+          break;
+        }
+      }
     }
     else {
       println("loading builtin cam");
