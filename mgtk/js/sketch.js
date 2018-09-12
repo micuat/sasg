@@ -118,6 +118,9 @@ var masterPreset = [
     ]
   },
   {
+    preset: [{ a: "shader", p: "default", shader: ["holo"] }]
+  },
+  {
     preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
     { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe", "faceLost"] }]
   },
@@ -125,7 +128,7 @@ var masterPreset = [
     preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
     { a: "face", p: "darktoalpha", face: ["body"] }]
   },
-  {
+  { // 15 not used
     preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
     { a: ["default", "gameOfLife", "langtonAnt"], p: ["rgbshift"] }]
   },
@@ -1548,9 +1551,9 @@ var SShader = function (p) {
       "r15": 2,
       "g16": 2,
       "b17": 2,
-      "amount20": 0.5,
+      "amount20": "p.map(Math.pow(1-dampedFaders[13],4.0), 0, 1, 0.5, 1.0)",//0.5,
       "amount21": 0.001,
-      "amount22": 0.5,
+      "amount22": "p.map(Math.pow(1-dampedFaders[13],4.0), 0, 1, 0.5, 0.99)",//0.5
       "xMult23": 1,
       "yMult24": 1,
       "render": 0
