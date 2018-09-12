@@ -941,7 +941,7 @@ var SBeesAndBombs = function (p) {
         let y = 0;
         if (lastState == "inTransition") {
           if ((seq % 4.0) < 2.0) {
-            y = (tw * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+            y = ((tw+0.75) * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
             if (y > 0) y = 0;
           }
           else {
@@ -957,11 +957,11 @@ var SBeesAndBombs = function (p) {
         if(getName) return "inout";
         let y = 0;
         if ((seq % 4.0) < 2.0) {
-          y = (tw * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+          y = ((tw+0.75) * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
           if (y > 0) y = 0;
         }
         else if ((seq % 4.0) >= 2.0) {
-          y = (tw * 2 - (x / 2 + z - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+          y = ((tw+0.25) * 2 - (x / 2 + z - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
           if (y < 0) y = 0;
         }
         lastState = "inout";
@@ -2005,7 +2005,7 @@ var s = function (p) {
           for (let i = 0; i < 10; i++) {
             ppg.beginDraw();
             ppg.clear();
-            postShaders["bloom"].set("delta", 0.1 * dampedFaders[2] * (Math.cos(tElapsed * (bpm / 120.0) * Math.PI * 1.0) * 0.5 + 0.5));
+            postShaders["bloom"].set("delta", 0.1 * dampedFaders[2] * (-Math.cos(tElapsed * (bpm / 120.0) * Math.PI * 0.5) * 0.5 + 0.5));
             ppg.image(lpg, 0, 0);
             ppg.filter(postShaders["bloom"]);
             ppg.endDraw();
