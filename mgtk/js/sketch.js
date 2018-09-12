@@ -983,7 +983,7 @@ var SBeesAndBombs = function (p) {
       funcAsset.update(seq);
 
       if(seq % 4 == 0) {
-        shapeMode = (shapeMode + 1) % 4;
+        shapeMode = Math.floor(p.random(0, 4));
       }
     }
     pg.beginDraw();
@@ -1011,12 +1011,19 @@ var SBeesAndBombs = function (p) {
         let a = angle + -offset;
         let h = winh;//p.floor(p.map(p.sin(a), -1, 1, 0.5, 1) * winh);
         if(funcAsset.exec(true) == "inout") {
-          if(shapeMode == 1) {
+          if(shapeMode == 0) {
+            // cube
+          }
+          else if(shapeMode == 1) {
             let c = Math.sqrt((x - winh / 2)*(x - winh / 2)+(z - winh / 2)*(z - winh / 2))/winh;
             h *= Math.cos(c * Math.PI);
           }
-          else if(shapeMode == 3)
-            h *= Math.sin(Math.sqrt((x - winh / 2)*(x - winh / 2)+(z - winh / 2)*(z - winh / 2))) * 1.2;
+          else if(shapeMode == 2) {
+            h *= x / winh;
+          }
+          else if(shapeMode == 3) {
+            h *= Math.sin(Math.sqrt((x - winh / 2)*(x - winh / 2)+(z - winh / 2)*(z - winh / 2)) * 0.1) * 1.2;
+          }
         }
         //h = p.map(decay, 0, 1, winh, h);
         let y = funcAsset.exec(false, seq, this.tween, x, z);
