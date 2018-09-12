@@ -116,7 +116,7 @@ var masterPreset = [
   {
     preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
     // { a: "terrain", p: ["rgbshift", "slide", "invert"] },
-    { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe"] }]
+    { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe", "faceLost"] }]
   },
   {
     preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
@@ -1140,7 +1140,7 @@ var SFace = function (p) {
         pg.fill(255);
         pg.noStroke();
         pg.beginShape(p.TRIANGLES);
-        pg.texture(facePg)
+        pg.texture(facePg);
         for (let i = 0; i < faces.length; i++) {
           let idx = faces[i];
           let x = p.facePoints[idx][0] * 0.5 * 1.5;
@@ -1162,7 +1162,19 @@ var SFace = function (p) {
           modPoints[i] = { x: x, y: y };
         }
 
-        pg.stroke(255);
+        pg.fill(255);
+        pg.noStroke();
+        pg.beginShape(p.TRIANGLES);
+        pg.texture(facePg);
+        for (let i = 0; i < faces.length; i++) {
+          let idx = faces[i];
+          let x = modPoints[idx].x;
+          let y = modPoints[idx].y;
+          pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
+        }
+        pg.endShape();
+
+        pg.stroke(0);
         pg.noFill();
         pg.beginShape(p.TRIANGLES);
         for (let i = 0; i < faces.length; i++) {
@@ -1172,6 +1184,36 @@ var SFace = function (p) {
           pg.vertex(x, y, 0);
         }
         pg.endShape();
+      }
+    },
+    {
+      name: "faceLost",
+      f: function () {
+        pg.fill(255);
+        pg.noStroke();
+        for (let i = 0; i < faces.length; i+=3) {
+          if(p.random(1.0) > 0.5) {
+            pg.beginShape(p.TRIANGLES);
+            pg.texture(facePg);
+          }
+          else {
+            pg.fill(0);
+            pg.beginShape(p.TRIANGLES);
+          }
+          let idx = faces[i];
+          let x = p.facePoints[idx][0] * 0.5 * 1.5;
+          let y = p.facePoints[idx][1] * 0.5 * 1.5;
+          pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
+          idx = faces[i+1];
+          x = p.facePoints[idx][0] * 0.5 * 1.5;
+          y = p.facePoints[idx][1] * 0.5 * 1.5;
+          pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
+          idx = faces[i+2];
+          x = p.facePoints[idx][0] * 0.5 * 1.5;
+          y = p.facePoints[idx][1] * 0.5 * 1.5;
+          pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
+          pg.endShape();
+        }
       }
     },
     {
