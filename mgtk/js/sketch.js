@@ -2535,8 +2535,8 @@ var s = function (p) {
     p.oscP5.send(m, remoteLocation);
 
     if(seq != lastSeq) {
-      m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + 1);
-      // m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + Math.floor(p.random(2)));
+      // m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + 1);
+      m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + Math.floor(p.random(2)));
       p.oscP5.send(m, remoteLocation);
       m = new Packages.oscP5.OscMessage("/tw/ABCD/b/" + 1);
       p.oscP5.send(m, remoteLocation);
@@ -2617,7 +2617,8 @@ var s = function (p) {
 
     p.translate(p.width / 2, p.height / 2);
     p.fill(255);
-    p.text(p.str(seq % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 50);
+    p.text(p.str(seq % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 65);
+    p.text(p.str((seq * 2) % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 50);
     p.text(p.str(tElapsed % 1.0), -p.width / 2.0 + 20, p.height / 2.0 - 35);
     p.text("cur  preset: " + p.str(1 + curPreset), -p.width / 2.0 + 20, p.height / 2.0 - 20);
     p.text("next preset: " + p.str(1 + p.oscPreset), -p.width / 2.0 + 20, p.height / 2.0 - 5);
