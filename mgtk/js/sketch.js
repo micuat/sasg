@@ -1030,7 +1030,8 @@ var SBeesAndBombs = function (p) {
   let funcAsset = new FuncList(4, [
     {
       name: "default",
-      f: function (seq, tw, x, z) {
+      f: function (getName, seq, tw, x, z) {
+        if(getName) return "default";
         if (lastState == "inout") {
           lastState = "inTransition";
         }
@@ -1050,7 +1051,8 @@ var SBeesAndBombs = function (p) {
     },
     {
       name: "inout",
-      f: function (seq, tw, x, z) {
+      f: function (getName, seq, tw, x, z) {
+        if(getName) return "inout";
         let y = 0;
         if ((seq % 4.0) < 2.0) {
           y = (tw * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
@@ -1071,6 +1073,7 @@ var SBeesAndBombs = function (p) {
     maxD = p.dist(0, 0, 300, 300);
   }
 
+  let shapeMode = -1;
   this.draw = function () {
     if (this.pg == undefined || this.pg == null) return;
     pg = this.pg;
@@ -1079,6 +1082,10 @@ var SBeesAndBombs = function (p) {
       if (presetIndex >= midiToPreset.length) presetIndex = 0;
       funcAsset.preset = midiToPreset[presetIndex].preset;
       funcAsset.update(seq);
+
+      if(seq % 4 == 0) {
+        shapeMode = (shapeMode + 1) % 4;
+      }
     }
     pg.beginDraw();
     pg.clear();
@@ -1104,8 +1111,16 @@ var SBeesAndBombs = function (p) {
         let offset = p.map(d, 0, maxD, -p.PI, p.PI);
         let a = angle + -offset;
         let h = winh;//p.floor(p.map(p.sin(a), -1, 1, 0.5, 1) * winh);
+        if(funcAsset.exec(true) == "inout") {
+          if(shapeMode == 1) {
+            let c = Math.sqrt((x - winh / 2)*(x - winh / 2)+(z - winh / 2)*(z - winh / 2))/winh;
+            h *= Math.cos(c * Math.PI);
+          }
+          else if(shapeMode == 3)
+            h *= Math.sin(Math.sqrt((x - winh / 2)*(x - winh / 2)+(z - winh / 2)*(z - winh / 2))) * 1.2;
+        }
         //h = p.map(decay, 0, 1, winh, h);
-        let y = funcAsset.exec(seq, this.tween, x, z);
+        let y = funcAsset.exec(false, seq, this.tween, x, z);
         pg.translate(x - winh / 2, y, z - winh / 2);
         // p.normalMaterial();
         pg.box(w, h, w);
