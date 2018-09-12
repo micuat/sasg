@@ -13,6 +13,7 @@ var passPg;
 var mainPg;
 
 var curPreset = 0;
+var lastPreset = 0;
 
 var linePreset = {
   default: {
@@ -649,7 +650,7 @@ var SLines = function (p) {
       if (presetIndex >= midiToPreset.length) presetIndex = 0;
       unwrapPreset(newPreset, midiToPreset[presetIndex].preset[seq % 4]);
 
-      if (lastState == "none") {
+      if (lastState == "none" || lastPreset <= 1) {
         lastState = "appeared";
         newPreset["transformFunc"] = ["inFromTop"];
       }
@@ -2586,6 +2587,7 @@ var s = function (p) {
 
     // p.syphonServer.sendScreen();
     lastSeq = seq;
+    lastPreset = curPreset;
   }
 };
 
