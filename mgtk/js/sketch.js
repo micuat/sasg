@@ -1744,7 +1744,7 @@ var SShader = function (p) {
       "b8": 0.5,
       "xMult11": 1,
       "yMult12": 1,
-      "r13": 0.1,
+      "r13": "0.2+0.2*Math.sin(tElapsed * 0.1)",
       "g14": 0.4,
       "b15": 0.2,
       "angle17": 0.1,
