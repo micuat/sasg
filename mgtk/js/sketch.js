@@ -1200,7 +1200,7 @@ var SFace = function (p) {
         }
         pg.endShape();
 
-        pg.stroke(0);
+        pg.fill(0, 255, 0);
         pg.noFill();
         pg.beginShape(p.TRIANGLES);
         for (let i = 0; i < faces.length; i++) {
@@ -1224,7 +1224,7 @@ var SFace = function (p) {
             pg.texture(facePg);
           }
           else {
-            pg.fill(0);
+            pg.fill(0, 255, 0);
             pg.beginShape(p.TRIANGLES);
           }
           let idx = faces[i];
@@ -1255,7 +1255,7 @@ var SFace = function (p) {
           // pg.ellipse(x, y, 14, 14)
 
           // pg.stroke(255);
-          pg.fill(0);
+          pg.fill(0, 255, 0);
           pg.noStroke();
           pg.beginShape();
           pg.vertex(x, y);
@@ -1324,7 +1324,7 @@ var SFace = function (p) {
     pg.translate(windowWidth/2, windowHeight/2);
     pg.scale(scaling, scaling);
     pg.translate(-windowWidth/2, -windowHeight/2);
-    pg.translate(0, 100);
+    pg.translate(0, 80);
 
     pg.translate(0, (windowHeight - camH) * 0.5);
     pg.image(p.cam, 0, 0, 960, camH);
