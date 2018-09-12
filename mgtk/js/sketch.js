@@ -1631,7 +1631,7 @@ var SShader = function (p) {
       name: "randomBurst",
       f: function (self, seq) {
         self.curName = "spread";
-        if (seq % 4.0 < 2.0 && p.frameCount % 4 == 0) {
+        if (seq % 4.0 < 2.0 && p.frameCount % 15 == 0) {
           let index = Math.floor(Math.random() * names.length);
           self.curName = names[index];
         }
