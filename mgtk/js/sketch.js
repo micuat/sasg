@@ -1319,6 +1319,7 @@ var SFace = function (p) {
     pg.translate(windowWidth/2, windowHeight/2);
     pg.scale(scaling, scaling);
     pg.translate(-windowWidth/2, -windowHeight/2);
+    pg.translate(0, 100);
 
     pg.translate(0, (windowHeight - camH) * 0.5);
     pg.image(p.cam, 0, 0, 960, camH);
