@@ -2139,6 +2139,8 @@ var s = function (p) {
   let beatFader = 1;
   let postShaders = {};
 
+  let startTime = p.millis();
+
   let funcAssets = [];
   for (let i = 0; i < 16; i++) {
     funcAssets.push(new FuncList(4, [
@@ -2522,6 +2524,9 @@ var s = function (p) {
   p.getCount = function () { return p.frameCount - startFrame + Math.floor(p.oscFaders[1] * 60) };
 
   p.keyPressed = function () {
+    if(p.key == 'a') {
+      startTime = p.millis();
+    }
   }
 
   let activeLayerNum = 2;
@@ -2564,9 +2569,9 @@ var s = function (p) {
       reloaded = false;
     }
     p.background(0);
-    tElapsed = p.millis() * 0.001 + p.oscFaders[1];
+    tElapsed = (p.millis() - startTime) * 0.001 + p.oscFaders[1];
     let t = tElapsed * (bpm / 120.0);
-    seq = Math.floor(tElapsed * (bpm / 120.0)) + p.seqOffset;
+    seq = Math.floor(tElapsed * (bpm / 120.0));// + p.seqOffset;
 
     sendOsc();
 
@@ -2617,8 +2622,7 @@ var s = function (p) {
 
     p.translate(p.width / 2, p.height / 2);
     p.fill(255);
-    p.text(p.str(seq % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 65);
-    p.text(p.str((seq * 2) % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 50);
+    p.text(p.str(seq % 4.0), -p.width / 2.0 + 20, p.height / 2.0 - 50);
     p.text(p.str(tElapsed % 1.0), -p.width / 2.0 + 20, p.height / 2.0 - 35);
     p.text("cur  preset: " + p.str(1 + curPreset), -p.width / 2.0 + 20, p.height / 2.0 - 20);
     p.text("next preset: " + p.str(1 + p.oscPreset), -p.width / 2.0 + 20, p.height / 2.0 - 5);
