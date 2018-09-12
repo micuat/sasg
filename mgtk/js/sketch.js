@@ -115,38 +115,20 @@ var masterPreset = [
   {
     preset: [{ a: "shader", p: "kaleid" },
     { a: "terrain", p: "rgbshift" },
-    // { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }
     ]
   },
-  // {
-  //   preset: [{ a: "shader", p: "kaleid" }]
-  // },
   {
     preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
-    // { a: "terrain", p: ["rgbshift", "slide", "invert"] },
     { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe", "faceLost"] }]
   },
   {
     preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
-    // { a: "terrain", p: ["rgbshift", "slide", "invert"] },
     { a: "face", p: "darktoalpha", face: ["body"] }]
   },
   {
     preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
     { a: ["default", "gameOfLife", "langtonAnt"], p: ["rgbshift"] }]
   },
-  // {
-  //   preset: ["starField", "ribbons", "brown"]
-  // },
-  // {
-  //   preset: ["brown", "doublePendulum"]
-  // },
-  // {
-  //   preset: [{ a: "shader", p: "kaleid" }, { a: "ribbons", p: "rgbshift" }]
-  // },
-  // {
-  //   preset: ["warehouse", "brown"]
-  // },
 ];
 
 function getPreset(name, defaultPreset) {
@@ -690,96 +672,6 @@ var SLines = function (p) {
     pg.popMatrix();
     pg.endDraw();
   };
-};
-
-var SCircleMorph = function (p) {
-  let cirPath = [];
-  let triPath = [];
-  let spacing = 20;
-  let theta = 0;
-  let seq = 0;
-
-  polarToCartesian = function (r, angle) {
-    return p.createVector(r * p.cos(angle), r * p.sin(angle));
-  }
-
-  this.setup = function () {
-    // p.createCanvas(800, 800);
-    // p.angleMode(p.DEGREES);
-    let radius = 200;
-    let startA = 0;
-    let endA = 120;
-    let start = polarToCartesian(radius, p.radians(startA));
-    let end = polarToCartesian(radius, p.radians(endA));
-    for (let a = startA; a < 360; a += spacing) {
-      let cv = polarToCartesian(radius, p.radians(a));
-      cirPath.push(cv);
-      let amt = (a % 120) / (endA - startA);
-      let tv = p5.Vector.lerp(start, end, amt);
-      triPath.push(tv);
-
-      if ((a + spacing) % 120 === 0) {
-        startA = startA + 120;
-        endA = endA + 120;
-        start = polarToCartesian(radius, p.radians(startA));
-        end = polarToCartesian(radius, p.radians(endA));
-      }
-    }
-  }
-
-  this.draw = function () {
-    t = p.frameCount / 30.0;
-    seq = Math.floor((p.frameCount % 120) / 30);
-    // p.background(255);
-    p.push();
-    p.scale(p.height / 800.0, p.height / 800.0);
-    p.translate(p.width / 2, p.height / 2 + 50);
-
-    let shape = p.createShape();
-    shape.beginShape();
-    shape.noFill();
-    theta = t * p.TWO_PI;
-    let amt = 1 - (p.sin(theta) + 1) / 2 / 2;
-    for (let i = 0; i < cirPath.length; i++) {
-      let th = -p.cos(i / cirPath.length * 6 * p.PI);
-      th = p.map(th, -1, 1, 0, 8);
-      th = p.lerp(8, th, amt);
-      // p.strokeWeight(th);
-      let cv = cirPath[i];
-      let tv = triPath[i];
-      let x = p.lerp(cv.x, tv.x, amt);
-      let y = p.lerp(cv.y, tv.y, amt);
-      shape.vertex(x, y);
-    }
-    shape.endShape(p.CLOSE);
-
-    for (let i = -2; i <= 1; i++) {
-      for (let j = -5; j <= 4; j++) {
-        p.push();
-        p.translate(j * 200 * p.sqrt(3), i * 300);
-        if ((i + 10) % 2 == 1) {
-          p.translate(100 * p.sqrt(3), 0);
-        }
-        p.rotate(p.radians(30));
-
-        if (seq == 0 && t > 0.5) {
-          p.rotate(t * p.TWO_PI * 2 / 3);
-          let sc = p.cos(t * p.TWO_PI * 2);
-          sc = p.map(sc, -1, 1, 0.75, 1);
-          p.scale(sc, sc);
-        }
-        if (seq == 2 && t > 0.5) {
-          p.rotate(-t * p.TWO_PI * 2 / 3);
-          let sc = p.cos(t * p.TWO_PI * 2);
-          sc = p.map(sc, -1, 1, 0.75, 1);
-          p.scale(sc, sc);
-        }
-        p.shape(shape, 0, 0);
-        p.pop();
-      }
-    }
-    p.pop();
-  }
 };
 
 var SStarField = function (p) {
@@ -1336,40 +1228,6 @@ var SFace = function (p) {
   };
 };
 
-var SBrown = function (p) {
-  let shape = p.loadShape("data/models/line_brown.obj");
-
-  this.setup = function () {
-  }
-
-  this.draw = function () {
-    if (this.pg == undefined || this.pg == null) return;
-    pg = this.pg;
-
-    pg.beginDraw();
-    pg.clear();
-    pg.pushMatrix();
-    pg.translate(pg.width / 2, pg.height / 2);
-    pg.directionalLight(255, 255, 255, 1.5, 0.5, 1);
-    pg.directionalLight(255, 255, 255, -1.5, -0.5, 1);
-    for (let i = -1; i <= 1; i++) {
-      pg.pushMatrix();
-      pg.translate(windowWidth / 3 * i, 0);
-      pg.scale(5, -5, 5);
-      if (this.tween < 0) {
-        pg.rotateZ(-Math.pow(this.tween, 4.0) * Math.PI);
-      }
-      else {
-        pg.rotateZ(Math.pow(this.tween, 4.0) * Math.PI);
-      }
-      pg.shape(shape, 0, 0);
-      pg.popMatrix();
-    }
-    pg.popMatrix();
-    pg.endDraw();
-  }
-}
-
 var SLangtonAnt = function (p) {
   let pg;
   let grid;
@@ -1493,110 +1351,6 @@ var SLangtonAnt = function (p) {
     }
     return arr;
   }
-};
-
-var SDoublePendulum = function (p) {
-  function DP() {
-    this.r1 = 200;
-    this.r2 = 400;
-    this.m1 = 40;
-    this.m2 = 5;
-    this.a1 = 0;
-    this.a2 = 0;
-    this.a1_v = 0;
-    this.a2_v = 0;
-    this.g = 1;
-
-    this.a1 = Math.PI / 3;
-    this.a2 = Math.PI / 3;
-    this.cx = windowWidth / 2;
-    this.cy = 50;
-
-    this.px = [];
-    this.py = [];
-  }
-
-  DP.prototype.update = function () {
-    let num1 = -this.g * (2 * this.m1 + this.m2) * Math.sin(this.a1);
-    let num2 = -this.m2 * this.g * Math.sin(this.a1 - 2 * this.a2);
-    let num3 = -2 * Math.sin(this.a1 - this.a2) * this.m2;
-    let num4 = this.a2_v * this.a2_v * this.r2 + this.a1_v * this.a1_v * this.r1 * Math.cos(this.a1 - this.a2);
-    let den = this.r1 * (2 * this.m1 + this.m2 - this.m2 * Math.cos(2 * this.a1 - 2 * this.a2));
-    let a1_a = (num1 + num2 + num3 * num4) / den;
-
-    num1 = 2 * Math.sin(this.a1 - this.a2);
-    num2 = (this.a1_v * this.a1_v * this.r1 * (this.m1 + this.m2));
-    num3 = this.g * (this.m1 + this.m2) * Math.cos(this.a1);
-    num4 = this.a2_v * this.a2_v * this.r2 * this.m2 * Math.cos(this.a1 - this.a2);
-    den = this.r2 * (2 * this.m1 + this.m2 - this.m2 * Math.cos(2 * this.a1 - 2 * this.a2));
-    let a2_a = (num1 * (num2 + num3 + num4)) / den;
-
-    pg.pushMatrix();
-    pg.pushStyle();
-    pg.translate(this.cx, this.cy);
-    pg.stroke(255, 200);
-    pg.strokeWeight(2);
-
-    let x1 = this.r1 * Math.sin(this.a1);
-    let y1 = this.r1 * Math.cos(this.a1);
-
-    let x2 = x1 + this.r2 * Math.sin(this.a2);
-    let y2 = y1 + this.r2 * Math.cos(this.a2);
-
-
-    pg.line(0, 0, x1, y1);
-    pg.line(x1, y1, x2, y2);
-    pg.noStroke();
-    pg.fill(255, 150);
-    pg.ellipse(x2, y2, 15, 15);
-    this.px.push(x2);
-    this.py.push(y2);
-    if (this.px.length > 10) this.px.shift();
-    if (this.py.length > 10) this.py.shift();
-
-    for (let i in this.px) {
-      pg.ellipse(this.px[i], this.py[i], 15, 15);
-    }
-    pg.popStyle();
-    pg.popMatrix();
-
-    this.a1_v += a1_a;
-    this.a2_v += a2_a;
-    this.a1 += this.a1_v;
-    this.a2 += this.a2_v;
-  }
-
-  let dp;
-  this.setup = function () {
-    dp = [];
-    for (let i = 0; i < 3; i++) {
-      let d = new DP();
-      d.r1 = p.random(100, 102);
-      d.r2 = 200 - d.r1;
-      dp.push(d);
-    }
-  }
-
-  this.draw = function () {
-    if (this.pg == undefined || this.pg == null) return;
-    pg = this.pg;
-
-    pg.beginDraw();
-    pg.pushMatrix();
-    pg.pushStyle();
-
-    for (let i = 0; i < dp.length; i++) {
-      let d = dp[i];
-      pg.pushMatrix();
-      pg.translate((i - 1) * windowWidth / 3.0, 0);
-      d.update();
-      pg.popMatrix();
-    }
-    pg.popStyle();
-    pg.popMatrix();
-    pg.endDraw();
-  }
-
 };
 
 var SShader = function (p) {
@@ -1860,120 +1614,6 @@ var SShader = function (p) {
   }
 };
 
-var SFeedbackShader = function (p) {
-  let pg;
-  let frontPg;
-  let backPg;
-  var oscPgs;
-  let texShader, levelShader, oscShader;
-  let curCol = [0, 0, 0];
-
-  if (frontPg == undefined)
-    frontPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
-  if (backPg == undefined)
-    backPg = p.createGraphics(windowWidth, windowHeight, p.P3D);
-  if (oscPgs == undefined) {
-    oscPgs = [];
-    for (let i = 0; i < 3; i++) {
-      oscPgs.push(p.createGraphics(windowWidth, windowHeight, p.P3D));
-    }
-  }
-
-  function loadShaders() {
-    texShader = p.loadShader(p.sketchPath("shaders/frag.glsl"));
-    levelShader = p.loadShader(p.sketchPath("shaders/level.glsl"));
-    oscShader = p.loadShader(p.sketchPath("shaders/osc.glsl"));
-  }
-  loadShaders();
-
-  this.setup = function () {
-  }
-
-  this.draw = function () {
-    if (this.pg == undefined || this.pg == null) return;
-    pg = this.pg;
-
-    if (p.frameCount % 60 == 0) {
-      loadShaders();
-    }
-
-    let colorSc = [
-      [0, 255, 150],
-      [0, 155, 50],
-      [230, 230, 100],
-      [205, 70, 0],
-      [50, 100, 255],
-      [0, 70, 155],
-      [20, 205, 200],
-      [135, 30, 0]
-    ]
-
-    function drawShader() {
-      let backColIdx = Math.floor(tElapsed % 2) * 2 + 1;
-      let backCol = [colorSc[backColIdx][0] / 255.0,
-      colorSc[backColIdx][1] / 255.0,
-      colorSc[backColIdx][2] / 255.0];
-      backCol = [0, 0, 0];
-      for (let i = 0; i < oscPgs.length; i++) {
-        oscShader.set("iTime", tElapsed);
-        let frontColIdx = Math.floor(tElapsed % 2) * 2;
-        curCol[0] = p.lerp(curCol[0], colorSc[frontColIdx][0] / 255.0, 0.05);
-        curCol[1] = p.lerp(curCol[1], colorSc[frontColIdx][1] / 255.0, 0.05);
-        curCol[2] = p.lerp(curCol[2], colorSc[frontColIdx][2] / 255.0, 0.05);
-        oscShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
-        oscShader.set("bgColor1", backCol[0], backCol[1], backCol[2]);
-        oscShader.set("phaseFader", dampedFaders[5]);
-        oscShader.set("xFader", dampedFaders[6] * 10.0);
-        oscShader.set("oscNum", i * 1.0);
-        oscShader.set("backTex", backPg);
-        let oscPg = oscPgs[i];
-        oscPg.beginDraw();
-        oscPg.filter(oscShader);
-        oscPg.endDraw();
-      }
-
-      texShader.set("iTime", tElapsed);
-      texShader.set("bgColor0", curCol[0], curCol[1], curCol[2]);
-      texShader.set("bgColor1", colorSc[backColIdx][0] / 255.0,
-        colorSc[backColIdx][1] / 255.0,
-        colorSc[backColIdx][2] / 255.0);
-      texShader.set("osc0Tex", oscPgs[0]);
-      texShader.set("osc1Tex", oscPgs[1]);
-      texShader.set("osc2Tex", oscPgs[2]);
-      texShader.set("backTex", backPg);
-      texShader.set("feedbackFader", 1.0 - Math.pow(1.0 - dampedFaders[4], 4.0));
-      texShader.set("phaseFader", dampedFaders[5]);
-      texShader.set("xFader", dampedFaders[6] * 10.0);
-      texShader.set("rAmountFader", dampedFaders[7] * 1.0);
-      texShader.set("modulationFader", dampedFaders[19] * 1.0);
-      frontPg.beginDraw();
-      frontPg.filter(texShader);
-      frontPg.endDraw();
-
-      let intermediatePg = frontPg;
-      frontPg = backPg;
-      backPg = intermediatePg;
-    }
-    drawShader();
-
-    pg.beginDraw();
-    pg.pushMatrix();
-    pg.pushStyle();
-
-    levelShader.set("pgTexture", frontPg);
-    levelShader.set("masterFader", dampedFaders[0] * 1.0);
-    levelShader.set("seq", seq % 4.0);
-    if (true || shaderUpdated == false) {
-      pg.filter(levelShader);
-      pg.resetShader();
-    }
-
-    pg.popStyle();
-    pg.popMatrix();
-    pg.endDraw();
-  }
-};
-
 var SWarehouse = function (p) {
   let pg;
 
@@ -2128,14 +1768,12 @@ var STemplate = function (p) {
 var s = function (p) {
   let name;
   let sLines = new SLines(p);
-  // let sCircleMorph = new SCircleMorph(p);
   // let sStarField = new SStarField(p);
   let sGameOfLife = new SGameOfLife(p);
   let sRibbons = new SRibbons(p);
   let sBeesAndBombs = new SBeesAndBombs(p);
   let sFace = new SFace(p);
   let sLangtonAnt = new SLangtonAnt(p);
-  // let sDoublePendulum = new SDoublePendulum(p);
   let sShader = new SShader(p);
   // let sWarehouse = new SWarehouse(p);
   let sTerrain = new STerrain(p);
@@ -2171,19 +1809,6 @@ var s = function (p) {
           sLines.setup();
         }
       },
-      // {
-      //   name: "circleMorph",
-      //   f: function (tween, pg) {
-      //     pg.beginDraw();
-      //     pg.clear();
-      //     pg.endDraw();
-      //     let alpha = 1.0 - tween;
-      //     p.push();
-      //     p.stroke(255, beatFader * alpha * 255);
-      //     sCircleMorph.draw();
-      //     p.pop();
-      //   }
-      // },
       // {
       //   name: "starField",
       //   f: function (tween, pg) {
@@ -2250,19 +1875,6 @@ var s = function (p) {
           sFace.setup();
         }
       },
-      // {
-      //   name: "brown",
-      //   f: function (tween, pg) {
-      //     let alpha = 1.0 - tween;
-      //     sBrown.pg = pg;
-      //     sBrown.tween = tween;
-      //     sBrown.alpha = alpha * beatFader;
-      //     sBrown.draw();
-      //   },
-      //   setup: function () {
-      //     sBrown.setup();
-      //   }
-      // },
       {
         name: "langtonAnt",
         f: function (tween, pg) {
@@ -2276,22 +1888,6 @@ var s = function (p) {
           sLangtonAnt.setup();
         }
       },
-      // {
-      //   name: "doublePendulum",
-      //   f: function (tween, pg) {
-      //     pg.beginDraw();
-      //     pg.clear();
-      //     pg.endDraw();
-      //     let alpha = 1.0 - tween;
-      //     sDoublePendulum.pg = pg;
-      //     sDoublePendulum.tween = tween;
-      //     sDoublePendulum.alpha = alpha * beatFader;
-      //     sDoublePendulum.draw();
-      //   },
-      //   setup: function () {
-      //     sDoublePendulum.setup();
-      //   }
-      // },
       {
         name: "shader",
         f: function (tween, pg) {
@@ -2308,22 +1904,6 @@ var s = function (p) {
           sShader.setup();
         }
       },
-      // {
-      //   name: "feedbackShader",
-      //   f: function (tween, pg) {
-      //     pg.beginDraw();
-      //     pg.clear();
-      //     pg.endDraw();
-      //     let alpha = 1.0 - tween;
-      //     sFeedbackShader.pg = pg;
-      //     sFeedbackShader.tween = tween;
-      //     sFeedbackShader.alpha = alpha * beatFader;
-      //     sFeedbackShader.draw();
-      //   },
-      //   setup: function () {
-      //     sFeedbackShader.setup();
-      //   }
-      // },
       // {
       //   name: "warehouse",
       //   f: function (tween, pg) {
