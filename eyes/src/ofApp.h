@@ -215,4 +215,6 @@ public:
 	ofxPanel gui;
     
     ofxSyphonServer mainOutputSyphonServer;
+
+    bool doTracking;
 };

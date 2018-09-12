@@ -51,7 +51,9 @@ void ofApp::setup() {
 	shader.load("Shaders/tone");
 	ofEnableAlphaBlending();
     
-    mainOutputSyphonServer.setName("Face Output");
+//    mainOutputSyphonServer.setName("Face Output");
+
+    doTracking = true;
 }
 
 //--------------------------------------------------------------
@@ -77,7 +79,9 @@ void ofApp::setupGui() {
 
 //--------------------------------------------------------------
 void ofApp::update() {
-	if (testMode) {
+    if(!doTracking);
+
+    if (testMode) {
 		input0.update();
 		if (true || input0.isFrameNew()) {
 			tracker0.update(input0);
@@ -117,6 +121,7 @@ void ofApp::update() {
 //--------------------------------------------------------------
 void ofApp::draw() {
 	ofBackground(0);
+    if(!doTracking) return;
     grabber.draw(0,0);
     tracker0.drawDebug();
 
@@ -196,6 +201,9 @@ void ofApp::drawMainTexture() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
+    if(key == ' ') {
+        doTracking = !doTracking;
+    }
 }
 
 //--------------------------------------------------------------
