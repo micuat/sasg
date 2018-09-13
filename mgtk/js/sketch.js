@@ -136,6 +136,10 @@ var masterPreset = [
     preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
     { a: ["default", "gameOfLife", "langtonAnt"], p: ["rgbshift"] }]
   },
+  { // not used
+    preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
+    { a: ["warehouse"], p: ["rgbshift"] }]
+  },
 ];
 
 function getPreset(name, defaultPreset) {
@@ -1766,8 +1770,12 @@ var SWarehouse = function (p) {
     pg.pushMatrix();
     pg.pushStyle();
 
+    let yOrigin = 466;
     pg.translate(windowWidth / 2, windowHeight / 2);
-    pg.translate(0, 50, 400 * this.tween + 200)
+    pg.rotateX(p.map(dampedFaders[4] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5), 0, 1, 0, -Math.PI));
+    pg.rotateZ(p.map(dampedFaders[5] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5), 0, 1, 0, -Math.PI));
+    pg.translate(0, 50, yOrigin);
+    pg.translate(0, 0, p.map(dampedFaders[6] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5), 0, 1, 0, -500));
     pg.scale(-50, -50, -50);
     pg.shape(p.warehouseShape);
 
@@ -1914,7 +1922,7 @@ var s = function (p) {
   let sFace = new SFace(p);
   let sLangtonAnt = new SLangtonAnt(p);
   let sShader = new SShader(p);
-  // let sWarehouse = new SWarehouse(p);
+  let sWarehouse = new SWarehouse(p);
   let sTerrain = new STerrain(p);
 
   let startFrame;
@@ -2043,22 +2051,22 @@ var s = function (p) {
           sShader.setup();
         }
       },
-      // {
-      //   name: "warehouse",
-      //   f: function (tween, pg) {
-      //     pg.beginDraw();
-      //     pg.clear();
-      //     pg.endDraw();
-      //     let alpha = 1.0 - tween;
-      //     sWarehouse.pg = pg;
-      //     sWarehouse.tween = tween;
-      //     sWarehouse.alpha = alpha * beatFader;
-      //     sWarehouse.draw();
-      //   },
-      //   setup: function () {
-      //     sWarehouse.setup();
-      //   }
-      // },
+      {
+        name: "warehouse",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.clear();
+          pg.endDraw();
+          let alpha = 1.0 - tween;
+          sWarehouse.pg = pg;
+          sWarehouse.tween = tween;
+          sWarehouse.alpha = alpha * beatFader;
+          sWarehouse.draw();
+        },
+        setup: function () {
+          sWarehouse.setup();
+        }
+      },
       {
         name: "terrain",
         f: function (tween, pg) {
