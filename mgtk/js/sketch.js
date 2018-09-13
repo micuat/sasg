@@ -126,8 +126,8 @@ var masterPreset = [
   },
   {
     preset: [{ a: "terrain", p: ["slide", "invert"] },
-    { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
-    { a: "ribbons", p: ["fillalpha"] },
+    { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
+    { a: ["starField", "gameOfLife", "langtonAnt"], p: ["fillalpha"] },
     { a: "face", p: "darktoalpha", face: ["body"] },
     ]
   },
@@ -1800,7 +1800,7 @@ var STemplate = function (p) {
 var s = function (p) {
   let name;
   let sLines = new SLines(p);
-  // let sStarField = new SStarField(p);
+  let sStarField = new SStarField(p);
   let sGameOfLife = new SGameOfLife(p);
   let sRibbons = new SRibbons(p);
   let sBeesAndBombs = new SBeesAndBombs(p);
@@ -1841,16 +1841,16 @@ var s = function (p) {
           sLines.setup();
         }
       },
-      // {
-      //   name: "starField",
-      //   f: function (tween, pg) {
-      //     sStarField.pg = pg;
-      //     sStarField.tween = tween;
-      //     let alpha = 1.0 - tween;
-      //     sStarField.alpha = alpha * beatFader;
-      //     sStarField.draw();
-      //   }
-      // },
+      {
+        name: "starField",
+        f: function (tween, pg) {
+          sStarField.pg = pg;
+          sStarField.tween = tween;
+          let alpha = 1.0 - tween;
+          sStarField.alpha = alpha * beatFader;
+          sStarField.draw();
+        }
+      },
       {
         name: "gameOfLife",
         f: function (tween, pg) {
