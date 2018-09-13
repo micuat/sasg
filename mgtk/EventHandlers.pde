@@ -169,10 +169,14 @@ void oscEvent(OscMessage theOscMessage) {
     }
   }
   else if (theOscMessage.checkAddrPattern("/pose/points")==true) {
-    for(int i = 0; i < 17; i++) {
-      posePoints[i][0] = theOscMessage.get(i * 2 + 0).floatValue();
-      posePoints[i][1] = theOscMessage.get(i * 2 + 1).floatValue();
-    }
+    int index = theOscMessage.get(0).intValue();
+    if(index < 8)
+    {
+      for(int i = 0; i < 17; i++) {
+        posePoints[index][i][0] = theOscMessage.get(i * 2 + 1).floatValue();
+        posePoints[index][i][1] = theOscMessage.get(i * 2 + 2).floatValue();
+      }
+     }
   }
   //else if (theOscMessage.checkAddrPattern("/data")==true) {
   //  openPose = theOscMessage.get(0).stringValue();

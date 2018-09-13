@@ -1151,26 +1151,29 @@ var SFace = function (p) {
       name: "body",
       f: function (getType) {
         if(getType) return "body";
-        for (let i = 8; i < p.posePoints.length; i++) {
-          // pg.noStroke();
-          // pg.fill(255, 0, 0);
-          let x = p.map(p.posePoints[i][0], 0, 640, 80, 640 - 80) * 1.5;
-          let y = p.map(p.posePoints[i][1], 0, 480, 0, 360) * 1.5;
-          // pg.ellipse(x, y, 14, 14)
+        for (let index = 0; index < p.posePoints.length; index++) {
+          let pose = p.posePoints[index];
+          for (let i = 8; i < pose.length; i++) {
+            pg.noStroke();
+            pg.fill(255, 0, 0);
+            let x = p.map(pose[i][0], 0, 640, 80, 640 - 80) * 1.5;
+            let y = p.map(pose[i][1], 0, 480, 0, 360) * 1.5;
+            pg.ellipse(x, y, 14, 14)
 
-          // pg.stroke(255);
-          pg.fill(0, 255, 0);
-          pg.noStroke();
-          pg.beginShape();
-          pg.vertex(x, y);
-          let x0 = p.map(p.posePoints[i - 1][0], 0, 640, 80, 640 - 80) * 1.5;
-          let y0 = p.map(p.posePoints[i - 1][1], 0, 480, 0, 360) * 1.5;
-          // pg.line(x, y, x0, y0)
-          pg.vertex(x0, y0);
-          x0 = p.map(p.posePoints[i - 2][0], 0, 640, 80, 640 - 80) * 1.5;
-          y0 = p.map(p.posePoints[i - 2][1], 0, 480, 0, 360) * 1.5;
-          pg.vertex(x0, y0);
-          pg.endShape();
+            // pg.stroke(255);
+            pg.fill(0, 255, 0);
+            pg.noStroke();
+            pg.beginShape();
+            pg.vertex(x, y);
+            let x0 = p.map(pose[i - 1][0], 0, 640, 80, 640 - 80) * 1.5;
+            let y0 = p.map(pose[i - 1][1], 0, 480, 0, 360) * 1.5;
+            // pg.line(x, y, x0, y0)
+            pg.vertex(x0, y0);
+            x0 = p.map(pose[i - 2][0], 0, 640, 80, 640 - 80) * 1.5;
+            y0 = p.map(pose[i - 2][1], 0, 480, 0, 360) * 1.5;
+            pg.vertex(x0, y0);
+            pg.endShape();
+          }
         }
       }
     },

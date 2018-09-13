@@ -52,6 +52,7 @@ function drawKeypoints()  {
     // For each pose detected, loop through all the keypoints
     let pose = poses[i].pose;
     let points = [];
+    points.push(i);
     for (let j = 0; j < pose.keypoints.length; j++) {
       // A keypoint is an object describing a body part (like rightArm or leftShoulder)
       let keypoint = pose.keypoints[j];
@@ -64,9 +65,7 @@ function drawKeypoints()  {
       points.push(keypoint.position.x);
       points.push(keypoint.position.y);
     }
-    if(i == 0) {
-      socket.emit('pose', points);
-    }
+    socket.emit('pose', points);
   }
 }
 
