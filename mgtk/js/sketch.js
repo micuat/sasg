@@ -1095,6 +1095,8 @@ var SFace = function (p) {
 
   let faceRemoteLocation = new Packages.netP5.NetAddress("127.0.0.1", 18001);
 
+  let poseBuffer = [];
+
   let funcAsset = new FuncList(4, [
     {
       name: "default",
@@ -1190,48 +1192,67 @@ var SFace = function (p) {
       name: "body",
       f: function (getType) {
         if (getType) return "body";
+        let posePointsClone = [];
         for (let index = 0; index < p.posePoints.length; index++) {
           let pose = p.posePoints[index];
-          let alpha = p.map(p.millis() - p.poseMillis[index], 0, 1000, 0, 255);
-          if(alpha < 0) continue;
+          posePointsClone[index] = [];
+          for (let i = 0; i < pose.length; i++) {
+            posePointsClone[index][i] = [];
+            posePointsClone[index][i][0] = pose[i][0];
+            posePointsClone[index][i][1] = pose[i][1];
+          }
+        }
 
-          pg.fill(255, alpha);
-          pg.noStroke();
-          pg.beginShape();
-          pg.texture(postPgs[index % 2]);
-          let x = p.map(pose[5][0], 0, 640, 80, 640 - 80) * 1.5;
-          let y = p.map(pose[5][1], 0, 480, 0, 360) * 1.5;
-          pg.vertex(x, y, 0, x, y);
-          let x0 = p.map(pose[6][0], 0, 640, 80, 640 - 80) * 1.5;
-          let y0 = p.map(pose[6][1], 0, 480, 0, 360) * 1.5;
-          // pg.line(x, y, x0, y0)
-          pg.vertex(x0, y0, 0, x0, y0);
-          x0 = p.map(pose[11][0], 0, 640, 80, 640 - 80) * 1.5;
-          y0 = p.map(pose[11][1], 0, 480, 0, 360) * 1.5;
-          pg.vertex(x0, y0, 0, x0, y0);
-          pg.endShape();
+        poseBuffer.push(posePointsClone);
+        if (poseBuffer.length > 30) poseBuffer.shift();
+        for (let ib = 0; ib < poseBuffer.length; ib++) {
+          for (let index = 0; index < p.posePoints.length; index++) {
+            let pose = poseBuffer[ib][index];
+            let alpha = p.map(p.millis() - p.poseMillis[index], 0, 1000, 0, 255);
+            if(alpha < 0) continue;
 
-          for (let i = 8; i < pose.length; i++) {
-            // pg.noStroke();
-            pg.fill(255, 0, 0, alpha);
-            let x = p.map(pose[i][0], 0, 640, 80, 640 - 80) * 1.5;
-            let y = p.map(pose[i][1], 0, 480, 0, 360) * 1.5;
-            pg.ellipse(x, y, 14, 14)
-
-            // pg.stroke(255);
             pg.fill(255, alpha);
             pg.noStroke();
             pg.beginShape();
-            pg.texture(postPgs[index % 2]);
+            pg.texture(postPgs[1]);
+            let x = p.map(pose[10][0], 0, 640, 80, 640 - 80) * 1.5;
+            let y = p.map(pose[10][1], 0, 480, 0, 360) * 1.5;
             pg.vertex(x, y, 0, x, y);
-            let x0 = p.map(pose[i - 1][0], 0, 640, 80, 640 - 80) * 1.5;
-            let y0 = p.map(pose[i - 1][1], 0, 480, 0, 360) * 1.5;
+            let x0 = p.map(pose[9][0], 0, 640, 80, 640 - 80) * 1.5;
+            let y0 = p.map(pose[9][1], 0, 480, 0, 360) * 1.5;
             // pg.line(x, y, x0, y0)
             pg.vertex(x0, y0, 0, x0, y0);
-            x0 = p.map(pose[i - 2][0], 0, 640, 80, 640 - 80) * 1.5;
-            y0 = p.map(pose[i - 2][1], 0, 480, 0, 360) * 1.5;
+            x0 = p.map(pose[7][0], 0, 640, 80, 640 - 80) * 1.5;
+            y0 = p.map(pose[7][1], 0, 480, 0, 360) * 1.5;
+            pg.vertex(x0, y0, 0, x0, y0);
+            x0 = p.map(pose[8][0], 0, 640, 80, 640 - 80) * 1.5;
+            y0 = p.map(pose[8][1], 0, 480, 0, 360) * 1.5;
             pg.vertex(x0, y0, 0, x0, y0);
             pg.endShape();
+
+            for (let i = 8; i < pose.length; i++) {
+              // pg.noStroke();
+              pg.fill(255, 0, 0, alpha);
+              let x = p.map(pose[i][0], 0, 640, 80, 640 - 80) * 1.5;
+              let y = p.map(pose[i][1], 0, 480, 0, 360) * 1.5;
+              // pg.ellipse(x, y, 14, 14)
+              if(ib==0)pg.text(index+"-"+i, x, y);
+
+              // // pg.stroke(255);
+              // pg.fill(255, alpha);
+              // pg.noStroke();
+              // pg.beginShape();
+              // pg.texture(postPgs[index % 2]);
+              // pg.vertex(x, y, 0, x, y);
+              // let x0 = p.map(pose[i - 1][0], 0, 640, 80, 640 - 80) * 1.5;
+              // let y0 = p.map(pose[i - 1][1], 0, 480, 0, 360) * 1.5;
+              // // pg.line(x, y, x0, y0)
+              // pg.vertex(x0, y0, 0, x0, y0);
+              // x0 = p.map(pose[i - 2][0], 0, 640, 80, 640 - 80) * 1.5;
+              // y0 = p.map(pose[i - 2][1], 0, 480, 0, 360) * 1.5;
+              // pg.vertex(x0, y0, 0, x0, y0);
+              // pg.endShape();
+            }
           }
         }
       }
