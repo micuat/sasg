@@ -884,7 +884,10 @@ var SRibbons = function (p) {
     },
     function(dx, y, tt) {
       return Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tt) * tt;
-    }
+    },
+    function(dx, y, tt) {
+      return Math.sin(dx * 0.001 + y / 100.0 * Math.PI + tt) * 10.0;
+    },
   ];
   let func = funcs[0];
   this.setup = function () {
