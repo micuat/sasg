@@ -31,6 +31,7 @@ function setup() {
   });
   // Hide the video element, and just show the canvas
   video.hide();
+  frameRate(15);
 }
 
 function modelReady() {
