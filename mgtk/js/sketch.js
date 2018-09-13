@@ -1142,7 +1142,7 @@ var SFace = function (p) {
         }
         pg.endShape();
 
-        pg.fill(0, 255, 0);
+        pg.fill(0);
         pg.noFill();
         pg.beginShape(p.TRIANGLES);
         for (let i = 0; i < faces.length; i++) {
@@ -1166,7 +1166,7 @@ var SFace = function (p) {
             pg.texture(facePg);
           }
           else {
-            pg.fill(0, 255, 0);
+            pg.fill(0);
             pg.beginShape(p.TRIANGLES);
           }
           let idx = faces[i];
