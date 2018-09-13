@@ -129,7 +129,7 @@ var masterPreset = [
     { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
     { a: "ribbons", p: ["fillalpha"] },
     { a: "face", p: "darktoalpha", face: ["body"] },
-  ]
+    ]
   },
   { // 15 not used
     preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
@@ -936,7 +936,7 @@ var SBeesAndBombs = function (p) {
     {
       name: "default",
       f: function (getName, seq, tw, x, z) {
-        if(getName) return "default";
+        if (getName) return "default";
         if (lastState == "inout") {
           lastState = "inTransition";
         }
@@ -944,7 +944,7 @@ var SBeesAndBombs = function (p) {
         let y = 0;
         if (lastState == "inTransition") {
           if ((seq % 4.0) < 2.0) {
-            y = ((tw+0.75) * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+            y = ((tw + 0.75) * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
             if (y > 0) y = 0;
           }
           else {
@@ -957,14 +957,14 @@ var SBeesAndBombs = function (p) {
     {
       name: "inout",
       f: function (getName, seq, tw, x, z) {
-        if(getName) return "inout";
+        if (getName) return "inout";
         let y = 0;
         if ((seq % 4.0) < 2.0) {
-          y = ((tw+0.75) * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+          y = ((tw + 0.75) * 2 + (x + z / 2 - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
           if (y > 0) y = 0;
         }
         else if ((seq % 4.0) >= 2.0) {
-          y = ((tw+0.25) * 2 - (x / 2 + z - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+          y = ((tw + 0.25) * 2 - (x / 2 + z - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
           if (y < 0) y = 0;
         }
         lastState = "inout";
@@ -988,7 +988,7 @@ var SBeesAndBombs = function (p) {
       funcAsset.preset = midiToPreset[presetIndex].preset;
       funcAsset.update(seq);
 
-      if(seq % 4 == 0) {
+      if (seq % 4 == 0) {
         shapeMode = Math.floor(p.random(0, 4));
       }
     }
@@ -1016,19 +1016,19 @@ var SBeesAndBombs = function (p) {
         let offset = p.map(d, 0, maxD, -p.PI, p.PI);
         let a = angle + -offset;
         let h = winh;//p.floor(p.map(p.sin(a), -1, 1, 0.5, 1) * winh);
-        if(funcAsset.exec(true) == "inout") {
-          if(shapeMode == 0) {
+        if (funcAsset.exec(true) == "inout") {
+          if (shapeMode == 0) {
             // cube
           }
-          else if(shapeMode == 1) {
-            let c = Math.sqrt((x - winh / 2)*(x - winh / 2)+(z - winh / 2)*(z - winh / 2))/winh;
+          else if (shapeMode == 1) {
+            let c = Math.sqrt((x - winh / 2) * (x - winh / 2) + (z - winh / 2) * (z - winh / 2)) / winh;
             h *= Math.cos(c * Math.PI);
           }
-          else if(shapeMode == 2) {
+          else if (shapeMode == 2) {
             h *= x / winh;
           }
-          else if(shapeMode == 3) {
-            h *= Math.sin(Math.sqrt((x - winh / 2)*(x - winh / 2)+(z - winh / 2)*(z - winh / 2)) * 0.1) * 1.2;
+          else if (shapeMode == 3) {
+            h *= Math.sin(Math.sqrt((x - winh / 2) * (x - winh / 2) + (z - winh / 2) * (z - winh / 2)) * 0.1) * 1.2;
           }
         }
         //h = p.map(decay, 0, 1, winh, h);
@@ -1068,7 +1068,7 @@ var SFace = function (p) {
     {
       name: "faceDelay",
       f: function (getType) {
-        if(getType) return "face";
+        if (getType) return "face";
         pg.fill(255);
         pg.noStroke();
         pg.beginShape(p.TRIANGLES);
@@ -1085,7 +1085,7 @@ var SFace = function (p) {
     {
       name: "faceWireframe",
       f: function (getType) {
-        if(getType) return "face";
+        if (getType) return "face";
         let modPoints = [];
         for (let i = 0; i < p.facePoints.length; i++) {
           let tx = p.facePoints[i][0] * 0.5 * 1.5;
@@ -1122,11 +1122,11 @@ var SFace = function (p) {
     {
       name: "faceLost",
       f: function (getType) {
-        if(getType) return "face";
+        if (getType) return "face";
         pg.fill(255);
         pg.noStroke();
-        for (let i = 0; i < faces.length; i+=3) {
-          if(p.random(1.0) > 0.5) {
+        for (let i = 0; i < faces.length; i += 3) {
+          if (p.random(1.0) > 0.5) {
             pg.beginShape(p.TRIANGLES);
             pg.texture(facePg);
           }
@@ -1138,11 +1138,11 @@ var SFace = function (p) {
           let x = p.facePoints[idx][0] * 0.5 * 1.5;
           let y = p.facePoints[idx][1] * 0.5 * 1.5;
           pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
-          idx = faces[i+1];
+          idx = faces[i + 1];
           x = p.facePoints[idx][0] * 0.5 * 1.5;
           y = p.facePoints[idx][1] * 0.5 * 1.5;
           pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
-          idx = faces[i+2];
+          idx = faces[i + 2];
           x = p.facePoints[idx][0] * 0.5 * 1.5;
           y = p.facePoints[idx][1] * 0.5 * 1.5;
           pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
@@ -1153,7 +1153,7 @@ var SFace = function (p) {
     {
       name: "body",
       f: function (getType) {
-        if(getType) return "body";
+        if (getType) return "body";
         for (let index = 0; index < p.posePoints.length; index++) {
           let pose = p.posePoints[index];
           for (let i = 8; i < pose.length; i++) {
@@ -1226,10 +1226,10 @@ var SFace = function (p) {
     pg.pushStyle();
     let camH = p.cam.height * 960 / p.cam.width;
 
-    if(funcAsset.exec(true) == "face") {
+    if (funcAsset.exec(true) == "face") {
       scaling = p.lerp(scaling, 1.5, 0.1);
 
-      if(p.frameCount % 30 == 0) {
+      if (p.frameCount % 30 == 0) {
         let m = new Packages.oscP5.OscMessage("/face/enable");
         m.add("1");
         p.oscP5.send(m, faceRemoteLocation);
@@ -1238,15 +1238,15 @@ var SFace = function (p) {
     else {
       scaling = p.lerp(scaling, 1.0, 0.1);
 
-      if(p.frameCount % 30 == 0) {
+      if (p.frameCount % 30 == 0) {
         let m = new Packages.oscP5.OscMessage("/face/enable");
         m.add("0");
         p.oscP5.send(m, faceRemoteLocation);
       }
     }
-    pg.translate(windowWidth/2, windowHeight/2);
+    pg.translate(windowWidth / 2, windowHeight / 2);
     pg.scale(scaling, scaling);
-    pg.translate(-windowWidth/2, -windowHeight/2);
+    pg.translate(-windowWidth / 2, -windowHeight / 2);
     pg.translate(0, 80);
 
     pg.translate(0, (windowHeight - camH) * 0.5);
@@ -1729,7 +1729,7 @@ var STerrain = function (p) {
       let xoff = 0;
       for (let x = 0; x < cols; x++) {
         terrain[x][y] = p.map(p.noise(xoff, yoff), 0, 1, -100, 100);
-        terrain[x][y] = p.lerp(terrain[x][y], Math.cos(x * 0.1)*200, dampedFaders[12] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5) * 0.5 + 0.5));
+        terrain[x][y] = p.lerp(terrain[x][y], Math.cos(x * 0.1) * 200, dampedFaders[12] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5) * 0.5 + 0.5));
         xoff += 0.2;
       }
       yoff += 0.2;
@@ -2148,7 +2148,7 @@ var s = function (p) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }
 
-    for(let i = 0; i < dampedFaders.length; i++) {
+    for (let i = 0; i < dampedFaders.length; i++) {
       dampedFaders[i] = p.oscFaders[i];
     }
   }
@@ -2156,7 +2156,7 @@ var s = function (p) {
   p.getCount = function () { return p.frameCount - startFrame + Math.floor(dampedFaders[1] * 60) };
 
   p.keyPressed = function () {
-    if(p.key == 'a') {
+    if (p.key == 'a') {
       startTime = p.millis();
     }
   }
@@ -2171,7 +2171,7 @@ var s = function (p) {
     let m = new Packages.oscP5.OscMessage("/tw/ABCD/k/" + amount);
     p.oscP5.send(m, remoteLocation);
 
-    if(seq != lastSeq) {
+    if (seq != lastSeq) {
       // m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + 1);
       m = new Packages.oscP5.OscMessage("/tw/ABCD/b/" + Math.floor(p.random(1)));
       p.oscP5.send(m, remoteLocation);
@@ -2185,16 +2185,16 @@ var s = function (p) {
   }
 
   p.draw = function () {
-    for(let i = 0; i < dampedFaders.length; i++) {
+    for (let i = 0; i < dampedFaders.length; i++) {
       dampedFaders[i] = p.lerp(dampedFaders[i], p.oscFaders[i], 0.1);
     }
-    if(p.frameCount > 10 && reloaded) {
+    if (p.frameCount > 10 && reloaded) {
       ss = [sLines, sGameOfLife, sRibbons, sBeesAndBombs, sFace, sLangtonAnt, sShader, sTerrain]
-      for(let i in ss) {
+      for (let i in ss) {
         ss[i].setup();
         ss[i].setup();
         ss[i].pg = layerPgs[0];
-        for(let j = 0; j < 10; j++) {
+        for (let j = 0; j < 10; j++) {
           ss[i].draw();
         }
         ss[i].setup();
