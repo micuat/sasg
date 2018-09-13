@@ -170,7 +170,7 @@ void oscEvent(OscMessage theOscMessage) {
   }
   else if (theOscMessage.checkAddrPattern("/pose/points")==true) {
     int index = theOscMessage.get(0).intValue();
-    if(index < 8)
+    if(index < posePoints.length)
     {
       for(int i = 0; i < 17; i++) {
         posePoints[index][i][0] = theOscMessage.get(i * 2 + 1).floatValue();

@@ -65,7 +65,8 @@ function drawKeypoints()  {
       points.push(keypoint.position.x);
       points.push(keypoint.position.y);
     }
-    socket.emit('pose', points);
+    if(i < 4)
+      socket.emit('pose', points);
   }
 }
 

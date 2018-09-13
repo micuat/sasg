@@ -1183,6 +1183,36 @@ var SFace = function (p) {
         }
       }
     },
+    {
+      name: "bodyParticle",
+      f: function (getType) {
+        if (getType) return "body";
+        for (let index = 0; index < p.posePoints.length; index++) {
+          let pose = p.posePoints[index];
+          for (let i = 8; i < pose.length; i++) {
+            pg.noStroke();
+            pg.fill(255);
+            let x = p.map(pose[i][0], 0, 640, 80, 640 - 80) * 1.5;
+            let y = p.map(pose[i][1], 0, 480, 0, 360) * 1.5;
+
+            let lfo = Math.sin(tElapsed*16.0) * 0.5 + 0.5;
+            for (let j = 0; j < 8; j++) {
+              let nx = x + 50 * Math.cos(j/4.0*Math.PI) * lfo;
+              let ny = y + 50 * Math.sin(j/4.0*Math.PI) * lfo;
+              pg.beginShape();
+              pg.texture(postPgs[index % 2]);
+              for(let k = 0; k < 10; k++) {
+                let r = 10;
+                let rx = x + r * Math.cos(k/5.0*Math.PI);
+                let ry = y + r * Math.sin(k/5.0*Math.PI);
+                pg.vertex(rx, ry, 0, rx, ry);
+              }
+              pg.endShape();
+            }
+          }
+        }
+      }
+    }
   ]);
 
   this.setup = function () {
@@ -2174,15 +2204,41 @@ var s = function (p) {
     let m = new Packages.oscP5.OscMessage("/tw/ABCD/k/" + amount);
     p.oscP5.send(m, remoteLocation);
 
+    if(p.frameCount % 5 == 0) {
+      m = new Packages.oscP5.OscMessage("/tw/QRSTUVWXYZ/u/0");
+      p.oscP5.send(m, remoteLocation);
+      let targets = [];
+      let modes = ["Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+      for(let i = 0; i < 3; i++) {
+        let target = p.random(modes);
+        amount = Math.floor((-Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 2.0) * 128 + 128) * dampedFaders[7]);
+        m = new Packages.oscP5.OscMessage("/tw/"+target+"/l/" + amount);
+        p.oscP5.send(m, remoteLocation);
+        m = new Packages.oscP5.OscMessage("/tw/"+target+"/u/1");
+        p.oscP5.send(m, remoteLocation);
+  
+        targets.push(target);
+      }
+    }
     if (seq != lastSeq) {
       // m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + 1);
       m = new Packages.oscP5.OscMessage("/tw/ABCD/b/" + Math.floor(p.random(1)));
       p.oscP5.send(m, remoteLocation);
       m = new Packages.oscP5.OscMessage("/tw/ABCD/a/" + Math.floor(p.random(2)));
       p.oscP5.send(m, remoteLocation);
+
       m = new Packages.oscP5.OscMessage("/tw/ABCD/b/" + 1);
       p.oscP5.send(m, remoteLocation);
       m = new Packages.oscP5.OscMessage("/tw/ABCD/x/" + 2);
+      p.oscP5.send(m, remoteLocation);
+
+      m = new Packages.oscP5.OscMessage("/tw/QRSTUVWXYZ/b/3");
+      p.oscP5.send(m, remoteLocation);
+      m = new Packages.oscP5.OscMessage("/tw/QRSTUVWXYZ/f/21");
+      p.oscP5.send(m, remoteLocation);
+      m = new Packages.oscP5.OscMessage("/tw/QRSTUVWXYZ/k/0");
+      p.oscP5.send(m, remoteLocation);
+      m = new Packages.oscP5.OscMessage("/tw/QRSTUVWXYZ/a/1");
       p.oscP5.send(m, remoteLocation);
     }
   }
