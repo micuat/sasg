@@ -1,4 +1,5 @@
 void keyPressed(KeyEvent event) {
+  if (key == 27) key = 0; // disable esc quit
   try {
     nashorn.eval("for(var prop in pApplet) {if(!this.isReservedFunction(prop)) {globalSketch[prop] = pApplet[prop]}}");
 

@@ -4,6 +4,7 @@ bool testMode = false;
 
 //--------------------------------------------------------------
 void ofApp::setup() {
+    ofSetEscapeQuitsApp(false);
 	//ofSetLogLevel(OF_LOG_NOTICE);
     ofSetFrameRate(30);
 
