@@ -946,6 +946,24 @@ var SBeesAndBombs = function (p) {
 
   let midiToPreset = getPreset("bees", ["default"]);
   let lastState = "default";
+  let doLfoFuncs = [
+    function (x, z) {
+      return 1;
+    },
+    function (x, z) {
+      return 1;
+    },
+    function (x, z) {
+      return 1;
+    },
+    function (x, z) {
+      return Math.sin(tElapsed * 10 + x + z * 0.1) * 0.25 + 0.75;
+    },
+    function (x, z) {
+      return Math.sin(tElapsed * 5 + x * 0.01) * 0.25 + 0.75;
+    },
+  ];
+  let doLfo = doLfoFuncs[0];
 
   let funcAsset = new FuncList(4, [
     {
@@ -979,7 +997,7 @@ var SBeesAndBombs = function (p) {
           if (y > 0) y = 0;
         }
         else if ((seq % 4.0) >= 2.0) {
-          y = ((tw + 0.25) * 2 - (x / 2 + z - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+          y = ((tw + 0.5) * 2 - (x / 2 + z - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
           if (y < 0) y = 0;
         }
         lastState = "inout";
@@ -1005,6 +1023,7 @@ var SBeesAndBombs = function (p) {
 
       if (seq % 4 == 0) {
         shapeMode = Math.floor(p.random(0, 4));
+        doLfo = p.random(doLfoFuncs);
       }
     }
     pg.beginDraw();
@@ -1037,7 +1056,7 @@ var SBeesAndBombs = function (p) {
           }
           else if (shapeMode == 1) {
             let c = Math.sqrt((x - winh / 2) * (x - winh / 2) + (z - winh / 2) * (z - winh / 2)) / winh;
-            h *= Math.cos(c * Math.PI);
+            h *= Math.cos(c * Math.PI) * 0.5 + 0.5;
           }
           else if (shapeMode == 2) {
             h *= x / winh;
@@ -1045,6 +1064,7 @@ var SBeesAndBombs = function (p) {
           else if (shapeMode == 3) {
             h *= Math.sin(Math.sqrt((x - winh / 2) * (x - winh / 2) + (z - winh / 2) * (z - winh / 2)) * 0.1) * 1.2;
           }
+          h *= doLfo(x, z);
         }
         //h = p.map(decay, 0, 1, winh, h);
         let y = funcAsset.exec(false, seq, this.tween, x, z);
