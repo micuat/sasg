@@ -115,6 +115,7 @@ var masterPreset = [
   {
     preset: [{ a: "shader", p: "kaleid" },
     { a: "terrain", p: "rgbshift" },
+    { a: ["warehouse"], p: ["rgbshift"] },
     ]
   },
   {
@@ -387,13 +388,13 @@ var SLines = function (p) {
     {
       name: "bounceDown",
       f: function (agent) {
-        pg.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+        pg.translate(0.0, agent.tweenPowReturn() * 200, 0.0);
       }
     },
     {
       name: "bounceUp",
       f: function (agent) {
-        pg.translate(0.0, agent.tweenPowReturn() * -150, 0.0);
+        pg.translate(0.0, agent.tweenPowReturn() * -200, 0.0);
       }
     },
     {
@@ -415,10 +416,10 @@ var SLines = function (p) {
       name: "toDown",
       f: function (agent) {
         if (agent.tween < 0.5) {
-          pg.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+          pg.translate(0.0, agent.tweenPowReturn() * 200, 0.0);
         }
         else {
-          pg.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
+          pg.translate(0.0, -agent.tweenPowReturn() * 200, 0.0);
         }
       }
     },
@@ -426,10 +427,10 @@ var SLines = function (p) {
       name: "toUp",
       f: function (agent) {
         if (agent.tween < 0.5) {
-          pg.translate(0.0, -agent.tweenPowReturn() * 150, 0.0);
+          pg.translate(0.0, -agent.tweenPowReturn() * 200, 0.0);
         }
         else {
-          pg.translate(0.0, agent.tweenPowReturn() * 150, 0.0);
+          pg.translate(0.0, agent.tweenPowReturn() * 200, 0.0);
         }
       }
     },
@@ -437,12 +438,6 @@ var SLines = function (p) {
       name: "rotateY",
       f: function (agent) {
         pg.rotateY(agent.tween * Math.PI);
-      }
-    },
-    {
-      name: "inFromTop",
-      f: function (agent) {
-        pg.translate(0.0, (1 - agent.tweenPowZO()) * -200, 0.0);
       }
     },
   ]);
@@ -659,6 +654,7 @@ var SLines = function (p) {
 
     pg.pushMatrix();
     pg.pushStyle();
+    pg.blendMode(p.ADD);
     pg.translate(windowWidth / 2, windowHeight / 2 + p.map(dampedFaders[10], 0, 1, -windowHeight, 0));
     function drawBeat() {
       // beatFader = dampedFaders[3];
@@ -675,6 +671,7 @@ var SLines = function (p) {
       }
     }
     drawBeat();
+    pg.blendMode(p.BLEND);
     pg.popStyle();
     pg.popMatrix();
     pg.endDraw();
@@ -1196,19 +1193,6 @@ var SFace = function (p) {
       name: "body",
       f: function (getType) {
         if (getType) return "body";
-        let posePointsClone = [];
-        for (let index = 0; index < p.posePoints.length; index++) {
-          let pose = p.posePoints[index];
-          posePointsClone[index] = [];
-          for (let i = 0; i < pose.length; i++) {
-            posePointsClone[index][i] = [];
-            posePointsClone[index][i][0] = pose[i][0];
-            posePointsClone[index][i][1] = pose[i][1];
-          }
-        }
-
-        poseBuffer.push(posePointsClone);
-        if (poseBuffer.length > 30) poseBuffer.shift();
         for (let ib = 0; ib < poseBuffer.length; ib++) {
           for (let index = 0; index < p.posePoints.length; index++) {
             let pose = poseBuffer[ib][index];
@@ -1266,27 +1250,17 @@ var SFace = function (p) {
       f: function (getType) {
         if (getType) return "body";
         for (let index = 0; index < p.posePoints.length; index++) {
-          let pose = p.posePoints[index];
-          for (let i = 8; i < pose.length; i++) {
-            pg.noStroke();
-            pg.fill(255);
+          let pose = poseBuffer[poseBuffer.length - 1][index];
+          let alpha = p.map(p.millis() - p.poseMillis[index], 0, 1000, 0, 255);
+          if(alpha < 0) continue;
+
+          pg.fill(255, alpha);
+          pg.noStroke();
+
+          for (let i = 0; i < pose.length; i++) {
             let x = p.map(pose[i][0], 0, 640, 80, 640 - 80) * 1.5;
             let y = p.map(pose[i][1], 0, 480, 0, 360) * 1.5;
-
-            let lfo = Math.sin(tElapsed*16.0) * 0.5 + 0.5;
-            for (let j = 0; j < 8; j++) {
-              let nx = x + 50 * Math.cos(j/4.0*Math.PI) * lfo;
-              let ny = y + 50 * Math.sin(j/4.0*Math.PI) * lfo;
-              pg.beginShape();
-              pg.texture(postPgs[index % 2]);
-              for(let k = 0; k < 10; k++) {
-                let r = 10;
-                let rx = x + r * Math.cos(k/5.0*Math.PI);
-                let ry = y + r * Math.sin(k/5.0*Math.PI);
-                pg.vertex(rx, ry, 0, rx, ry);
-              }
-              pg.endShape();
-            }
+            pg.ellipse(x, y, 14, 14)
           }
         }
       }
@@ -1330,6 +1304,22 @@ var SFace = function (p) {
     }
     facePg.endDraw();
 
+    // body
+    let posePointsClone = [];
+    for (let index = 0; index < p.posePoints.length; index++) {
+      let pose = p.posePoints[index];
+      posePointsClone[index] = [];
+      for (let i = 0; i < pose.length; i++) {
+        posePointsClone[index][i] = [];
+        posePointsClone[index][i][0] = pose[i][0];
+        posePointsClone[index][i][1] = pose[i][1];
+      }
+    }
+
+    poseBuffer.push(posePointsClone);
+    if (poseBuffer.length > 30) poseBuffer.shift();
+
+    // draw 
     pg.beginDraw();
     pg.clear();
     pg.pushMatrix();
@@ -1774,7 +1764,7 @@ var SWarehouse = function (p) {
     pg.translate(windowWidth / 2, windowHeight / 2);
     pg.rotateX(p.map(dampedFaders[4] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5), 0, 1, 0, -Math.PI));
     pg.rotateZ(p.map(dampedFaders[5] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5), 0, 1, 0, -Math.PI));
-    pg.translate(0, 50, yOrigin);
+    pg.translate(0, 50 - p.map(dampedFaders[10], 0, 1, windowHeight, 0), yOrigin);
     pg.translate(0, 0, p.map(dampedFaders[6] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5), 0, 1, 0, -500));
     pg.scale(-50, -50, -50);
     pg.shape(p.warehouseShape);
