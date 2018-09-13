@@ -127,7 +127,7 @@ var masterPreset = [
   {
     preset: [{ a: "terrain", p: ["slide", "invert"] },
     { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
-    { a: ["starField", "gameOfLife", "langtonAnt"], p: ["fillalpha"] },
+    { a: ["starField", "gameOfLife", "langtonAnt"], p: ["slide", "mpeg", "rgbshift"] },
     { a: "face", p: "darktoalpha", face: ["body"] },
     ]
   },
@@ -737,6 +737,7 @@ var SStarField = function (p) {
     pg = this.pg;
     pg.beginDraw();
     pg.clear();
+    pg.background(0); //hack
     pg.pushMatrix();
     pg.translate(this.tween * windowWidth / 3.0, 0);
     pg.translate(windowWidth * 0.5, windowHeight * 0.5);
@@ -799,6 +800,7 @@ var SGameOfLife = function (p) {
 
     pg.beginDraw();
     pg.clear();
+    pg.background(0); //hack
     pg.pushMatrix();
     pg.pushStyle();
     pg.noStroke();
@@ -1337,6 +1339,7 @@ var SLangtonAnt = function (p) {
     pg.strokeWeight(m);
     pg.fill(0);
     pg.clear();
+    pg.background(0); //hack
 
     for (let n = 0; n < 40; n++) {
       let state = grid[x][y];
