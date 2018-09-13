@@ -70,6 +70,7 @@ function drawKeypoints()  {
     }
     if(i < 4)
       socket.emit('pose', points);
+    // console.log(points)
   }
 }
 

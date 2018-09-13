@@ -172,6 +172,7 @@ void oscEvent(OscMessage theOscMessage) {
     int index = theOscMessage.get(0).intValue();
     if(index < posePoints.length)
     {
+      poseMillis[index] = millis();
       for(int i = 0; i < 17; i++) {
         posePoints[index][i][0] = theOscMessage.get(i * 2 + 1).floatValue();
         posePoints[index][i][1] = theOscMessage.get(i * 2 + 2).floatValue();

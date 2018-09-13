@@ -47,6 +47,7 @@ public int[] oscButton = new int[57];
 public int seqOffset = 0;
 public float[][] facePoints = new float[68][2];
 public float[][][] posePoints = new float[4][17][2];
+public int[] poseMillis = new int[4];
 public String openPose = "";
 
 MidiBus myBus;
