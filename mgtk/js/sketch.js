@@ -125,10 +125,11 @@ var masterPreset = [
     { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe", "faceLost"] }]
   },
   {
-    preset: [{ a: "terrain", p: ["slide", "invert"] },
+    preset: [{ a: "terrain", p: ["slide", "rgbshift"] },
     { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
-    { a: ["starField", "gameOfLife", "langtonAnt"], p: ["slide", "mpeg", "rgbshift"] },
-    { a: "face", p: "darktoalpha", face: ["body"] },
+    // { a: ["starField", "gameOfLife", "langtonAnt"], p: ["slide", "mpeg", "rgbshift"] },
+    { a: ["default"], p: ["default"] },
+    { a: "face", p: ["default"], face: ["body"] },
     ]
   },
   { // 15 not used
