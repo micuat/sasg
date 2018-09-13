@@ -2234,7 +2234,7 @@ var s = function (p) {
 
       m = new Packages.oscP5.OscMessage("/tw/QRSTUVWXYZ/b/3");
       p.oscP5.send(m, remoteLocation);
-      m = new Packages.oscP5.OscMessage("/tw/QRSTUVWXYZ/f/21");
+      m = new Packages.oscP5.OscMessage("/tw/QRSTUVWXYZ/f/1");//21 hsb fade
       p.oscP5.send(m, remoteLocation);
       m = new Packages.oscP5.OscMessage("/tw/QRSTUVWXYZ/k/0");
       p.oscP5.send(m, remoteLocation);
