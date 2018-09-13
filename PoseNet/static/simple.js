@@ -31,7 +31,7 @@ function setup() {
   });
   // Hide the video element, and just show the canvas
   video.hide();
-  frameRate(15);
+  frameRate(30);
 }
 
 function modelReady() {
@@ -48,6 +48,7 @@ function draw() {
 
 // A function to draw ellipses over the detected keypoints
 function drawKeypoints()  {
+  textSize(32);
   // Loop through all the poses detected
   for (let i = 0; i < poses.length; i++) {
     // For each pose detected, loop through all the keypoints
@@ -58,10 +59,11 @@ function drawKeypoints()  {
       // A keypoint is an object describing a body part (like rightArm or leftShoulder)
       let keypoint = pose.keypoints[j];
       // Only draw an ellipse is the pose probability is bigger than 0.2
-      if (keypoint.score > 0.2) {
+      if (keypoint.score > 0.2 && i == 0) {
         fill(255, 0, 0);
         noStroke();
-        ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
+        // ellipse(keypoint.position.x, keypoint.position.y, 10, 10);
+        text(j, keypoint.position.x, keypoint.position.y);
       }
       points.push(keypoint.position.x);
       points.push(keypoint.position.y);

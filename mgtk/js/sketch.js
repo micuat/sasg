@@ -1192,12 +1192,28 @@ var SFace = function (p) {
         if (getType) return "body";
         for (let index = 0; index < p.posePoints.length; index++) {
           let pose = p.posePoints[index];
+          pg.fill(255);
+          pg.noStroke();
+          pg.beginShape();
+          pg.texture(postPgs[index % 2]);
+          let x = p.map(pose[5][0], 0, 640, 80, 640 - 80) * 1.5;
+          let y = p.map(pose[5][1], 0, 480, 0, 360) * 1.5;
+          pg.vertex(x, y, 0, x, y);
+          let x0 = p.map(pose[6][0], 0, 640, 80, 640 - 80) * 1.5;
+          let y0 = p.map(pose[6][1], 0, 480, 0, 360) * 1.5;
+          // pg.line(x, y, x0, y0)
+          pg.vertex(x0, y0, 0, x0, y0);
+          x0 = p.map(pose[11][0], 0, 640, 80, 640 - 80) * 1.5;
+          y0 = p.map(pose[11][1], 0, 480, 0, 360) * 1.5;
+          pg.vertex(x0, y0, 0, x0, y0);
+          pg.endShape();
+
           for (let i = 8; i < pose.length; i++) {
             // pg.noStroke();
-            // pg.fill(255, 0, 0);
+            pg.fill(255, 0, 0);
             let x = p.map(pose[i][0], 0, 640, 80, 640 - 80) * 1.5;
             let y = p.map(pose[i][1], 0, 480, 0, 360) * 1.5;
-            // pg.ellipse(x, y, 14, 14)
+            pg.ellipse(x, y, 14, 14)
 
             // pg.stroke(255);
             pg.fill(255);
