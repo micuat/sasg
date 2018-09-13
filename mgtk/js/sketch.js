@@ -876,7 +876,17 @@ var SRibbons = function (p) {
   let rotPower = 0;
   let isSolid = true;
   let amplitude = 0.0;
+  let doRot = true;
 
+  let funcs = [
+    function(dx, y, tt) {
+      return Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tt);
+    },
+    function(dx, y, tt) {
+      return Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tt) * tt;
+    }
+  ];
+  let func = funcs[0];
   this.setup = function () {
     targetRotX = p.random(-Math.PI, Math.PI) * 2.0;
     targetRotY = p.random(-Math.PI, Math.PI) * 2.0;
@@ -884,6 +894,8 @@ var SRibbons = function (p) {
     rotPower = Math.floor(p.random(2.0, 9.0));
     isSolid = p.random(1.0) > 0.5 ? true : false;
     amplitude = Math.pow(p.random(0.5, 1.0), 2.0) * 100;
+    doRot = p.random(1.0) > 0.25 ? true : false;
+    func = p.random(funcs);
   }
   this.draw = function () {
     if (this.pg == undefined || this.pg == null) return;
@@ -904,15 +916,17 @@ var SRibbons = function (p) {
       pg.noFill();
       pg.stroke(255, 255);// * this.alpha);
     }
-    let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, rotPower);
-    pg.rotateX(rotw * targetRotX + Math.PI * 0.5);
-    pg.rotateY(rotw * targetRotY);
+    if(doRot) {
+      let rotw = 1.0 - Math.pow(tw * 0.5 + 0.5, rotPower);
+      pg.rotateX(rotw * targetRotX + Math.PI * 0.5);
+      pg.rotateY(rotw * targetRotY);
+    }
     for (let y = -200; y < 200; y += 50) {
       pg.beginShape(p.TRIANGLE_STRIP);
       let tSpeedMod = tSpeed;
       if (y == 0) tSpeedMod *= 3;
       for (let dx = -l; dx < l; dx += 5.0) {
-        let z = Math.sin(dx * 0.01 + y / 100.0 * Math.PI + tw * tSpeedMod);
+        let z = func(dx, y, tw * tSpeedMod);
         pg.vertex(dx, y, z * amplitude);
         pg.vertex(dx, y + 10, z * amplitude);
       }
