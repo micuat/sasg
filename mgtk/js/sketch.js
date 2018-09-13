@@ -645,10 +645,6 @@ var SLines = function (p) {
       if (presetIndex >= midiToPreset.length) presetIndex = 0;
       unwrapPreset(newPreset, midiToPreset[presetIndex].preset[seq % 4]);
 
-      if (lastState == "none" || lastPreset <= 1) {
-        lastState = "appeared";
-        newPreset["transformFunc"] = ["inFromTop"];
-      }
       for (let i in functions) {
         let funcTypeName = functions[i];
         funcAssets[funcTypeName].preset = newPreset[funcTypeName];
