@@ -125,8 +125,11 @@ var masterPreset = [
     { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe", "faceLost"] }]
   },
   {
-    preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
-    { a: "face", p: "darktoalpha", face: ["body"] }]
+    preset: [{ a: "terrain", p: ["slide", "invert"] },
+    { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
+    { a: "ribbons", p: ["fillalpha"] },
+    { a: "face", p: "darktoalpha", face: ["body"] },
+  ]
   },
   { // 15 not used
     preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
@@ -1154,24 +1157,25 @@ var SFace = function (p) {
         for (let index = 0; index < p.posePoints.length; index++) {
           let pose = p.posePoints[index];
           for (let i = 8; i < pose.length; i++) {
-            pg.noStroke();
-            pg.fill(255, 0, 0);
+            // pg.noStroke();
+            // pg.fill(255, 0, 0);
             let x = p.map(pose[i][0], 0, 640, 80, 640 - 80) * 1.5;
             let y = p.map(pose[i][1], 0, 480, 0, 360) * 1.5;
-            pg.ellipse(x, y, 14, 14)
+            // pg.ellipse(x, y, 14, 14)
 
             // pg.stroke(255);
-            pg.fill(0, 255, 0);
+            pg.fill(255);
             pg.noStroke();
             pg.beginShape();
-            pg.vertex(x, y);
+            pg.texture(postPgs[index % 2]);
+            pg.vertex(x, y, 0, x, y);
             let x0 = p.map(pose[i - 1][0], 0, 640, 80, 640 - 80) * 1.5;
             let y0 = p.map(pose[i - 1][1], 0, 480, 0, 360) * 1.5;
             // pg.line(x, y, x0, y0)
-            pg.vertex(x0, y0);
+            pg.vertex(x0, y0, 0, x0, y0);
             x0 = p.map(pose[i - 2][0], 0, 640, 80, 640 - 80) * 1.5;
             y0 = p.map(pose[i - 2][1], 0, 480, 0, 360) * 1.5;
-            pg.vertex(x0, y0);
+            pg.vertex(x0, y0, 0, x0, y0);
             pg.endShape();
           }
         }
@@ -2091,6 +2095,17 @@ var s = function (p) {
           ppg.endDraw();
         }
       },
+      {
+        name: "fillalpha",
+        f: function (lpg, ppg) {
+          ppg.beginDraw();
+          ppg.clear();
+          postShaders["fillalpha"].set("delta", 3.0);
+          ppg.image(lpg, 0, 0);
+          ppg.filter(postShaders["fillalpha"]);
+          ppg.endDraw();
+        }
+      },
     ]))
   }
 
@@ -2128,7 +2143,7 @@ var s = function (p) {
       postAssets[i].update();
     }
 
-    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert", "mpeg", "radial", "darktoalpha", "pixelate"];
+    let shaderTypes = ["kaleid", "rgbshift", "slide", "bloom", "invert", "mpeg", "radial", "darktoalpha", "pixelate", "fillalpha"];
     for (let i in shaderTypes) {
       postShaders[shaderTypes[i]] = p.loadShader(p.sketchPath("shaders/post/" + shaderTypes[i] + ".glsl"));
     }
