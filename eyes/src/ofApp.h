@@ -216,5 +216,5 @@ public:
     
     ofxSyphonServer mainOutputSyphonServer;
 
-    bool doTracking;
+    string doTracking;
 };

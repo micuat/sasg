@@ -13,7 +13,7 @@ void ofApp::setup() {
     
     mainTexture.allocate(ofGetWidth(), ofGetHeight(), GL_RGBA);
 
-    // ofxSubscribeOsc(8001, "/mm/swapper/eyetween", eyeTween);
+    ofxSubscribeOsc(18001, "/face/enable", doTracking);
     ofxPublishOsc("localhost", 13000, "/face/points", facePoints);
     facePoints.resize(68);
 
@@ -53,7 +53,7 @@ void ofApp::setup() {
     
 //    mainOutputSyphonServer.setName("Face Output");
 
-    doTracking = true;
+    doTracking = "0";
 }
 
 //--------------------------------------------------------------
@@ -79,7 +79,7 @@ void ofApp::setupGui() {
 
 //--------------------------------------------------------------
 void ofApp::update() {
-    if(!doTracking);
+    if(doTracking == "0") return;
 
     if (testMode) {
 		input0.update();
@@ -121,7 +121,7 @@ void ofApp::update() {
 //--------------------------------------------------------------
 void ofApp::draw() {
 	ofBackground(0);
-    if(!doTracking) return;
+    if(doTracking == "0") return;
     grabber.draw(0,0);
     tracker0.drawDebug();
 
@@ -201,8 +201,11 @@ void ofApp::drawMainTexture() {
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-    if(key == ' ') {
-        doTracking = !doTracking;
+    if(key == '1') {
+        doTracking = "1";
+    }
+    else if(key == '0') {
+        doTracking = "0";
     }
 }
 

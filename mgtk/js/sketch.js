@@ -1054,6 +1054,8 @@ var SFace = function (p) {
   let scaling = 1.5;
   let midiToPreset = getPreset("face", ["default"]);
 
+  let faceRemoteLocation = new Packages.netP5.NetAddress("127.0.0.1", 18001);
+
   let funcAsset = new FuncList(4, [
     {
       name: "default",
@@ -1219,9 +1221,21 @@ var SFace = function (p) {
 
     if(funcAsset.exec(true) == "face") {
       scaling = p.lerp(scaling, 1.5, 0.1);
+
+      if(p.frameCount % 30 == 0) {
+        let m = new Packages.oscP5.OscMessage("/face/enable");
+        m.add("1");
+        p.oscP5.send(m, faceRemoteLocation);
+      }
     }
     else {
       scaling = p.lerp(scaling, 1.0, 0.1);
+
+      if(p.frameCount % 30 == 0) {
+        let m = new Packages.oscP5.OscMessage("/face/enable");
+        m.add("0");
+        p.oscP5.send(m, faceRemoteLocation);
+      }
     }
     pg.translate(windowWidth/2, windowHeight/2);
     pg.scale(scaling, scaling);
