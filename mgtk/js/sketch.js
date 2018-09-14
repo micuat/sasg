@@ -1792,7 +1792,7 @@ var STerrain = function (p) {
   for (let x = 0; x < cols; x++) {
     terrain[x] = [];
     for (let y = 0; y < rows; y++) {
-      terrain[x][y] = 0; //specify a default value for now
+      terrain[x][y] = {x: 0, y: 0, z: 0}; //specify a default value for now
     }
   }
 
@@ -1823,7 +1823,7 @@ var STerrain = function (p) {
     pg.clear();
     pg.pushMatrix();
     pg.pushStyle();
-    pg.translate(p.width / 2, p.height / 2 + p.map(dampedFaders[10], 0, 1, windowHeight, 0));
+    pg.translate(p.width / 2, p.height / 2 + p.map(Math.pow(1-dampedFaders[10],4.0), 1, 0, windowHeight, 0));
 
     pg.directionalLight(90, 195, 126, -1, 0, 0);
     pg.pointLight(140, 135, 196, 300, -100, 1000);
@@ -1833,8 +1833,10 @@ var STerrain = function (p) {
     for (let y = 0; y < rows; y++) {
       let xoff = 0;
       for (let x = 0; x < cols; x++) {
-        terrain[x][y] = p.map(p.noise(xoff, yoff), 0, 1, -100, 100);
-        terrain[x][y] = p.lerp(terrain[x][y], Math.cos(x * 0.1) * 200, dampedFaders[12] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5) * 0.5 + 0.5));
+        terrain[x][y].x = (x - cols/2) * scl;
+        terrain[x][y].y = (y - rows/2) * scl;
+        terrain[x][y].z = p.map(p.noise(xoff, yoff), 0, 1, -100, 100);
+        // terrain[x][y] = p.lerp(terrain[x][y], Math.cos(x * 0.1) * 200, dampedFaders[12] * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5) * 0.5 + 0.5));
         xoff += 0.2;
       }
       yoff += 0.2;
@@ -1843,15 +1845,15 @@ var STerrain = function (p) {
     pg.translate(0, 100);
     pg.rotateX(p.PI / 2.2);
 
-    pg.fill(200, 200, 200);
-    pg.stroke(255);
+    pg.fill(200, 200, 200, 255 * dampedFaders[10]);
+    pg.stroke(255, 255 * (1.5 - dampedFaders[10]));
+    pg.scale(p.map(dampedFaders[10], 0, 1, 10, 1), 1, 1);
     // pg.noFill();
-    pg.translate(-w / 2, -h / 2);
     for (let y = 0; y < rows - 1; y++) {
       pg.beginShape(p.TRIANGLE_STRIP);
       for (let x = 0; x < cols; x++) {
-        pg.vertex(x * scl, y * scl, terrain[x][y]);
-        pg.vertex(x * scl, (y + 1) * scl, terrain[x][y + 1]);
+        pg.vertex(terrain[x][y].x, terrain[x][y].y, terrain[x][y].z);
+        pg.vertex(terrain[x][y].x, terrain[x][y+1].y, terrain[x][y + 1].z);
       }
       pg.endShape();
     }
