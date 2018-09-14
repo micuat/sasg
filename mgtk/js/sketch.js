@@ -1350,8 +1350,8 @@ var SFace = function (p) {
       posePointsClone[index] = [];
       for (let i = 0; i < pose.length; i++) {
         posePointsClone[index][i] = [];
-        posePointsClone[index][i][0] = pose[i][0] + dampedFaders[4] * windowWidth * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5)*0.5+0.5);
-        posePointsClone[index][i][1] = pose[i][1] + dampedFaders[5] * windowWidth * (Math.cos(tElapsed * (bpm / 120.0) * Math.PI * 1)*0.5);
+        posePointsClone[index][i][0] = pose[i][0] + dampedFaders[4] * windowWidth * Math.pow((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5)*0.5+0.5), 8.0);
+        posePointsClone[index][i][1] = pose[i][1];//+ dampedFaders[5] * windowWidth * (Math.pow((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 2.0)*0.5+0.5), 8.0)-0.5);
       }
     }
 
