@@ -130,11 +130,19 @@ var masterPreset = [
     { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe", "faceLost"] }]
   },
   { // 15
-    preset: [{ a: "terrain", p: ["slide", "rgbshift"] },
-    { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
-    // { a: ["starField", "gameOfLife", "langtonAnt"], p: ["slide", "mpeg", "rgbshift"] },
-    { a: ["default"], p: ["default"] },
-    { a: "face", p: ["default", "default", "default", "kaleid"], face: ["body"] },
+    preset: [
+      { a: ["default"], p: ["default"] },
+      { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
+      { a: ["default"], p: ["default"] },
+      { a: "face", p: ["default"], face: ["body"] },
+    ]
+  },
+  {
+    preset: [
+      { a: ["default"], p: ["default"] },
+      { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
+      { a: ["default"], p: ["default"] },
+      { a: "face", p: ["kaleid"], face: ["body"] },
     ]
   },
   // { // 15 not used
