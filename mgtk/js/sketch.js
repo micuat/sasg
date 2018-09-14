@@ -134,7 +134,7 @@ var masterPreset = [
     { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
     // { a: ["starField", "gameOfLife", "langtonAnt"], p: ["slide", "mpeg", "rgbshift"] },
     { a: ["default"], p: ["default"] },
-    { a: "face", p: ["default"], face: ["body"] },
+    { a: "face", p: ["default", "default", "default", "kaleid"], face: ["body"] },
     ]
   },
   // { // 15 not used
@@ -1263,7 +1263,7 @@ var SFace = function (p) {
               let x = p.map(pose[i][0], 0, 640, 80, 640 - 80) * 1.5;
               let y = p.map(pose[i][1], 0, 480, 0, 360) * 1.5;
               // pg.ellipse(x, y, 14, 14)
-              if(ib==0)pg.text(index+"-"+i, x, y);
+              // if(ib==0)pg.text(index+"-"+i, x, y);
 
               // // pg.stroke(255);
               // pg.fill(255, alpha);
@@ -1350,8 +1350,8 @@ var SFace = function (p) {
       posePointsClone[index] = [];
       for (let i = 0; i < pose.length; i++) {
         posePointsClone[index][i] = [];
-        posePointsClone[index][i][0] = pose[i][0] + dampedFaders[4] * windowWidth * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 1)*0.5+0.5);
-        posePointsClone[index][i][1] = pose[i][1] + dampedFaders[5] * windowWidth * (Math.cos(tElapsed * (bpm / 120.0) * Math.PI * 1)*0.5+0.5);
+        posePointsClone[index][i][0] = pose[i][0] + dampedFaders[4] * windowWidth * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5)*0.5+0.5);
+        posePointsClone[index][i][1] = pose[i][1] + dampedFaders[5] * windowWidth * (Math.cos(tElapsed * (bpm / 120.0) * Math.PI * 1)*0.5);
       }
     }
 
