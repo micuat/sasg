@@ -1003,7 +1003,7 @@ var SBeesAndBombs = function (p) {
           if (y > 0) y = 0;
         }
         else if ((seq % 4.0) >= 2.0) {
-          y = ((tw + 0.5) * 2 - (x / 2 + z - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 5;
+          y = ((tw + 0.5) * 2 - (x / 2 + z - windowHeight * 2.0) * (1.0 / windowHeight / 2.0)) * windowHeight * 2;
           if (y < 0) y = 0;
         }
         lastState = "inout";
@@ -1035,7 +1035,12 @@ var SBeesAndBombs = function (p) {
     pg.beginDraw();
     pg.clear();
     pg.noStroke();
-    pg.fill(255);
+    if (funcAsset.exec(true) == "inout") {
+      pg.fill(255, 255 * Math.sqrt(-Math.cos(tElapsed * (bpm / 120.0) * Math.PI * 0.5) * 0.5 + 0.5));
+    }
+    else {
+      pg.fill(255);
+    }
     // p.ortho(-400, 400, 400, -400, 0, 1000);
 
     pg.translate(p.width / 2, p.height / 2, -650);
