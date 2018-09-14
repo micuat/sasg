@@ -104,7 +104,7 @@ var masterPreset = [
     { a: "lines", p: "default", lines: [linePreset.justPoint, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
   },
   {
-    preset: [{ a: "shader", p: "mpeg", shader: ["randomBurst"] }, { a: "ribbons", p: "slide" },
+    preset: [{ a: "shader", p: "default", shader: ["randomBurst"] }, { a: "ribbons", p: "slide" },
     { a: "lines", p: "default", lines: [linePreset.sig, linePreset.toDownFlat, linePreset.toUpFlat, linePreset.toDownFlat] }]
   },
   { // 10
@@ -1520,7 +1520,7 @@ var SShader = function (p) {
       name: "randomBurst",
       f: function (self, seq) {
         self.curName = "spread";
-        if (seq % 4.0 < 2.0 && p.frameCount % 15 == 0) {
+        if (seq % 4.0 < 2.0 && p.frameCount % 30 == 0) {
           let index = Math.floor(Math.random() * names.length);
           self.curName = names[index];
         }
