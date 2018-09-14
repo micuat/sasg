@@ -122,10 +122,14 @@ var masterPreset = [
     preset: [{ a: "shader", p: "default", shader: ["holo"] }]
   },
   {
-    preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
+    preset: [{ a: "shader", p: "default", shader: ["holo"] },
     { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe", "faceLost"] }]
   },
   {
+    preset: [{ a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave"] },
+    { a: "face", p: "darktoalpha", face: ["faceDelay", "faceWireframe", "faceLost"] }]
+  },
+  { // 15
     preset: [{ a: "terrain", p: ["slide", "rgbshift"] },
     { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
     // { a: ["starField", "gameOfLife", "langtonAnt"], p: ["slide", "mpeg", "rgbshift"] },
@@ -133,14 +137,14 @@ var masterPreset = [
     { a: "face", p: ["default"], face: ["body"] },
     ]
   },
-  { // 15 not used
-    preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
-    { a: ["default", "gameOfLife", "langtonAnt"], p: ["rgbshift"] }]
-  },
-  { // not used
-    preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
-    { a: ["warehouse"], p: ["rgbshift"] }]
-  },
+  // { // 15 not used
+  //   preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
+  //   { a: ["default", "gameOfLife", "langtonAnt"], p: ["rgbshift"] }]
+  // },
+  // { // not used
+  //   preset: [{ a: "shader", p: ["default", "mpeg"], shader: ["holo"] },
+  //   { a: ["warehouse"], p: ["rgbshift"] }]
+  // },
 ];
 
 function getPreset(name, defaultPreset) {
@@ -1324,6 +1328,7 @@ var SFace = function (p) {
     pg.clear();
     pg.pushMatrix();
     pg.pushStyle();
+    pg.translate(0, p.map(dampedFaders[10], 0, 1, -windowHeight*3, 0), 0);
     let camH = p.cam.height * 960 / p.cam.width;
 
     if (funcAsset.exec(true) == "face") {
