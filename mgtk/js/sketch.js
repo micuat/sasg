@@ -1125,6 +1125,12 @@ var SFace = function (p) {
           let idx = faces[i];
           let x = p.facePoints[idx][0] * 0.5 * 1.5;
           let y = p.facePoints[idx][1] * 0.5 * 1.5;
+          if(36 <= idx && 41 <= idx) {
+            x -= dampedFaders[4] * 200 * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5);
+          }
+          if(42 <= idx && 47 <= idx) {
+            x += dampedFaders[4] * 200 * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5);
+          }
           pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
         }
         pg.endShape();
@@ -1151,6 +1157,12 @@ var SFace = function (p) {
           let idx = faces[i];
           let x = modPoints[idx].x;
           let y = modPoints[idx].y;
+          if(36 <= idx && 41 <= idx) {
+            x -= dampedFaders[4] * 200 * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5);
+          }
+          if(42 <= idx && 47 <= idx) {
+            x += dampedFaders[4] * 200 * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5);
+          }
           pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
         }
         pg.endShape();
@@ -1185,14 +1197,32 @@ var SFace = function (p) {
           let idx = faces[i];
           let x = p.facePoints[idx][0] * 0.5 * 1.5;
           let y = p.facePoints[idx][1] * 0.5 * 1.5;
+          if(36 <= idx && 41 <= idx) {
+            x -= dampedFaders[4] * 200 * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5);
+          }
+          if(42 <= idx && 47 <= idx) {
+            x += dampedFaders[4] * 200 * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5);
+          }
           pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
           idx = faces[i + 1];
           x = p.facePoints[idx][0] * 0.5 * 1.5;
           y = p.facePoints[idx][1] * 0.5 * 1.5;
+          if(36 <= idx && 41 <= idx) {
+            x -= dampedFaders[4] * 200 * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5);
+          }
+          if(42 <= idx && 47 <= idx) {
+            x += dampedFaders[4] * 200 * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5);
+          }
           pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
           idx = faces[i + 2];
           x = p.facePoints[idx][0] * 0.5 * 1.5;
           y = p.facePoints[idx][1] * 0.5 * 1.5;
+          if(36 <= idx && 41 <= idx) {
+            x -= dampedFaders[4] * 200 * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5);
+          }
+          if(42 <= idx && 47 <= idx) {
+            x += dampedFaders[4] * 200 * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.25)*0.5+0.5);
+          }
           pg.vertex(x, y, 0, points[idx][0] * 0.5, points[idx][1] * 0.5);
           pg.endShape();
         }
@@ -1320,13 +1350,13 @@ var SFace = function (p) {
       posePointsClone[index] = [];
       for (let i = 0; i < pose.length; i++) {
         posePointsClone[index][i] = [];
-        posePointsClone[index][i][0] = pose[i][0];
-        posePointsClone[index][i][1] = pose[i][1];
+        posePointsClone[index][i][0] = pose[i][0] + dampedFaders[4] * windowWidth * (Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 1)*0.5+0.5);
+        posePointsClone[index][i][1] = pose[i][1] + dampedFaders[5] * windowWidth * (Math.cos(tElapsed * (bpm / 120.0) * Math.PI * 1)*0.5+0.5);
       }
     }
 
     poseBuffer.push(posePointsClone);
-    if (poseBuffer.length > 30) poseBuffer.shift();
+    if (poseBuffer.length > 10) poseBuffer.shift();
 
     // draw 
     pg.beginDraw();
@@ -2334,19 +2364,19 @@ var s = function (p) {
       dampedFaders[i] = p.lerp(dampedFaders[i], p.oscFaders[i], 0.1);
     }
     if (p.frameCount > 10 && reloaded) {
-      ss = [sLines, sGameOfLife, sRibbons, sBeesAndBombs, sFace, sLangtonAnt, sShader, sTerrain]
-      for (let i in ss) {
-        ss[i].setup();
-        ss[i].setup();
-        ss[i].pg = layerPgs[0];
-        for (let j = 0; j < 10; j++) {
-          ss[i].draw();
-        }
-        ss[i].setup();
-      }
-      layerPgs[0].beginDraw();
-      layerPgs[0].clear();
-      layerPgs[0].endDraw();
+      // ss = [sLines, sGameOfLife, sRibbons, sBeesAndBombs, sFace, sLangtonAnt, sShader, sTerrain]
+      // for (let i in ss) {
+      //   ss[i].setup();
+      //   ss[i].setup();
+      //   ss[i].pg = layerPgs[0];
+      //   for (let j = 0; j < 10; j++) {
+      //     ss[i].draw();
+      //   }
+      //   ss[i].setup();
+      // }
+      // layerPgs[0].beginDraw();
+      // layerPgs[0].clear();
+      // layerPgs[0].endDraw();
 
       reloaded = false;
     }
