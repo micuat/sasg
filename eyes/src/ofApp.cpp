@@ -85,7 +85,7 @@ void ofApp::update() {
     if (testMode) {
 		input0.update();
 		if (true || input0.isFrameNew()) {
-			tracker0.update(input0);
+			tracker0.update(input0, cv::Rect(1280/4,720/4,1280/2,720/2));
 		}
 	}
 	else {
