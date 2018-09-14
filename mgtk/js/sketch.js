@@ -133,7 +133,7 @@ var masterPreset = [
     preset: [
       { a: ["default"], p: ["default"] },
       { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
-      { a: ["default"], p: ["default"] },
+      { a: ["defaultblack"], p: ["default"] },
       { a: "face", p: ["default"], face: ["body"] },
     ]
   },
@@ -141,7 +141,7 @@ var masterPreset = [
     preset: [
       { a: ["default"], p: ["default"] },
       { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
-      { a: ["default"], p: ["default"] },
+      { a: ["defaultblack"], p: ["default"] },
       { a: "face", p: ["kaleid"], face: ["body"] },
     ]
   },
@@ -1251,42 +1251,34 @@ var SFace = function (p) {
             pg.beginShape();
             pg.texture(postPgs[1]);
             let x = p.map(pose[10][0], 0, 640, 80, 640 - 80) * 1.5;
+            x += dampedFaders[4] * windowWidth * Math.pow((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5)*0.5+0.5), 8.0);
             let y = p.map(pose[10][1], 0, 480, 0, 360) * 1.5;
             pg.vertex(x, y, 0, x, y);
             let x0 = p.map(pose[9][0], 0, 640, 80, 640 - 80) * 1.5;
+            x0 += dampedFaders[4] * windowWidth * Math.pow((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5)*0.5+0.5), 8.0);
             let y0 = p.map(pose[9][1], 0, 480, 0, 360) * 1.5;
             // pg.line(x, y, x0, y0)
             pg.vertex(x0, y0, 0, x0, y0);
             x0 = p.map(pose[7][0], 0, 640, 80, 640 - 80) * 1.5;
+            x0 += dampedFaders[4] * windowWidth * Math.pow((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5)*0.5+0.5), 8.0);
             y0 = p.map(pose[7][1], 0, 480, 0, 360) * 1.5;
             pg.vertex(x0, y0, 0, x0, y0);
             x0 = p.map(pose[8][0], 0, 640, 80, 640 - 80) * 1.5;
+            x0 += dampedFaders[4] * windowWidth * Math.pow((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5)*0.5+0.5), 8.0);
             y0 = p.map(pose[8][1], 0, 480, 0, 360) * 1.5;
             pg.vertex(x0, y0, 0, x0, y0);
             pg.endShape();
 
-            for (let i = 8; i < pose.length; i++) {
-              // pg.noStroke();
-              pg.fill(255, 0, 0, alpha);
-              let x = p.map(pose[i][0], 0, 640, 80, 640 - 80) * 1.5;
-              let y = p.map(pose[i][1], 0, 480, 0, 360) * 1.5;
-              // pg.ellipse(x, y, 14, 14)
-              // if(ib==0)pg.text(index+"-"+i, x, y);
-
-              // // pg.stroke(255);
-              // pg.fill(255, alpha);
-              // pg.noStroke();
-              // pg.beginShape();
-              // pg.texture(postPgs[index % 2]);
-              // pg.vertex(x, y, 0, x, y);
-              // let x0 = p.map(pose[i - 1][0], 0, 640, 80, 640 - 80) * 1.5;
-              // let y0 = p.map(pose[i - 1][1], 0, 480, 0, 360) * 1.5;
-              // // pg.line(x, y, x0, y0)
-              // pg.vertex(x0, y0, 0, x0, y0);
-              // x0 = p.map(pose[i - 2][0], 0, 640, 80, 640 - 80) * 1.5;
-              // y0 = p.map(pose[i - 2][1], 0, 480, 0, 360) * 1.5;
-              // pg.vertex(x0, y0, 0, x0, y0);
-              // pg.endShape();
+            let pairs = [[5,6], [6,12], [12,11], [11,5], [6,8], [8,10], [7,5], [7,9]];
+            for (let i in pairs) {
+              pg.stroke(255);
+              let i0 = pairs[i][0];
+              let i1 = pairs[i][1];
+              let x0 = p.map(pose[i0][0], 0, 640, 80, 640 - 80) * 1.5;
+              let y0 = p.map(pose[i0][1], 0, 480, 0, 360) * 1.5;
+              let x1 = p.map(pose[i1][0], 0, 640, 80, 640 - 80) * 1.5;
+              let y1 = p.map(pose[i1][1], 0, 480, 0, 360) * 1.5;
+              pg.line(x0, y0, x1, y1);
             }
           }
         }
@@ -1358,8 +1350,8 @@ var SFace = function (p) {
       posePointsClone[index] = [];
       for (let i = 0; i < pose.length; i++) {
         posePointsClone[index][i] = [];
-        posePointsClone[index][i][0] = pose[i][0] + dampedFaders[4] * windowWidth * Math.pow((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 0.5)*0.5+0.5), 8.0);
-        posePointsClone[index][i][1] = pose[i][1];//+ dampedFaders[5] * windowWidth * (Math.pow((Math.sin(tElapsed * (bpm / 120.0) * Math.PI * 2.0)*0.5+0.5), 8.0)-0.5);
+        posePointsClone[index][i][0] = pose[i][0];
+        posePointsClone[index][i][1] = pose[i][1];
       }
     }
 
@@ -1393,13 +1385,14 @@ var SFace = function (p) {
       }
     }
     pg.translate(windowWidth / 2, windowHeight / 2);
-    pg.scale(scaling, scaling);
+    pg.scale(-scaling, scaling);
     pg.translate(-windowWidth / 2, -windowHeight / 2);
     pg.translate(0, 80);
 
     pg.translate(0, (windowHeight - camH) * 0.5);
-    pg.image(p.cam, 0, 0, 960, camH);
-
+    if (funcAsset.exec(true) == "face") {
+      pg.image(p.cam, 0, 0, 960, camH);
+    }
     funcAsset.exec(false);
     pg.popStyle();
     pg.popMatrix();
@@ -1979,6 +1972,14 @@ var s = function (p) {
         f: function (tween, pg) {
           pg.beginDraw();
           pg.clear();
+          pg.endDraw();
+        }
+      },
+      {
+        name: "defaultblack",
+        f: function (tween, pg) {
+          pg.beginDraw();
+          pg.background(0);
           pg.endDraw();
         }
       },
