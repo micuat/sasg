@@ -113,9 +113,7 @@ var masterPreset = [
     { a: "lines", p: "default", lines: [linePreset.sig, linePreset.justPoint, linePreset.justPoint, linePreset.justPoint] }]
   },
   {
-    preset: [{ a: "shader", p: "kaleid" },
-    { a: "terrain", p: "rgbshift" },
-    { a: ["warehouse"], p: ["rgbshift"] },
+    preset: [{ a: "shader", p: "kaleid" }
     ]
   },
   {
@@ -133,15 +131,9 @@ var masterPreset = [
     preset: [
       { a: ["default"], p: ["default"] },
       { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
-      { a: ["defaultblack"], p: ["default"] },
-      { a: "face", p: ["default"], face: ["body"] },
-    ]
-  },
-  {
-    preset: [
       { a: ["default"], p: ["default"] },
-      { a: "shader", p: ["slide", "invert"], shader: ["tri", "modwave", "holo", "pixelwave"] },
-      { a: ["defaultblack"], p: ["default"] },
+      { a: "terrain", p: "rgbshift" },
+      { a: ["warehouse"], p: ["rgbshift"] },
       { a: "face", p: ["kaleid"], face: ["body"] },
     ]
   },
@@ -1363,10 +1355,11 @@ var SFace = function (p) {
     pg.clear();
     pg.pushMatrix();
     pg.pushStyle();
-    pg.translate(0, p.map(dampedFaders[10], 0, 1, -windowHeight*3, 0), 0);
     let camH = p.cam.height * 960 / p.cam.width;
 
     if (funcAsset.exec(true) == "face") {
+      pg.translate(0, p.map(dampedFaders[10], 1, 0, -windowHeight*3, 0), 0);
+
       scaling = p.lerp(scaling, 1.5, 0.1);
 
       if (p.frameCount % 30 == 0) {
@@ -1972,14 +1965,7 @@ var s = function (p) {
         f: function (tween, pg) {
           pg.beginDraw();
           pg.clear();
-          pg.endDraw();
-        }
-      },
-      {
-        name: "defaultblack",
-        f: function (tween, pg) {
-          pg.beginDraw();
-          pg.background(0);
+          pg.background(0); //hack!
           pg.endDraw();
         }
       },
