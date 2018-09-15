@@ -659,7 +659,7 @@ var SLines = function (p) {
     pg.pushMatrix();
     pg.pushStyle();
     pg.blendMode(p.ADD);
-    pg.translate(windowWidth / 2, windowHeight / 2 + p.map(dampedFaders[10], 0, 1, -windowHeight, 0));
+    pg.translate(windowWidth / 2, windowHeight / 2 + p.map(dampedFaders[10], 0, 1, -windowHeight-100, 0));
     function drawBeat() {
       // beatFader = dampedFaders[3];
       pg.stroke(255, 255 * beatFader);
@@ -2359,19 +2359,19 @@ var s = function (p) {
       dampedFaders[i] = p.lerp(dampedFaders[i], p.oscFaders[i], 0.1);
     }
     if (p.frameCount > 10 && reloaded) {
-      // ss = [sLines, sGameOfLife, sRibbons, sBeesAndBombs, sFace, sLangtonAnt, sShader, sTerrain]
-      // for (let i in ss) {
-      //   ss[i].setup();
-      //   ss[i].setup();
-      //   ss[i].pg = layerPgs[0];
-      //   for (let j = 0; j < 10; j++) {
-      //     ss[i].draw();
-      //   }
-      //   ss[i].setup();
-      // }
-      // layerPgs[0].beginDraw();
-      // layerPgs[0].clear();
-      // layerPgs[0].endDraw();
+      ss = [sLines, sGameOfLife, sRibbons, sBeesAndBombs, sFace, sLangtonAnt, sShader, sTerrain]
+      for (let i in ss) {
+        ss[i].setup();
+        ss[i].setup();
+        ss[i].pg = layerPgs[0];
+        for (let j = 0; j < 10; j++) {
+          ss[i].draw();
+        }
+        ss[i].setup();
+      }
+      layerPgs[0].beginDraw();
+      layerPgs[0].clear();
+      layerPgs[0].endDraw();
 
       reloaded = false;
     }
@@ -2380,7 +2380,7 @@ var s = function (p) {
     let t = tElapsed * (bpm / 120.0);
     seq = Math.floor(tElapsed * (bpm / 120.0));// + p.seqOffset;
 
-    sendOsc();
+    // sendOsc();
 
     if (seq != lastSeq) {
       if (seq % funcAssets[0].everyNSeq == 0) {
@@ -2425,7 +2425,7 @@ var s = function (p) {
     mainPg.endDraw();
     p.image(mainPg, 0, 0);
 
-    p.syphonServer.sendImage(mainPg);
+    // p.syphonServer.sendImage(mainPg);
 
     p.translate(p.width / 2, p.height / 2);
     p.fill(255);

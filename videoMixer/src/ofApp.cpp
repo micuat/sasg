@@ -203,11 +203,11 @@ void ofApp::draw(){
             }
             
             ofSetColor(ofFloatColor(1.0f, alpha));
-            if(c.getServerName() == "alcFreeliner") {
-                float t = (ofGetElapsedTimef() * 0.1f);
-                ofFloatColor col = ofFloatColor::fromHsb(t - floorf(t), 1.0f, 1.0f);
-                ofSetColor(col);
-            }
+//            if(c.getServerName() == "alcFreeliner") {
+//                float t = (ofGetElapsedTimef() * 0.1f);
+//                ofFloatColor col = ofFloatColor::fromHsb(t - floorf(t), 1.0f, 1.0f);
+//                ofSetColor(col);
+//            }
             c.draw(0, 0);
             ofSetColor(ofFloatColor(1.0f, 1.0f));
 
