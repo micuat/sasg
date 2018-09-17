@@ -77,7 +77,7 @@ function PLorenz(p) {
 function PTenPrint(p) {
   let x = 0;
   let y = 0;
-  let spacing = 20;
+  let spacing = 32;
   let pg = p.createGraphics(windowWidth, windowHeight);
   this.draw = function () {
     pg.beginDraw();
@@ -134,8 +134,8 @@ var s = function (p) {
       p.image(im, 0, 0, w, h);
     }
     else {
-      let h = windowHeight;
-      let w = aspect * h;
+      let w = windowWidth;
+      let h = w / aspect;
       p.image(im, 0, 0, w, h);
     }
     p.popStyle();
@@ -161,11 +161,37 @@ var s = function (p) {
       p.textAlign(p.CENTER, p.CENTER);
       p.translate(p.width / 2, p.height / 2);
   
-      // p.image(images["nano.png"], 0, 0);
       drawImage("nano.png");
-
+      p.fill(0);
       p.textSize(48);
-      p.text("Who am I", 0, 0);
+      p.text("Who am I", 0, -50);
+    },
+    function () {
+      p.translate(p.width / 2, p.height / 2);
+      drawImage("bizarrege.png");
+    },
+    function () {
+      p.translate(p.width / 2, p.height / 2);
+      drawImage("miniw.png");
+    },
+    function () {
+      p.translate(p.width / 2, p.height / 2);
+      drawImage("telus.png");
+    },
+    function () {
+      p.translate(p.width / 2, p.height / 2);
+      drawImage("pl.png");
+    },
+    function () {
+      p.translate(p.width / 2, p.height / 2);
+      drawImage("ts.png");
+    },
+    function () {
+      p.textAlign(p.CENTER, p.CENTER);
+      p.translate(p.width / 2, p.height / 2);
+  
+      p.textSize(48);
+      p.text("Generative art is not a new idea", 0, 0);
     },
     function () {
       p.textAlign(p.CENTER, p.CENTER);
@@ -173,35 +199,58 @@ var s = function (p) {
   
       pTenPrint.draw();
       p.textSize(48);
-      p.text("Generative art is not new idea:\n10 PRINT", 0, 0);
+      p.text("10 PRINT (1982)", 0, 0);
+      p.textSize(24);
+      p.text("10 PRINT CHR$(205.5+RND(1)); : GOTO 10", 0, 150);
+    },
+    function () {
+      p.textAlign(p.CENTER, p.CENTER);
+      p.translate(p.width / 2, p.height / 2);
+      p.pushStyle();
+      p.tint(255,128);
+      drawImage("laban.jpg");
+      p.popStyle();
+
+      p.fill(255);
+      p.textSize(48);
+      p.text("Labanotation (1928)", 0, 0);
+      p.textSize(24);
+      p.text("image taken from pinterest", 0, 150);
     },
     function () {
       p.textAlign(p.CENTER, p.CENTER);
       p.translate(p.width / 2, p.height / 2);
   
+      p.pushStyle();
+      p.tint(255,128);
+      drawImage("weaving.jpg");
+      p.popStyle();
+
+      p.fill(255);
       p.textSize(48);
-      p.text("Generative art is not new idea:\nLabanotation", 0, 0);
+      p.text("Weaving", 0, 0);
+      p.textSize(24);
+      p.text("A Handweaver's Pattern Book", 0, 150);
     },
     function () {
       p.textAlign(p.CENTER, p.CENTER);
       p.translate(p.width / 2, p.height / 2);
-  
       p.textSize(48);
-      p.text("Generative art is not new idea:\nWeaving", 0, 0);
+      p.text("Made with Processing", 0, 0);
     },
     function () {
       p.textAlign(p.CENTER, p.CENTER);
       p.translate(p.width / 2, p.height / 2);
-  
+      drawImage("sasg.png");
       p.textSize(48);
-      p.text("Made with Processing:\nfreeliner by MaxD", 0, 0);
+      p.text("alc_freeliner by MaxD", 0, 100);
     },
     function () {
       p.textAlign(p.CENTER, p.CENTER);
       p.translate(p.width / 2, p.height / 2);
-  
+      drawImage("bc.png");
       p.textSize(48);
-      p.text("Made with Processing:\nPerformance", 0, 0);
+      p.text("Performance", 0, 0);
     },
     function () {
       p.textAlign(p.CENTER, p.CENTER);
