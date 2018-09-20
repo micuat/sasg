@@ -123,10 +123,15 @@ var s = function (p) {
   }
 
   function getCount() { return p.frameCount - startFrame };
-  function drawImage(name) {
+  function drawImage(name, tint) {
     let im = images[name];
     let aspect = im.width / im.height;
     p.pushStyle();
+    if(tint == undefined) {
+    }
+    else {
+      p.tint(255, 255 * tint);
+    }
     p.imageMode(p.CENTER);
     if(aspect > windowWidth/windowHeight) {
       let h = windowHeight;
@@ -206,10 +211,7 @@ var s = function (p) {
     function () {
       p.textAlign(p.CENTER, p.CENTER);
       p.translate(p.width / 2, p.height / 2);
-      p.pushStyle();
-      p.tint(255,128);
-      drawImage("laban.jpg");
-      p.popStyle();
+      drawImage("laban.jpg", 0.5);
 
       p.fill(255);
       p.textSize(48);
@@ -221,10 +223,7 @@ var s = function (p) {
       p.textAlign(p.CENTER, p.CENTER);
       p.translate(p.width / 2, p.height / 2);
   
-      p.pushStyle();
-      p.tint(255,128);
-      drawImage("weaving.jpg");
-      p.popStyle();
+      drawImage("weaving.jpg", 0.5);
 
       p.fill(255);
       p.textSize(48);
@@ -255,7 +254,29 @@ var s = function (p) {
     function () {
       p.textAlign(p.CENTER, p.CENTER);
       p.translate(p.width / 2, p.height / 2);
+      drawImage("pathrefinder.jpg");
+      p.textSize(48);
+      p.text("Pathfinder by Mio Loclair", 0, 0);
+    },
+    function () {
+      p.textAlign(p.CENTER, p.CENTER);
+      p.translate(p.width / 2, p.height / 2);
+      drawImage("pf.jpg");
+      p.textSize(48);
+      p.text("PixelFlow by Thomas Diewald", 0, 0);
+    },
+    function () {
+      p.textAlign(p.CENTER, p.CENTER);
+      p.translate(p.width / 2, p.height / 2);
+      drawImage("mano.jpg");
+      p.textSize(48);
+      p.text("@manoloidee", 0, 0);
+    },
+    function () {
+      p.textAlign(p.CENTER, p.CENTER);
+      p.translate(p.width / 2, p.height / 2);
   
+      drawImage("dan.jpg", 0.4);
       p.textSize(64);
       p.text("Coding Challenge!", 0, 0);
     },
@@ -285,4 +306,4 @@ var s = function (p) {
 
 };
 
-var p063 = new p5(s);
+var pSnue = new p5(s);
